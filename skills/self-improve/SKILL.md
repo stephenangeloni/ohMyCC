@@ -8,6 +8,8 @@ level: 4
 
 You are the **loop controller** for the self-improvement system. You manage the full lifecycle: setup, research, planning, execution, tournament selection, history recording, visualization, and stop-condition evaluation. You delegate to specialized OMC agents and coordinate their inputs and outputs.
 
+By default the tournament runs as the hand-rolled Task/worktree loop below. When opted in (`--workflow` / "use a workflow") **and** a Workflow is available, the round loop runs as a single background Dynamic Workflow (see [Improvement Loop → workflow variant](#improvement-loop-workflow-variant)); see `docs/shared/workflow-gating.md`.
+
 ---
 
 ## Autonomous Execution Policy
@@ -156,6 +158,25 @@ All git operations happen inside the target repo, NOT in the OMC project root.
 **Gate**: All settings must be true. Once the gate passes, execute continuously without stopping.
 
 Update `state_write(mode='self-improve', active=true, status="running")`.
+
+<a id="improvement-loop-workflow-variant"></a>
+### Improvement Loop (workflow variant)
+
+Take this path **only when** opted in (`--workflow` / "use a workflow") **AND** a Workflow is available; otherwise **fall back** to the hand-rolled Task/worktree loop (Steps 0–11) and note the fallback in one line. Never hard-fail — self-improve is already heavy/gated, so this adds no new hard floor. Run the round loop as one `Workflow`: each entrant is an `agent(..., { isolation: 'worktree' })` (worktree isolation because entrants mutate files in parallel — EXPENSIVE per `docs/shared/workflow-gating.md`, justified by conflicting writes). Hold the scoreboard in a script variable (replacing the JSON-state machine for in-run state) while still writing the existing file artifacts (Steps 9–10) for resumability. Plateau/circuit-breaker become real `while` loop conditions (Step 11 predicate), removing cross-round goal drift.
+
+```js
+export const meta = { name: 'self-improve', phases: [{ title: 'Round' }] }
+let best = baseline, plateau = 0, breaker = 0, round = 0
+while (best < target && plateau < plateauWindow && breaker < breakerMax && round < maxIters) {
+  const entrants = await parallel(plans.map(p => () =>
+    agent(`Implement ${p.id}; run validate.sh then benchmark; return Benchmark Result JSON.`,
+      { label: `entrant:${p.id}`, phase: 'Round', isolation: 'worktree' })))
+  const winner = pickWinner(entrants.filter(Boolean), best)   // Step 8 tournament, in-memory
+  ;({ best, plateau, breaker } = score(winner, best))          // Step 9 counters
+  await persistArtifacts(round, entrants, winner)              // Steps 9–10 file contract
+  round++
+}
+```
 
 ### Step 0 — Stale Worktree Cleanup (mandatory, runs every iteration)
 
@@ -356,6 +377,8 @@ When the loop exits:
    Improvement: {delta} ({delta_pct}%)
    ```
 5. Run `/oh-my-claudecode:cancel` for clean state cleanup
+
+**Notes:** `--workflow` (or "use a workflow") opts into the Dynamic Workflow variant; `direct:` / `--no-workflow` forces the default Task/worktree loop. Default behavior is unchanged. Policy: `docs/shared/workflow-gating.md`.
 
 ---
 

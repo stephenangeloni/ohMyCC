@@ -116,6 +116,24 @@ The gate auto-passes when it detects **any** concrete signal. You do not need al
 | Code block | `ralph add: \`\`\`ts ... \`\`\`` | Concrete code provided |
 | Escape prefix | `force: ralph do it` or `! ralph do it` | Explicit user override |
 
+### Workflow Escalation (a separate axis from the planning gate)
+
+The planning gate above decides *plan-first vs execute-now*. A **second, independent** axis
+decides *lightweight Task/team path vs a background Dynamic Workflow*. These do not share an
+escape: `force:` / `!` only bypass the **planning** gate; they never imply a workflow.
+
+| Signal | Example prompt | Effect |
+|---|---|---|
+| Workflow opt-in flag | `ralplan --workflow migrate the config loader` | Forces the heavy workflow path for opted-in / high-risk work even just below thresholds (the `--deliberate` analog) |
+| Natural-language opt-in | `ralplan use a workflow to audit the repo` | Recognized per-task; routes to a workflow when available |
+| Inverse escape | `direct: ralplan ...` or `ralplan --no-workflow ...` | Forces the lightweight Task/team path even when thresholds cross (cost/latency-sensitive) |
+
+Escalation is **opt-in, never default** and requires ≥2 size/complexity signals on top of the
+opt-in. Single-file / routine work is hard-floored to direct execution regardless of flag. OMC
+never sets `/effort ultracode` programmatically. Full policy, thresholds, the size×complexity
+matrix, availability detection + graceful fallback, and the loop-authority invariant live in
+`docs/shared/workflow-gating.md`.
+
 ### End-to-End Flow Example
 
 1. User types: `ralph add user authentication`
@@ -138,3 +156,4 @@ The gate auto-passes when it detects **any** concrete signal. You do not need al
 | Want to bypass the gate | Prefix with `force:` or `!` (e.g., `force: ralph fix it`) |
 | Gate does not fire on a vague prompt | The gate only catches prompts with <=15 effective words and no concrete anchors; add more detail or use `/ralplan` explicitly |
 | Redirected to ralplan but want execution | Use the structured approval option or explicitly say which execution skill should proceed; `just do it` / `skip planning` alone only ends planning with a `pending approval` artifact |
+| A workflow launched (or was offered) when you wanted the light path | Prefix `direct:` or add `--no-workflow`; this forces Task/team even when thresholds cross (see `docs/shared/workflow-gating.md`) |

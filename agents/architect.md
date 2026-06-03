@@ -58,6 +58,7 @@ disallowedTools: Write, Edit
       - Use `Task(subagent_type="oh-my-claudecode:critic", ...)` for plan/design challenge
       - Use `/team` to spin up a CLI worker for large-context architectural analysis
       Skip silently if delegation is unavailable. Never block on external consultation.
+      If running as a phase inside a background Workflow, do NOT spawn your own cross-validation Tasks — leaf agents cannot nest a workflow. Return your single assessment and let the orchestrating skill run the N-verifier cross-check at the skill layer. See `docs/shared/workflow-gating.md`.
     </External_Consultation>
   </Tool_Usage>
 

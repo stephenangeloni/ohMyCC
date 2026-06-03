@@ -82,3 +82,23 @@ Claude Code `/goal` is a session-scoped Stop hook: it blocks the session from st
 - Snapshots passed via `--claude-goal-json` are model-supplied proof of the active `/goal` state; OMC validates them for textual consistency with the plan's expected objective and ledger event, but it cannot independently observe Claude `/goal` state.
 - If the Claude `/goal` slash command is renamed or restructured, only the handoff wording needs to change; the reconciliation logic is name-agnostic.
 </Important_Limitations>
+
+<Loop_Authority_And_Verification>
+Ultragoal is the durable `/goal` adoption layer, so `/goal` is the loop authority while a story is
+being worked. But `/goal`'s evaluator does not call tools — it only judges what Claude has surfaced
+in the conversation, so it can be satisfied by a mere *claim* of success. Therefore the final
+completion gate must come from a tool-running verifier, not from `/goal` alone.
+
+**Composition (`/goal` first → independent double-check):** drive each story under `/goal`; when the
+final story's `/goal` reports done, run the quality gate (`aiSlopCleaner` + `verification` +
+`codeReview`) as the one-shot completion check before `checkpoint --status complete`. When a
+separate-reviewer verification with fresh test/build/lint evidence is required, hand that gate to
+`ralph`'s reviewer pass (Step 7 → 7.5 → 7.6) — the baton-pass in `docs/shared/workflow-gating.md` §6.
+At that handoff the `/goal` loop is resolved to `artifact_only`; only the verification turn is
+authoritative. Never run `/goal` and a `ralph` loop concurrently — pick one authority at a time.
+
+**When to prefer which:** stay on `/goal`/ultragoal alone when the condition is cleanly surfaceable
+and no separate-reviewer verification is required; escalate to the `ralph` double-check when the
+change is risky (security/auth/migration/public-API/architecture) or needs structured PRD story
+tracking and mandatory deslop + regression re-verify.
+</Loop_Authority_And_Verification>

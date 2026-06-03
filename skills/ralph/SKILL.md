@@ -28,6 +28,7 @@ Ralph is a PRD-driven persistence loop that keeps working on a task until ALL us
 - User wants a quick one-shot fix -- delegate directly to an executor agent
 - User wants manual control over completion -- use `ultrawork` directly
 - User already has an active Claude Code `/goal` and only wants that native goal loop monitored -- adopt the existing `/goal` explicitly or use artifact-only Ultragoal notes instead of starting Ralph as a competing persistence loop
+- **Composition (preferred when both light persistence and a real verification gate are wanted):** let `/goal` be the loop authority during execution, then on `/goal`'s "done" hand off to Ralph as a **one-shot verification gate** — Ralph re-verifies completion with fresh test/build/lint evidence and reviewer sign-off. This is a sequential baton-pass, never two loops running at once. If the `/goal` condition is not cleanly surfaceable/sequenceable, skip the composition and run Ralph as the sole authority from the start. See `docs/shared/workflow-gating.md` §6.
   </Do_Not_Use_When>
 
 <Why_This_Exists>
@@ -57,6 +58,7 @@ By default, ralph operates in PRD mode. A scaffold `prd.json` is auto-generated 
 - Read `docs/shared/agent-tiers.md` before first delegation to select correct agent tiers
 - Deliver the full implementation: no scope reduction, no partial completion, no deleting tests to make them pass
 - If a Claude Code `/goal` is mentioned, treat it as a native session-loop handoff/evidence source only and use the deterministic conflict policies `refuse`, `adopt_existing`, and `artifact_only` rather than non-deterministic warning handling. Ralph remains the OMC loop authority for this run; do not claim `/goal` independently ran tests or read files, and do not treat evaluator success as a substitute for Ralph reviewer verification.
+- **`/goal`→Ralph baton-pass:** when the user wants `/goal` to drive execution first and Ralph to double-check, accept the handoff *after* `/goal` reports done and run Ralph's Step 7 reviewer verification (+ 7.5 deslop, 7.6 regression) as the one-shot completion gate. The `/goal` loop is resolved to `artifact_only` at that point — only Ralph's verification turn is authoritative. If Ralph's reviewer rejects, the run is not done: re-arm `/goal` with the remaining gap or let Ralph own the fix loop. Never let `/goal` and Ralph loop concurrently. See `docs/shared/workflow-gating.md` §6.
   </Execution_Policy>
 
 <Steps>

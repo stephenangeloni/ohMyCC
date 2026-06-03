@@ -1,12 +1,14 @@
 ---
 name: autopilot
 description: Full autonomous execution from idea to working code
-argument-hint: "<product idea or task description>"
+argument-hint: "[--workflow] <product idea or task description>"
 level: 4
 ---
 
 <Purpose>
 Autopilot takes a brief product idea and autonomously handles the full lifecycle: requirements analysis, technical design, planning, parallel implementation, QA cycling, and multi-perspective validation. It produces working, verified code from a 2-3 line description.
+
+By default every phase runs in-context via `Task()`. When opted in (`--workflow` / "use a workflow") **and** a background Workflow is available, Phase 3 (QA) runs as a loop-until-done workflow and Phase 4 (Validation) runs the reviewers as top-level parallel verifiers at the skill layer; both fall back gracefully to the default Task path. Default behavior is unchanged. Policy: `docs/shared/workflow-gating.md`.
 </Purpose>
 
 <Use_When>
@@ -61,12 +63,30 @@ Most non-trivial software tasks require coordinated phases: understanding requir
    - Build, lint, test, fix failures
    - Repeat up to 5 cycles
    - Stop early if the same error repeats 3 times (indicates a fundamental issue)
+   - **(workflow variant)** When opted in (`--workflow` / "use a workflow") **AND** a Workflow is available **AND** this is multi-cycle QA on a non-trivial change, run the build/lint/test/fix cycle as a loop-until-done `Workflow` with REAL counters (`maxQaCycles`, default 5; early-exit when the same error repeats 3×) instead of cycling in-context. Otherwise **fall back** to the default Phase 3 above and note the fallback in one line. Trivial fixes stay inline (hard floor). Never hard-fail. Policy: `docs/shared/workflow-gating.md`.
 
 5. **Phase 4 - Validation**: Multi-perspective review in parallel
    - Architect: Functional completeness
    - Security-reviewer: Vulnerability check
    - Code-reviewer: Quality review
    - All must approve; fix and re-validate on rejection
+   - **(workflow variant)** When opted in (`--workflow` / "use a workflow") **AND** a Workflow is available **AND** the change is L/XL or risky (security/auth, migration, public-API, or architecture), run the three reviewers as TOP-LEVEL parallel verifier `agent()` calls in a single `Workflow` with a REAL bounded re-validation counter (`maxValidationRounds`, default 3). Verdicts live in script variables instead of accumulating in the orchestrator context. Per their `External_Consultation` guard, the reviewers do NOT self-fan-out cross-validation when running as workflow phases — the cross-check that used to happen inside each agent now happens at THIS skill layer. Otherwise **fall back** to the default Phase 4 parallel `Task()` validation above and note the fallback in one line. Never hard-fail.
+
+   ```js
+   export const meta = { name: 'autopilot-validate',
+     description: 'Skill-layer multi-reviewer validation with bounded re-validation',
+     phases: [{ title: 'Validate' }, { title: 'Gate' }] }
+   const REVIEWERS = ['architect', 'security-reviewer', 'code-reviewer']
+   let round = 0, verdicts = []
+   while (round++ < (cfg.maxValidationRounds ?? 3)) {
+     verdicts = await parallel(REVIEWERS.map(r => () =>
+       agent(`Validate the Phase 2 changes from your perspective; return APPROVE/REJECT + findings.`,
+         { label: `verify:${r}`, phase: 'Validate', agentType: `oh-my-claudecode:${r}` })))
+     if (verdicts.every(v => v?.verdict === 'APPROVE')) break
+     await agent(`Fix the rejecting findings: ${JSON.stringify(verdicts)}`, { phase: 'Gate', agentType: 'oh-my-claudecode:executor' })
+   }
+   return verdicts
+   ```
 
 6. **Phase 5 - Cleanup**: Delete all state files on successful completion
    - Remove `.omc/state/autopilot-state.json`, `ralph-state.json`, `ultrawork-state.json`, `ultraqa-state.json`
@@ -77,7 +97,8 @@ Most non-trivial software tasks require coordinated phases: understanding requir
 - Use `Task(subagent_type="oh-my-claudecode:architect", ...)` for Phase 4 architecture validation
 - Use `Task(subagent_type="oh-my-claudecode:security-reviewer", ...)` for Phase 4 security review
 - Use `Task(subagent_type="oh-my-claudecode:code-reviewer", ...)` for Phase 4 quality review
-- Agents form their own analysis first, then spawn Claude Task agents for cross-validation
+- Default path: agents form their own analysis first, then spawn Claude Task agents for cross-validation
+- Under the Phase 4 **workflow variant**, cross-validation is run at the SKILL layer (top-level parallel verifier `agent()` calls); the reviewers do NOT self-fan-out (per their `External_Consultation` guard). The default non-workflow path is unchanged.
 - Never block on external tools; proceed with available agents if delegation fails
 </Tool_Usage>
 
@@ -137,6 +158,8 @@ Optional settings in `.claude/omc.jsonc` (project) or `~/.config/claude-omc/conf
   }
 }
 ```
+
+`--workflow` (or "use a workflow") opts Phases 3–4 into the background Dynamic Workflow variants when a Workflow is available and the gate holds; `direct:` / `--no-workflow` forces the default in-context Task path. Default behavior is unchanged. Policy: `docs/shared/workflow-gating.md`.
 
 ## Resume
 

@@ -1,7 +1,7 @@
 ---
 name: sciomc
 description: Orchestrate parallel scientist agents for comprehensive analysis with AUTO mode
-argument-hint: <research goal>
+argument-hint: "[--workflow] <research goal>"
 level: 4
 ---
 
@@ -93,6 +93,53 @@ Task(subagent_type="oh-my-claudecode:scientist", model="opus", prompt="[RESEARCH
 | "Document how W works" | MEDIUM | "Document the authentication flow" |
 | "Explain why X happens" | HIGH | "Explain why race conditions occur in the cache layer" |
 | "Compare approaches A vs B" | HIGH | "Compare Redux vs Context for state management here" |
+
+### Parallel Invocation (workflow variant)
+
+Take this path **only when** opted in (`--workflow` flag or "use a workflow"/"run a workflow") **AND**
+a background Workflow is available **AND** the research decomposes into **≥5 independent stages OR
+AUTO mode is requested** (the escalation threshold). If any condition fails — no opt-in, no Workflow
+capability, or <5 stages without AUTO — **fall back to the default Task() fan-out above** and note
+the fallback in one line. Never hard-fail.
+
+Standard 3-stage analyses always stay on the default direct fan-out (hard floor).
+
+When taken, author a single `Workflow` (`meta.name: 'sciomc'`) using `parallel()` over the scientist
+stages. The native concurrency cap (16) replaces the hand-managed ">20 → batch" logic; stage outputs
+are held in script variables. For AUTO mode a real loop counter replaces the prose `[PROMISE:…]` tag
+loop. Note: sciomc already offloads stage outputs to `.omc/research/**`, so the win here is loop/batch
+**determinism**, not context relief.
+
+```js
+export const meta = {
+  name: 'sciomc',
+  description: 'Parallel scientist stages → cross-validate → synthesize',
+  phases: [{ title: 'Stages' }, { title: 'Verify' }, { title: 'Synthesize' }],
+}
+const STAGE_SCHEMA = { /* findings[], confidence, findingsFile */ }
+const results = await parallel(STAGES.map(s => () =>
+  agent(`[RESEARCH_STAGE:${s.id}] ${s.prompt}`,
+    { label: `stage:${s.id}`, phase: 'Stages', schema: STAGE_SCHEMA,
+      agentType: 'oh-my-claudecode:scientist', model: s.model })))
+const valid = results.filter(Boolean)
+if (valid.length < results.length) log(`dropped ${results.length - valid.length} of ${results.length} stages`) // never silently truncate
+const verification = await agent(
+  `[RESEARCH_VERIFICATION] Cross-validate: ${JSON.stringify(valid)}`,
+  { phase: 'Verify', agentType: 'oh-my-claudecode:scientist', model: 'sonnet' })
+const synthesis = await agent(
+  `Synthesize findings and write report. Verification: ${JSON.stringify(verification)}. Findings: ${JSON.stringify(valid)}`,
+  { phase: 'Synthesize' })
+return synthesis
+```
+
+For AUTO mode, wrap the `parallel()` call in a `while (iteration < MAX && !done)` loop, incrementing
+`iteration` and testing a structured `verified` boolean (give the verification `agent()` a `schema`
+like `{ verified, conflicts[] }` and test `verification.verified`, not a prose `[VERIFIED]` string)
+before marking done. Under `--workflow` the Workflow script OWNS this loop — the prose
+`[PROMISE:…]` / iteration-tag loop is suppressed so there is a single loop authority and no competing
+loops (workflow-gating.md §6).
+
+See `docs/shared/workflow-gating.md` for availability detection + graceful fallback policy.
 
 ### Verification Loop
 
@@ -477,6 +524,10 @@ Optional settings in `.claude/settings.json`:
   }
 }
 ```
+
+- `--workflow` (or "use a workflow") opts this run into the background Dynamic Workflow variant when
+  available and ≥5 stages or AUTO mode is requested; `direct:` / `--no-workflow` forces the default
+  in-context Task() fan-out. Default and AUTO paths are unchanged. Policy: `docs/shared/workflow-gating.md`.
 
 ## Cancellation
 

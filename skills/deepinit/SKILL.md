@@ -1,6 +1,7 @@
 ---
 name: deepinit
 description: Deep codebase initialization with hierarchical AGENTS.md documentation
+argument-hint: "[--workflow]"
 level: 4
 ---
 
@@ -319,3 +320,38 @@ When running on an existing codebase with AGENTS.md files:
 - **Batch small directories** - Process multiple at once
 - **Skip unchanged** - If directory hasn't changed, skip regeneration
 - **Parallel writes** - Multiple agents writing different files simultaneously
+
+## Workflow Variant (opt-in)
+
+By default all generation happens via in-context `Task()` calls. When opted in (`--workflow` flag
+or "use a workflow"/"run a workflow") **and** a background Workflow is available **and** the
+codebase is large (**≥10 directories** — the `N_files≥10` threshold from
+`docs/shared/workflow-gating.md`), deepinit authors a single `Workflow` that enforces the
+parent-first DAG deterministically via `parallel()` barriers. If any condition fails — no opt-in,
+no Workflow capability, or <10 directories — **fall back to the default Step 3 `Task()` path** and
+note the fallback in one line. Never hard-fail. Small repos stay on the direct path.
+
+When taken, the workflow groups directories by depth level and processes each level as a
+`parallel()` barrier (bounded to 16 concurrent agents), so every parent is guaranteed written
+before its children start. Per-directory AGENTS.md files land on disk immediately, keeping
+context accumulation low — the ordering/concurrency determinism is the win over the default path.
+
+```js
+export const meta = {              // meta MUST be a pure literal — no computed values
+  name: 'deepinit',
+  description: 'Parent-first DAG AGENTS.md generation with level barriers',
+  phases: [{ title: 'Levels' }],  // per-level groups are created at runtime via the agent `phase` label
+}
+// `levels` = array-of-arrays built from Step 2 work plan, index 0 = root
+for (const [i, dirs] of levels.entries()) {
+  await parallel(dirs.map(dir => () =>
+    agent(`Read ${dir}, generate AGENTS.md with parent reference, write to disk.`,
+      { label: `dir:${dir}`, phase: `Level ${i}`, agentType: 'oh-my-claudecode:writer' })),
+  { concurrency: 16 })
+}
+```
+
+Notes:
+- `--workflow` opt-in only; `direct:` / `--no-workflow` forces the default in-context path.
+- Default (Task-based level-by-level) behavior is unchanged.
+- Policy, thresholds, and availability detection: `docs/shared/workflow-gating.md`.

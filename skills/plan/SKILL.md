@@ -1,7 +1,7 @@
 ---
 name: omc-plan
 description: Strategic planning with optional interview workflow
-argument-hint: "[--direct|--consensus|--review] [--interactive] [--deliberate] <task description>"
+argument-hint: "[--direct|--consensus|--review] [--interactive] [--deliberate] [--workflow] <task description>"
 pipeline: [deep-interview]
 handoff-policy: approval-required
 handoff: .omc/plans/ralplan-*.md
@@ -10,6 +10,8 @@ level: 4
 
 <Purpose>
 Plan creates comprehensive, actionable work plans through intelligent interaction. It auto-detects whether to interview the user (broad requests) or plan directly (detailed requests), and supports consensus mode (iterative Planner/Architect/Critic loop with RALPLAN-DR structured deliberation) and review mode (Critic evaluation of existing plans).
+
+By default the consensus re-review loop (step 5) runs as sequential in-context `Task()` calls. When opted in (`--workflow` / "use a workflow") **and** a Workflow is available **and** the plan is high-stakes/broad, the loop runs as a background Dynamic Workflow — holding each Architect/Critic verdict in a script variable instead of accumulating reviewer prose in context. See `docs/shared/workflow-gating.md`.
 </Purpose>
 
 <Use_When>
@@ -111,6 +113,48 @@ Without cleanup, the stop hook blocks all subsequent stops with `[RALPLAN - CONS
    d. **Return to Step 4** — Critic evaluates the revised plan
    e. Repeat until Critic approves OR max 5 iterations reached
    f. If max iterations reached without approval, present the best version to user via `AskUserQuestion` with note that expert consensus was not reached
+
+### Step 5 (workflow variant): background consensus loop
+
+Take this path **only when** ALL three hold: (a) the run is opted in (`--workflow` flag or "use a
+workflow"/"run a workflow"), (b) a background Workflow is available, and (c) the plan is
+high-stakes/broad — touches **≥3 distinct areas**, or involves security/auth/migration/destructive
+change, or `--deliberate` was passed. If any condition fails — no opt-in, no Workflow capability,
+single-file/obvious-scope plan (hard floor), or below threshold — **fall back to the default
+step 5 `Task()` loop above** and note the fallback in one line. Never hard-fail.
+
+When taken, author a single `Workflow` (`meta.name: 'plan-consensus'`) that runs the bounded
+Planner→Architect→Critic loop sequentially within each iteration. Architect and Critic **MUST**
+use sequential `await agent(...)` calls — never `parallel()` for those two. On Critic APPROVE or
+5 iterations, return the final plan:
+
+```js
+export const meta = {
+  name: 'plan-consensus',
+  description: 'Sequential Planner→Architect→Critic consensus loop (max 5)',
+  phases: [{ title: 'Draft' }, { title: 'Review' }, { title: 'Final' }],
+}
+let plan = await agent(INITIAL_PLAN_PROMPT,
+  { label: 'planner:0', phase: 'Draft', agentType: 'oh-my-claudecode:planner' })
+for (let i = 0; i < 5; i++) {
+  const arch = await agent(`Review this plan for architectural soundness:\n${plan}`,
+    { label: `architect:${i}`, phase: 'Review', agentType: 'oh-my-claudecode:architect' })
+  const crit = await agent(`Evaluate this plan and architect verdict. APPROVE or REJECT:\n${plan}\n---\n${arch}`,
+    { label: `critic:${i}`, phase: 'Review', agentType: 'oh-my-claudecode:critic' })
+  if (/\bAPPROVE\b/i.test(crit)) break
+  plan = await agent(`Revise plan given this feedback:\nArchitect: ${arch}\nCritic: ${crit}`,
+    { label: `planner:${i+1}`, phase: 'Draft', agentType: 'oh-my-claudecode:planner' })
+}
+return await agent(`Produce final plan with ADR section. Plan: ${plan}`,
+  { phase: 'Final' })
+```
+
+Notes:
+- `arch` and `crit` are held in script variables; only the final plan returns to main context.
+- If Critic does not APPROVE after 5 iterations, the loop exits and the best plan is returned — present it via `AskUserQuestion` with a note that expert consensus was not reached (matching step 5f above).
+- `--workflow` is composable with `--consensus` and `--deliberate`; pass `--deliberate` signals through `INITIAL_PLAN_PROMPT`.
+- `direct:` / `--no-workflow` forces the default in-context loop even when thresholds are met. Default unchanged. Policy: `docs/shared/workflow-gating.md`.
+
 6. **Apply improvements**: When reviewers approve with improvement suggestions, merge all accepted improvements into the plan file before proceeding. Final consensus output **MUST** include an **ADR** section with: **Decision**, **Drivers**, **Alternatives considered**, **Why chosen**, **Consequences**, **Follow-ups**. Specifically:
    a. Collect all improvement suggestions from Architect and Critic responses
    b. Deduplicate and categorize the suggestions

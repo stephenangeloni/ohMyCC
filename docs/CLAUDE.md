@@ -44,6 +44,12 @@ Never self-approve in the same active context; use `code-reviewer` or `verifier`
 Before concluding: zero pending tasks, tests passing, verifier evidence collected.
 </execution_protocols>
 
+<workflow_gating>
+Background Dynamic Workflows (the native `Workflow` tool) are **opt-in, never default** — they spawn many agents and cost meaningfully more tokens. Escalate only when the user opts in (a skill's `--workflow` flag, "use a workflow", or an accepted WF-REC `AskUserQuestion` prompt) AND ≥2 size/complexity signals hold. Hard-floor single-file / routine work to direct execution. OMC never sets `/effort ultracode` programmatically. Detect availability at session start; fall back to today's Task/team path when absent.
+**Loop-authority invariant:** at most one persistence loop is authoritative per run. `ralph`, native `/goal`, and a Workflow loop must never co-run — pick one authority, downgrade the others to `artifact_only`. To get both light persistence and a real verification gate, run them as a sequential baton-pass: `/goal` drives execution first, then `ralph` double-checks completion with fresh test evidence on `/goal`'s "done"; if that can't be sequenced cleanly, keep `ralph` as sole authority.
+Full policy, signal thresholds, the size×complexity matrix, and the `/goal`→ralph composition: `docs/shared/workflow-gating.md`.
+</workflow_gating>
+
 <hooks_and_context>
 Hooks inject `<system-reminder>` tags. Key patterns: `hook success: Success` (proceed), `[MAGIC KEYWORD: ...]` (invoke skill), `The boulder never stops` (ralph/ultrawork active).
 Persistence: `<remember>` (7 days), `<remember priority>` (permanent).

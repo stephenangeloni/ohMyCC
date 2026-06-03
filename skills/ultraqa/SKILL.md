@@ -1,7 +1,7 @@
 ---
 name: ultraqa
 description: QA cycling workflow - test, verify, fix, repeat until goal met
-argument-hint: "[--tests|--build|--lint|--typecheck|--custom <pattern>] [--interactive]"
+argument-hint: "[--workflow] [--tests|--build|--lint|--typecheck|--custom <pattern>] [--interactive]"
 level: 3
 ---
 
@@ -75,6 +75,41 @@ If no structured goal provided, interpret the argument as a custom goal.
 
 5. **REPEAT**: Go back to step 1
 
+### Cycle Workflow (workflow variant)
+
+Take this path **only when** the run is opted in (`--workflow` flag or "use a workflow") **AND** a
+background Workflow is available **AND** this is a multi-cycle QA run on a non-trivial change
+(hard floor: trivial single-file fixes verified inline stay on the default path). If any condition
+fails — no opt-in, no Workflow capability, or trivial change — **fall back to the default cycle
+above** and note the fallback in one line. Never hard-fail.
+
+This is architecturally mandated by the gating policy (no hard fail when a primitive is absent)
+per `docs/shared/workflow-gating.md`.
+
+When taken, the win is loop **determinism**: the script owns the cycle counter and same-error
+detection, so the model cannot declare done early. Since UltraQA already offloads to
+`.omc/ultraqa-state.json`, this replaces prose-managed counters with a real counter in script:
+
+```js
+export const meta = {
+  name: 'ultraqa',
+  description: 'QA cycle loop until goal met — script owns the counter',
+  phases: [{ title: 'QA Cycle' }, { title: 'Fix' }],
+}
+const MAX = 5, goal = args.goal_type, cmd = args.qa_cmd
+let lastErr = null, sameCount = 0
+for (let cycle = 1; cycle <= MAX; cycle++) {
+  const result = await agent(`RUN QA: goal=${goal} cmd=${cmd} cycle=${cycle}`,
+    { phase: 'QA Cycle', label: `cycle:${cycle}` })
+  if (result.passed) return { status: 'complete', cycles: cycle }
+  if (result.error === lastErr) { if (++sameCount >= 3) return { status: 'same-error', error: lastErr } }
+  else { lastErr = result.error; sameCount = 1 }
+  await agent(`FIX: ${result.diagnosis}`, { phase: 'Fix', label: `fix:${cycle}`,
+    agentType: 'oh-my-claudecode:executor' })
+}
+return { status: 'max-cycles', last_error: lastErr }
+```
+
 ## Exit Conditions
 
 | Condition             | Action                                                                        |
@@ -143,3 +178,9 @@ This ensures clean state for future sessions. Stale state files with `active: fa
 ---
 
 Begin ULTRAQA cycling now. Parse the goal and start cycle 1.
+
+## Configuration
+
+- `--workflow` (or "use a workflow") opts this run into the background Dynamic Workflow variant
+  when available and the change is non-trivial; `direct:` / `--no-workflow` forces the default
+  in-context cycle. Default path unchanged. Policy: `docs/shared/workflow-gating.md`.

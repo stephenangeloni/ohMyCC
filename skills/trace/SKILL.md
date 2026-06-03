@@ -1,7 +1,7 @@
 ---
 name: trace
 description: Evidence-driven tracing lane that orchestrates competing tracer hypotheses in Claude built-in team mode
-argument-hint: "<observation to trace>"
+argument-hint: "[--workflow] <observation to trace>"
 agent: tracer
 level: 2
 ---
@@ -11,6 +11,8 @@ level: 2
 Use this skill for ambiguous, causal, evidence-heavy questions where the goal is to explain **why** an observed result happened, not to jump directly into fixing or rewriting code.
 
 This is the orchestration layer on top of the built-in `tracer` agent. The goal is to make tracing feel like a reusable OMC operating lane: restate the observation, generate competing explanations, gather evidence in parallel, rank the explanations, and propose the next probe that would collapse uncertainty fastest.
+
+By default the tracer lanes run as in-context team workers (Steps 3–4 below). When the run is opted into a background Dynamic Workflow (`--workflow` / "use a workflow") **and** a Workflow is available **and** there are ≥3 genuinely distinct hypotheses, the lanes execute concurrently in the background and only the ranked synthesis returns — reducing context accumulation. See `docs/shared/workflow-gating.md`.
 
 ## Good entry cases
 
@@ -214,6 +216,42 @@ Use a team-oriented orchestration prompt along these lines:
 6. “Run a rebuttal round between the top two explanations.”
 7. “Return a ranked explanation table, convergence notes, the critical unknown, and the single best discriminating probe.”
 
+## Team-mode orchestration shape (workflow variant)
+
+Take this path **only when** the run is opted in (`--workflow` flag or natural language "use a
+workflow"/"run a workflow") **AND** a background Workflow is available **AND** there are **≥3
+genuinely distinct plausible hypotheses** (trace's natural threshold). If any condition fails —
+no opt-in, no Workflow capability, or <3 hypotheses — **fall back to the default team-mode path
+above** and note the fallback in one line. Never hard-fail.
+
+When taken, author a single `Workflow` (`meta.name: 'trace'`) that spawns exactly N tracer lanes
+concurrently, each returning a structured hypothesis report held in a script variable; then runs the
+rebuttal/convergence step; then ranks. Only the ranked synthesis returns to the main context:
+
+```js
+export const meta = {
+  name: 'trace',
+  description: 'Competing tracer lanes → ranked synthesis',
+  phases: [{ title: 'Lanes' }, { title: 'Synthesize' }],
+}
+const LANE_SCHEMA = { /* hypothesis, evidenceFor[], evidenceAgainst[], confidence, probe */ }
+const lanes = await parallel(HYPOTHESES.map(h => () =>
+  agent(`You are a tracer lane. Lane hypothesis: ${h}. Gather evidence for and against. `
+      + `Return the worker contract structure (lane, hypothesis, evidenceFor, evidenceAgainst, `
+      + `evidenceStrength, criticalUnknown, bestDiscriminatingProbe, confidence).`,
+      { label: `lane:${h.slice(0,40)}`, phase: 'Lanes', schema: LANE_SCHEMA,
+        agentType: 'oh-my-claudecode:tracer' })))
+const synthesis = await agent(
+  `Run the rebuttal round and return the leader synthesis contract. Lane reports: ${JSON.stringify(lanes.filter(Boolean))}`,
+  { phase: 'Synthesize' })
+return synthesis
+```
+
+Notes:
+- A lane that throws resolves to `null`; `.filter(Boolean)` before synthesizing — log how many
+  lanes were dropped, never silently truncate.
+- The synthesis agent emits the Leader synthesis contract format above.
+
 ## Output quality bar
 
 Good `/trace` output is:
@@ -263,3 +301,9 @@ Good `/trace` output is:
 
 ### Additional Trace Lanes
 [Only if uncertainty remains high]
+
+## Configuration
+
+- `--workflow` (or "use a workflow") opts this run into the background Dynamic Workflow variant when
+  available and ≥3 distinct hypotheses exist; `direct:` / `--no-workflow` forces the default
+  in-context team path. Default remains the in-context team-mode path. Policy: `docs/shared/workflow-gating.md`.
