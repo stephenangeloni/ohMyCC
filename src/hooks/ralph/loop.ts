@@ -293,6 +293,13 @@ export function createRalphLoopHook(directory: string): RalphLoopHook {
       return false;
     }
 
+    // Active-loop guard: a re-invocation (e.g. continuation prompt or a chained
+    // skill re-triggering ralph) must not discard accumulated hard-max safety
+    // accounting. If a loop is already live for this session, preserve its
+    // iteration count and any extended max_iterations.
+    const existing = readRalphState(directory, sessionId);
+    const hasActiveLoop = !!existing && existing.active === true;
+
     const enableUltrawork = !options?.disableUltrawork;
     const now = new Date().toISOString();
     const normalizedPrompt = stripCriticModeFlag(stripNoPrdFlag(prompt));
@@ -328,9 +335,11 @@ export function createRalphLoopHook(directory: string): RalphLoopHook {
 
     const state: RalphLoopState = {
       active: true,
-      iteration: 1,
-      max_iterations: options?.maxIterations ?? DEFAULT_MAX_ITERATIONS,
-      started_at: now,
+      iteration: hasActiveLoop ? existing.iteration : 1,
+      max_iterations: hasActiveLoop
+        ? existing.max_iterations
+        : options?.maxIterations ?? DEFAULT_MAX_ITERATIONS,
+      started_at: hasActiveLoop ? existing.started_at : now,
       prompt: normalizedPrompt,
       session_id: sessionId,
       project_path: directory,

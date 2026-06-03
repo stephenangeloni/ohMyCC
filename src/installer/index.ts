@@ -232,6 +232,33 @@ function createLineAnchoredMarkerRegex(marker: string, flags: string = 'gm'): Re
   return new RegExp(`^${escapeRegex(marker)}$`, flags);
 }
 
+/**
+ * Drop orphaned OMC managed-block bodies left attached to residual unmatched
+ * markers. This is only sound to call when a complete `START..END` block was
+ * already removed from the same content: that removal proves a real OMC block
+ * existed, so a leftover stray marker is the seam of a malformed/duplicated
+ * managed block, and the text adjacent to it is stale OMC body rather than user
+ * content. A stray START owns the body that follows it (through end of content);
+ * a stray END owns the body that precedes it (from start of content). Removing
+ * those spans stops stale OMC text from being resurrected as recovered user
+ * content and accreting on every future run.
+ */
+function stripOrphanedOmcBlockBodies(content: string, startMarker: string, endMarker: string): string {
+  let result = content;
+  // Stray START (no matching END after it): drop from the START line to EOF.
+  result = result.replace(
+    new RegExp(`^${escapeRegex(startMarker)}$[\\s\\S]*`, 'm'),
+    ''
+  );
+  // Stray END (no matching START before it): drop from start of content to and
+  // including the END line.
+  result = result.replace(
+    new RegExp(`^[\\s\\S]*?${escapeRegex(endMarker)}$\\r?\\n?`, 'm'),
+    ''
+  );
+  return result;
+}
+
 function stripGeneratedUserCustomizationHeaders(content: string): string {
   return content.replace(
     /^<!-- User customizations(?: \([^)]+\))? -->\r?\n?/gm,
@@ -1649,15 +1676,26 @@ export function mergeClaudeMd(existingContent: string | null, omcContent: string
   }
 
   const strippedExistingContent = existingContent.replace(OMC_BLOCK_PATTERN, '');
+  const removedCompleteOmcBlock = strippedExistingContent !== existingContent;
   const hasResidualStartMarker = markerStartRegex.test(strippedExistingContent);
   const hasResidualEndMarker = markerEndRegex.test(strippedExistingContent);
 
   // Case 2: Corrupted markers (unmatched markers remain after removing complete blocks)
   if (hasResidualStartMarker || hasResidualEndMarker) {
-    // Handle corrupted state - backup will be created by caller
-    // Strip unmatched OMC markers from recovered content to prevent unbounded
-    // growth on repeated calls (each call would re-detect corruption and append again)
-    const recoveredContent = strippedExistingContent
+    // Handle corrupted state - backup will be created by caller.
+    // If a complete OMC block was already removed, the leftover stray marker is
+    // the seam of a malformed/duplicated managed block, so the text attached to
+    // it is stale OMC body — not user content. Drop those orphaned bodies first;
+    // otherwise they get folded into the recovered "user content" section, become
+    // indistinguishable from real user text, and accrete on every future run.
+    // When no complete block was removed we keep the historic behavior of
+    // preserving the surrounding text (it cannot be attributed to OMC).
+    const candidateRecovered = removedCompleteOmcBlock
+      ? stripOrphanedOmcBlockBodies(strippedExistingContent, START_MARKER, END_MARKER)
+      : strippedExistingContent;
+    // Strip any unmatched OMC markers that remain so repeated calls don't
+    // re-detect corruption and re-append.
+    const recoveredContent = candidateRecovered
       .replace(markerStartRegex, '')
       .replace(markerEndRegex, '')
       .trim();
@@ -1674,6 +1712,57 @@ export function mergeClaudeMd(existingContent: string | null, omcContent: string
 
   // Case 3: Preserve only user-authored content that lives outside OMC markers
   return `${START_MARKER}\n${versionMarker}${cleanOmcContent}\n${END_MARKER}\n\n${USER_CUSTOMIZATIONS}\n${preservedUserContent}`;
+}
+
+/** Prefix shared by every CLAUDE.md backup file. */
+const CLAUDE_MD_BACKUP_PREFIX = 'CLAUDE.md.backup.';
+/** Number of CLAUDE.md backups to retain after each write. */
+const CLAUDE_MD_BACKUP_KEEP = 5;
+
+/**
+ * Build a unique backup filename for CLAUDE.md.
+ * Includes millisecond precision and, if a same-millisecond name already exists,
+ * a numeric counter suffix. Whole-second timestamps collide when two backups are
+ * written in the same second; without uniqueness the second write would
+ * overwrite the first and the original would be lost.
+ * @param date - Timestamp source for the filename.
+ * @param existingNames - Backup filenames already present in the target dir.
+ */
+export function buildClaudeMdBackupFilename(date: Date, existingNames: string[]): string {
+  // YYYY-MM-DDTHH-MM-SS-mmm (colons and the millisecond dot replaced for safe filenames)
+  const stamp = date.toISOString().replace(/[:.]/g, '-').replace(/Z$/, '');
+  const taken = new Set(existingNames);
+  let candidate = `${CLAUDE_MD_BACKUP_PREFIX}${stamp}`;
+  let counter = 1;
+  while (taken.has(candidate)) {
+    candidate = `${CLAUDE_MD_BACKUP_PREFIX}${stamp}-${counter}`;
+    counter++;
+  }
+  return candidate;
+}
+
+/**
+ * Prune CLAUDE.md backups in a directory, keeping only the newest `keep` files.
+ * Backup filenames are lexicographically sortable by timestamp, so a name sort
+ * matches chronological order. Non-backup files are never touched.
+ * @param dir - Directory containing the backups.
+ * @param keep - Number of most-recent backups to retain.
+ */
+export function pruneClaudeMdBackups(dir: string, keep: number = CLAUDE_MD_BACKUP_KEEP): void {
+  if (keep < 0 || !existsSync(dir)) {
+    return;
+  }
+  const backups = readdirSync(dir)
+    .filter(name => name.startsWith(CLAUDE_MD_BACKUP_PREFIX))
+    .sort();
+  const stale = backups.slice(0, Math.max(0, backups.length - keep));
+  for (const name of stale) {
+    try {
+      unlinkSync(join(dir, name));
+    } catch {
+      // Best-effort pruning; a failure here must not block installation.
+    }
+  }
 }
 
 /**
@@ -1941,10 +2030,15 @@ export function install(options: InstallOptions = {}): InstallResult {
 
       // Always create backup before modification (if file exists)
       if (existingContent !== null) {
-        const timestamp = new Date().toISOString().replace(/:/g, '-').split('.')[0]; // YYYY-MM-DDTHH-MM-SS
-        const backupPath = join(CLAUDE_CONFIG_DIR, `CLAUDE.md.backup.${timestamp}`);
+        const existingBackups = readdirSync(CLAUDE_CONFIG_DIR).filter(name =>
+          name.startsWith('CLAUDE.md.backup.')
+        );
+        const backupName = buildClaudeMdBackupFilename(new Date(), existingBackups);
+        const backupPath = join(CLAUDE_CONFIG_DIR, backupName);
         writeFileSync(backupPath, existingContent);
         log(`Backed up existing CLAUDE.md to ${backupPath}`);
+        // Keep only the most recent backups so they don't accumulate unbounded.
+        pruneClaudeMdBackups(CLAUDE_CONFIG_DIR);
       }
 
       // Merge OMC content with existing content

@@ -5,7 +5,11 @@ vi.mock('../../hud/state.js', () => ({
   writeHudState: vi.fn(() => true),
 }));
 
-import { cleanupStaleBackgroundTasks } from '../../hud/background-cleanup.js';
+import {
+  cleanupStaleBackgroundTasks,
+  detectOrphanedTasks,
+  markOrphanedTasksAsStale,
+} from '../../hud/background-cleanup.js';
 import { readHudState, writeHudState } from '../../hud/state.js';
 
 const mockReadHudState = vi.mocked(readHudState);
@@ -350,6 +354,104 @@ describe('background-cleanup', () => {
 
       expect(result).toBe(0);
       expect(mockWriteHudState).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('markOrphanedTasksAsStale', () => {
+    it('sets completedAt when marking an orphan so it can be reaped (P1)', async () => {
+      const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
+      mockReadHudState.mockReturnValue({
+        timestamp: new Date().toISOString(),
+        backgroundTasks: [
+          { id: 'orphan', description: 'Orphaned', startedAt: threeHoursAgo, status: 'running' },
+        ],
+      });
+
+      const marked = await markOrphanedTasksAsStale();
+
+      expect(marked).toBe(1);
+      expect(mockWriteHudState).toHaveBeenCalledTimes(1);
+      const written = mockWriteHudState.mock.calls[0][0];
+      const task = written.backgroundTasks.find((t: { id: string }) => t.id === 'orphan');
+      expect(task!.status).toBe('completed');
+      // Regression guard: without completedAt, cleanupStaleBackgroundTasks keeps the task
+      // forever (the reaper only expires completed tasks that have a completedAt).
+      expect(task!.completedAt).toBeDefined();
+    });
+
+    it('reads HUD state only once — no redundant re-read (P2)', async () => {
+      const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
+      mockReadHudState.mockReturnValue({
+        timestamp: new Date().toISOString(),
+        backgroundTasks: [
+          { id: 'orphan', description: 'Orphaned', startedAt: threeHoursAgo, status: 'running' },
+        ],
+      });
+
+      await markOrphanedTasksAsStale();
+
+      expect(mockReadHudState).toHaveBeenCalledTimes(1);
+    });
+
+    it('an orphan it marks is later reaped once its completedAt passes the threshold', async () => {
+      // State as it would look AFTER markOrphaned wrote it, with completedAt now stale.
+      const old = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      mockReadHudState.mockReturnValue({
+        timestamp: new Date().toISOString(),
+        backgroundTasks: [
+          { id: 'orphan', description: 'Orphaned', startedAt: old, status: 'completed', completedAt: old },
+        ],
+      });
+
+      await cleanupStaleBackgroundTasks(30 * 60 * 1000);
+
+      const written = mockWriteHudState.mock.calls[0][0];
+      expect(
+        written.backgroundTasks.find((t: { id: string }) => t.id === 'orphan')
+      ).toBeUndefined();
+    });
+  });
+
+  describe('detectOrphanedTasks', () => {
+    it('flags a long-running task as orphaned', async () => {
+      const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
+      mockReadHudState.mockReturnValue({
+        timestamp: new Date().toISOString(),
+        backgroundTasks: [
+          { id: 'orphan', description: 'Orphaned', startedAt: threeHoursAgo, status: 'running' },
+        ],
+      });
+
+      const orphaned = await detectOrphanedTasks();
+
+      expect(orphaned.map(t => t.id)).toContain('orphan');
+    });
+
+    it('flags a running task with an invalid startedAt as orphaned instead of skipping it (P2 NaN-safety)', async () => {
+      mockReadHudState.mockReturnValue({
+        timestamp: new Date().toISOString(),
+        backgroundTasks: [
+          { id: 'bad', description: 'Invalid start', startedAt: 'not-a-date', status: 'running' },
+        ],
+      });
+
+      const orphaned = await detectOrphanedTasks();
+
+      expect(orphaned.map(t => t.id)).toContain('bad');
+    });
+
+    it('does not flag a recently-started running task', async () => {
+      const recent = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      mockReadHudState.mockReturnValue({
+        timestamp: new Date().toISOString(),
+        backgroundTasks: [
+          { id: 'recent', description: 'Recent', startedAt: recent, status: 'running' },
+        ],
+      });
+
+      const orphaned = await detectOrphanedTasks();
+
+      expect(orphaned).toHaveLength(0);
     });
   });
 });

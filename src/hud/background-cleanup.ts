@@ -99,6 +99,30 @@ export async function cleanupStaleBackgroundTasks(
   return removedCount;
 }
 
+const ORPHANED_TASK_THRESHOLD_MS = 2 * 60 * 60 * 1000; // 2 hours — likely a crashed session
+
+/**
+ * Find running tasks that look orphaned (from a previous crashed session) within an
+ * already-loaded task list. Pure — no I/O — so callers that already hold state need not
+ * re-read it.
+ *
+ * A running task whose start timestamp is missing/unparseable is treated as orphaned
+ * (consistent with cleanupStaleBackgroundTasks treating NaN starts as stale) rather than
+ * silently skipped — `NaN > threshold` is always false, which previously let such tasks slip
+ * through detection.
+ */
+function findOrphanedTasks(tasks: BackgroundTask[], now: number = Date.now()): BackgroundTask[] {
+  const orphaned: BackgroundTask[] = [];
+  for (const task of tasks) {
+    if (task.status !== 'running') continue;
+    const startMs = getTaskStartMs(task);
+    if (Number.isNaN(startMs) || now - startMs > ORPHANED_TASK_THRESHOLD_MS) {
+      orphaned.push(task);
+    }
+  }
+  return orphaned;
+}
+
 /**
  * Detect orphaned background tasks that are still marked as running
  * but are likely from a previous session crash.
@@ -115,28 +139,15 @@ export async function detectOrphanedTasks(
     return [];
   }
 
-  // Detect tasks that are marked as running but should have completed
-  // (e.g., from previous session crashes)
-  const orphaned: BackgroundTask[] = [];
-
-  for (const task of state.backgroundTasks) {
-    if (task.status === 'running') {
-      // Check if task is from a previous HUD session
-      // (simple heuristic: running for more than 2 hours is likely orphaned)
-      const taskAge = Date.now() - new Date(task.startedAt).getTime();
-      const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
-
-      if (taskAge > TWO_HOURS_MS) {
-        orphaned.push(task);
-      }
-    }
-  }
-
-  return orphaned;
+  return findOrphanedTasks(state.backgroundTasks);
 }
 
 /**
- * Mark orphaned tasks as stale/completed to clean up the display.
+ * Mark orphaned tasks as completed to clear them from the active display.
+ *
+ * Sets `completedAt` alongside the status so cleanupStaleBackgroundTasks can later expire
+ * them — without it, an orphan marked 'completed' has no `completedAt` and the reaper
+ * (which only expires completed/failed tasks that have a `completedAt`) keeps it forever.
  *
  * @returns Number of tasks marked
  */
@@ -150,20 +161,19 @@ export async function markOrphanedTasksAsStale(
     return 0;
   }
 
-  const orphaned = await detectOrphanedTasks(directory, sessionId);
-  let marked = 0;
-
-  for (const orphanedTask of orphaned) {
-    const task = state.backgroundTasks.find(t => t.id === orphanedTask.id);
-    if (task && task.status === 'running') {
-      task.status = 'completed'; // Mark as completed to remove from active display
-      marked++;
-    }
+  // Operate on the already-loaded state. Do NOT call detectOrphanedTasks here — it would
+  // read the state file a second time (redundant I/O plus a TOCTOU window between reads).
+  // The returned tasks are references into state.backgroundTasks, so mutating them updates
+  // the state we are about to write.
+  const orphaned = findOrphanedTasks(state.backgroundTasks);
+  for (const task of orphaned) {
+    task.status = 'completed';
+    task.completedAt = new Date().toISOString();
   }
 
-  if (marked > 0) {
+  if (orphaned.length > 0) {
     writeHudState(state, directory, sessionId);
   }
 
-  return marked;
+  return orphaned.length;
 }

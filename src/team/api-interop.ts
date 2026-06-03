@@ -120,6 +120,18 @@ export const TEAM_API_OPERATIONS = [
 
 export type TeamApiOperation = typeof TEAM_API_OPERATIONS[number];
 
+/**
+ * Two-level `ok` contract — callers MUST check both levels:
+ *   - Envelope `ok` (this type) reports transport/operation success: the op ran
+ *     without throwing or failing input validation. On `ok: true` it carries `data`.
+ *   - Domain `ok` may additionally live INSIDE `data` (e.g. `data.ok`) for ops that
+ *     flatten a `{ ok, ... }` domain result into the envelope's `data`. See
+ *     `claim-task`, `transition-task-status`, and `release-task-claim`: those return
+ *     `{ ok: true, data: <domain result> }` even when the domain result is
+ *     `{ ok: false, error }`. A dependent that only inspects the envelope `ok` will
+ *     treat a failed claim/transition/release as success. Always branch on `data.ok`
+ *     for those ops.
+ */
 export type TeamApiEnvelope =
   | { ok: true; operation: TeamApiOperation; data: Record<string, unknown> }
   | { ok: false; operation: TeamApiOperation | 'unknown'; error: { code: string; message: string } };
@@ -591,7 +603,7 @@ export async function executeTeamApiOperation(
 
         let message: Awaited<ReturnType<typeof sendDirectMessage>> | null = null;
         const target = await findWorkerDispatchTarget(teamName, toWorker, cwd);
-        await queueDirectMailboxMessage({
+        const dispatchOutcome = await queueDirectMailboxMessage({
           teamName,
           fromWorker,
           toWorker,
@@ -612,6 +624,21 @@ export async function executeTeamApiOperation(
             },
           },
         });
+
+        // Guard the fragile contract: `message` is only assigned inside the
+        // sendDirectMessage dep. If the dispatch path returns without producing a
+        // message, surface a structured error instead of a false { ok: true,
+        // data: { message: null } } that 10+ dependents would read as delivered.
+        if (message === null) {
+          return {
+            ok: false,
+            operation,
+            error: {
+              code: 'operation_failed',
+              message: `send-message dispatch produced no message (reason: ${dispatchOutcome.reason})`,
+            },
+          };
+        }
 
         return { ok: true, operation, data: { message } };
       }
@@ -806,6 +833,7 @@ export async function executeTeamApiOperation(
           return { ok: false, operation, error: { code: 'invalid_input', message: 'expected_version must be a positive integer when provided' } };
         }
         const result = await teamClaimTask(teamName, taskId, worker, (rawExpectedVersion as number | undefined) ?? null, cwd);
+        // Two-level ok: envelope ok=true means the op ran; domain success is data.ok. Callers MUST check data.ok.
         return { ok: true, operation, data: result as unknown as Record<string, unknown> };
       }
       case 'transition-task-status': {
@@ -841,6 +869,7 @@ export async function executeTeamApiOperation(
             error: typeof transitionError === 'string' ? transitionError : undefined,
           },
         );
+        // Two-level ok: envelope ok=true means the op ran; domain success is data.ok. Callers MUST check data.ok.
         return { ok: true, operation, data: result as unknown as Record<string, unknown> };
       }
       case 'release-task-claim': {
@@ -852,6 +881,7 @@ export async function executeTeamApiOperation(
           return { ok: false, operation, error: { code: 'invalid_input', message: 'team_name, task_id, claim_token, worker are required' } };
         }
         const result = await teamReleaseTaskClaim(teamName, taskId, claimToken, worker, cwd);
+        // Two-level ok: envelope ok=true means the op ran; domain success is data.ok. Callers MUST check data.ok.
         return { ok: true, operation, data: result as unknown as Record<string, unknown> };
       }
       case 'read-config': {

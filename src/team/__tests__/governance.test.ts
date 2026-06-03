@@ -43,4 +43,12 @@ describe('team governance normalization', () => {
   it('fills missing governance with defaults', () => {
     expect(normalizeTeamGovernance(undefined, undefined)).toEqual(DEFAULT_TEAM_GOVERNANCE);
   });
+
+  it('lets an explicit governance false override a legacy policy true (?? precedence)', () => {
+    const result = normalizeTeamGovernance(
+      { cleanup_requires_all_workers_inactive: false },
+      { cleanup_requires_all_workers_inactive: true },
+    );
+    expect(result.cleanup_requires_all_workers_inactive).toBe(false);
+  });
 });

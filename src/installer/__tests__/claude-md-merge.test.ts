@@ -162,6 +162,31 @@ describe('mergeClaudeMd', () => {
       const startMarkerCount = (result.match(new RegExp(START_MARKER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
       expect(startMarkerCount).toBe(1);
     });
+
+    it('does not resurrect a stale OMC block body as recovered user content', () => {
+      // Regression: a complete OMC block (cleanly removed by OMC_BLOCK_PATTERN)
+      // plus a stray inner START marker with no matching END leaves a residual
+      // unmatched marker. The recovery branch then folded the OLD OMC body that
+      // followed the stray START into the "recovered from corrupted markers"
+      // user section, where it became indistinguishable from real user content
+      // and accreted on every future run.
+      const existingContent = `Real user line one
+${START_MARKER}
+OLD_OMC_BODY_ALPHA
+${END_MARKER}
+Real user line two
+${START_MARKER}
+OLD_OMC_BODY_BRAVO_after_stray_start`;
+
+      const result = mergeClaudeMd(existingContent, omcContent);
+
+      // Genuine user lines are preserved
+      expect(result).toContain('Real user line one');
+      expect(result).toContain('Real user line two');
+      // Stale OMC block bodies are dropped, not resurrected as user content
+      expect(result).not.toContain('OLD_OMC_BODY_ALPHA');
+      expect(result).not.toContain('OLD_OMC_BODY_BRAVO');
+    });
   });
 
   describe('Edge cases', () => {

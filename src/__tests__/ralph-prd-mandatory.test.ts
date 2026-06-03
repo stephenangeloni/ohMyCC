@@ -9,6 +9,7 @@ import {
   stripCriticModeFlag,
   createRalphLoopHook,
   readRalphState,
+  writeRalphState,
   findPrdPath,
   getSessionPrdPath,
   initPrd,
@@ -499,6 +500,37 @@ describe('Ralph PRD-Mandatory', () => {
       expect(prd!.userStories[0].passes).toBe(false);
       expect(prd!.userStories[0].acceptanceCriteria).toBeDefined();
       expect(Array.isArray(prd!.userStories[0].acceptanceCriteria)).toBe(true);
+    });
+  });
+
+  // ==========================================================================
+  // Active-Loop Guard (re-invocation must not reset iteration/max_iterations)
+  // ==========================================================================
+
+  describe('active-loop guard on Skill re-invocation', () => {
+    it('does not reset iteration or max_iterations when a loop is already active for the session', () => {
+      const sessionId = 'session-reinvoke';
+      const hook = createRalphLoopHook(testDir);
+
+      // First invocation starts the loop.
+      expect(hook.startLoop(sessionId, 'implement feature X')).toBe(true);
+
+      // Simulate accumulated progress: advanced iteration and extended hard-max.
+      const live = readRalphState(testDir, sessionId);
+      expect(live).not.toBeNull();
+      live!.iteration = 7;
+      live!.max_iterations = 30;
+      expect(writeRalphState(testDir, live!, sessionId)).toBe(true);
+
+      // Re-invocation (e.g. continuation prompt / chained skill) must NOT
+      // discard accumulated iteration/max_iterations accounting.
+      hook.startLoop(sessionId, 'implement feature X');
+
+      const after = readRalphState(testDir, sessionId);
+      expect(after).not.toBeNull();
+      expect(after!.active).toBe(true);
+      expect(after!.iteration).toBe(7);
+      expect(after!.max_iterations).toBe(30);
     });
   });
 });
