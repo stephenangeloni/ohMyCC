@@ -45,6 +45,11 @@ level: 3
     - Use lsp_diagnostics_directory for project-wide type checking.
     - Use Grep to find related tests that should pass.
     - Use Read to review test coverage adequacy.
+    - For TS/JS changes, when `fallow` is on PATH (`command -v fallow`), add a deterministic
+      quality gate: `fallow audit` (auto-detects the base branch; verdict pass/warn/fail, exit 1
+      on fail) and/or `fallow health --min-score <N>` as the authoritative score gate. Record the
+      verdict/exit code as fresh evidence. Skip silently if `fallow` is absent — never block a
+      verdict solely on a tool that is not installed.
   </Tool_Usage>
 
   <Execution_Policy>
@@ -69,6 +74,7 @@ level: 3
     | Tests | pass/fail | `npm test` | X passed, Y failed |
     | Types | pass/fail | `lsp_diagnostics_directory` | N errors |
     | Build | pass/fail | `npm run build` | exit code |
+    | Static (TS/JS, if available) | pass/warn/fail | `fallow audit` | verdict + exit code |
     | Runtime | pass/fail | [manual check] | [observation] |
 
     ### Acceptance Criteria

@@ -50,11 +50,18 @@ level: 3
 
   <Process>
     1. Identify the recently modified code sections provided
-    2. Analyze for opportunities to improve elegance and consistency
-    3. Apply project-specific best practices and coding standards
-    4. Ensure all functionality remains unchanged
-    5. Verify the refined code is simpler and more maintainable
-    6. Document only significant changes that affect understanding
+    2. Gather deterministic evidence (optional, TS/JS only): if `fallow` is on PATH
+       (`command -v fallow`), run `fallow audit --format json` (auto-detects the base branch;
+       pass `--changed-since <base>` only to override) to surface dead code, duplication, and
+       complexity targets in the touched files.
+       Use the findings to prioritize simplifications and to confirm — before inlining or
+       removing an export — that it is genuinely unused. If `fallow` is absent, skip
+       silently and rely on LSP/AST/grep.
+    3. Analyze for opportunities to improve elegance and consistency
+    4. Apply project-specific best practices and coding standards
+    5. Ensure all functionality remains unchanged
+    6. Verify the refined code is simpler and more maintainable
+    7. Document only significant changes that affect understanding
   </Process>
 
   <Constraints>
@@ -64,6 +71,9 @@ level: 3
     - Skip files where simplification would yield no meaningful improvement.
     - If unsure whether a change preserves behavior, leave the code unchanged.
     - Run `lsp_diagnostics` on each modified file to verify zero type errors after changes.
+    - When `fallow` is available, re-run `fallow audit --format json` after changes and
+      confirm no new findings were introduced (`introduced: true`). Report
+      the before/after delta in the Verification section alongside diagnostics.
   </Constraints>
 
   <Output_Format>

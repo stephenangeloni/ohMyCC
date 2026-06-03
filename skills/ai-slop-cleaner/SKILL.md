@@ -88,12 +88,18 @@ In review mode:
    - Order the work from safest deletion to riskier consolidation.
 
 3. **Classify the slop before editing**
-   - **Duplication** — repeated logic, copy-paste branches, redundant helpers
-   - **Dead code** — unused code, unreachable branches, stale flags, debug leftovers
-   - **Needless abstraction** — pass-through wrappers, speculative indirection, single-use helper layers
-   - **Boundary violations** — hidden coupling, misplaced responsibilities, wrong-layer imports or side effects
-   - **Missing tests** — behavior not locked, weak regression coverage, edge-case gaps
-   - **UI/design defaults** — generic visual patterns that make an AI-built interface feel unreviewed
+
+   For TS/JS targets, anchor this classification in deterministic evidence when `fallow`
+   is on PATH (`command -v fallow`). Fallow's detectors map directly onto the smell
+   classes below — use it to *find* the slop, then judge each finding before acting.
+   If `fallow` is absent, classify by reading + LSP/AST/grep as before.
+
+   - **Duplication** — repeated logic, copy-paste branches, redundant helpers — `fallow dupes --mode mild` (escalate to `--mode semantic` for renamed-variable clones)
+   - **Dead code** — unused code, unreachable branches, stale flags, debug leftovers — `fallow dead-code --changed-since <base>` (or `--file <path>` for a single file)
+   - **Needless abstraction** — pass-through wrappers, speculative indirection, single-use helper layers — `fallow dead-code` unused-export / unused-re-export findings
+   - **Boundary violations** — hidden coupling, misplaced responsibilities, wrong-layer imports or side effects — `fallow dead-code --boundary-violations` and `--circular-deps`
+   - **Missing tests** — behavior not locked, weak regression coverage, edge-case gaps — `fallow health --coverage-gaps`
+   - **UI/design defaults** — generic visual patterns that make an AI-built interface feel unreviewed (no fallow detector — review by eye per the checklist above)
 
 ### UI/Design Reviewer Checklist
 
@@ -107,17 +113,21 @@ Use these as review prompts, not absolute bans. Keep intentional brand, accessib
 - **Gradient restraint:** tone down extreme gradients unless the brand deliberately owns that visual language.
 
 4. **Run one smell-focused pass at a time**
-   - **Pass 1: Dead code deletion**
-   - **Pass 2: Duplicate removal**
+   - **Pass 1: Dead code deletion** — drive from `fallow dead-code` when available; confirm each export/file is truly unused before deleting (never act on a finding blindly).
+   - **Pass 2: Duplicate removal** — drive from `fallow dupes`; consolidate the clone group, not just one copy.
    - **Pass 3: Naming and error-handling cleanup**
-   - **Pass 4: Test reinforcement**
+   - **Pass 4: Test reinforcement** — target gaps from `fallow health --coverage-gaps`.
    - Re-run targeted verification after each pass.
    - Do not bundle unrelated refactors into the same edit set.
 
 5. **Run the quality gates**
    - Keep regression tests green.
    - Run the relevant lint, typecheck, and unit/integration tests for the touched area.
-   - Run existing static or security checks when available.
+   - Run existing static or security checks when available. For TS/JS, when `fallow` is
+     present, run `fallow audit --format json` (auto-detects the base branch) as a
+     deterministic post-cleanup gate: confirm the cleanup removed the targeted smells and introduced no
+     new findings (`introduced: true`). A non-zero exit (verdict `fail`) is a real gate —
+     fix or back out, do not force it through.
    - If a gate fails, fix the issue or back out the risky cleanup instead of forcing it through.
 
 6. **Close with an evidence-dense report**

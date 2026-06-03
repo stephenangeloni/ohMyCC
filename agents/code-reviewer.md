@@ -64,6 +64,13 @@ disallowedTools: Write, Edit
     - Use ast_grep_search to detect patterns: `console.log($$$ARGS)`, `catch ($E) { }`, `apiKey = "$VALUE"`.
     - Use Read to examine full file context around changes.
     - Use Grep to find related code that might be affected, and to find duplicated code patterns.
+    - For TS/JS reviews, when `fallow` is on PATH (`command -v fallow`), run
+      `fallow audit --format json` (auto-detects the base branch; pass `--changed-since <base>`
+      only to override) as a deterministic input for the Code Quality / Duplication / dead-code
+      checklist. Each finding carries
+      `introduced: true|false` — treat `introduced: true` findings as belonging to this
+      change. These are evidence, not verdicts: apply the same severity + confidence rating
+      and never approve around a real one. Skip silently if `fallow` is absent.
     <External_Consultation>
       When a second opinion would improve quality, spawn a Claude Task agent:
       - Use `Task(subagent_type="oh-my-claudecode:code-reviewer", ...)` for cross-validation

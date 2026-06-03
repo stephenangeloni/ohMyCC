@@ -1,0 +1,31 @@
+{
+  // Fallow (https://github.com/fallow-rs/fallow) config for the ohMyCC repo.
+  //
+  // Fallow is a deterministic TS/JS static-analysis CLI used by OMC flows
+  // (code-simplifier, ai-slop-cleaner, code-reviewer, verifier) when it is
+  // present on PATH. It is an OPTIONAL maintainer tool — install globally with
+  // `pnpm add -g fallow`. This file is NOT in package.json "files", so it is
+  // never shipped to OMC consumers; it only tunes fallow for THIS repo.
+  //
+  // Without these entry points, fallow zero-config flags ~72 node-invoked
+  // files (build scripts, hooks, CLI/MCP bridges, benchmark runners, examples)
+  // as "unused-file" false positives because nothing *imports* them — they are
+  // executed directly by node/tsx, package.json scripts, or Claude Code hooks.
+
+  // Files reached by an external runtime rather than a static import.
+  "entry": [
+    "src/index.ts",
+    "bridge/*.cjs",
+    "scripts/**/*.{mjs,cjs,ts}",
+    "hooks/**/*.{mjs,cjs,js}",
+    "benchmarks/run-all.ts",
+    "benchmarks/**/run-benchmark.ts",
+    "examples/**/*.{ts,mjs}"
+  ],
+
+  // Build output and emitted templates are not first-party source.
+  "ignorePatterns": [
+    "dist/**",
+    "templates/**"
+  ]
+}

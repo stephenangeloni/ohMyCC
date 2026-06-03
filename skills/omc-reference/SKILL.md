@@ -63,6 +63,13 @@ Prefix: `oh-my-claudecode:`. See `agents/*.md` for full prompts.
 - AST: `ast_grep_search`, `ast_grep_replace`
 - Utility: `python_repl`
 
+### Static analysis (optional external CLI)
+- `fallow` — deterministic TS/JS static analysis (dead code, duplication, complexity/health, architecture boundaries, dependency hygiene). CLI-only, no MCP.
+- **Auto-detected**: probe `command -v fallow` first. Use it when present; skip silently and fall back to LSP/AST/grep when absent (OMC ships to repos that may not have it installed).
+- Core commands: `fallow audit --format json` (PR/changed-file gate; auto-detects the base branch; findings carry `introduced: true|false`; add `--gate new-only` to fail only on introduced findings), `fallow dead-code [--changed-since <base>]`, `fallow dupes --mode mild|semantic`, `fallow health --score` / `--min-score <N>` (authoritative CI gate) / `--coverage-gaps` / `--targets`.
+- `<base>` = the PR base branch (usually `origin/main` or `main`). `audit` auto-detects it, so pass `--changed-since <base>` only to override scope; `dead-code`/`dupes`/`health` accept `--changed-since <base>` to scope to changed files.
+- Install globally: `pnpm add -g fallow`. Repo tuning lives in `.fallowrc.jsonc`.
+
 ## Skills Registry
 
 Invoke built-in workflows via `/oh-my-claudecode:<name>`.
