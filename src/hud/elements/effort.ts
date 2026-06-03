@@ -8,17 +8,20 @@
  * now a first-class, configurable HUD element instead of a shell-appended suffix.
  */
 
-import { dim, cyan, bold } from '../colors.js';
+import { cyan, bold } from '../colors.js';
 
 /**
  * Render the effort badge.
  *
+ * Value-only: the level alone (e.g. "xhigh") is self-explanatory, so no
+ * "effort:" prefix is rendered.
+ *
  * @param effort - Effort level string; null/undefined/blank hides the badge.
- * @returns Formatted `effort:<level>` badge, or null when there is no value.
+ * @returns Formatted `<level>` badge, or null when there is no value.
  */
 export function renderEffort(effort: string | null | undefined): string | null {
   if (!effort) return null;
   const value = effort.trim();
   if (!value) return null;
-  return `${dim('effort:')}${cyan(bold(value))}`;
+  return cyan(bold(value));
 }

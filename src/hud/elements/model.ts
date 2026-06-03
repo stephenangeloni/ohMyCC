@@ -6,7 +6,7 @@
 
 import { cyan } from '../colors.js';
 import { truncateToWidth } from '../../utils/string-width.js';
-import { DEFAULT_HUD_LABELS, type HudLabels, type ModelFormat } from '../types.js';
+import { type ModelFormat } from '../types.js';
 
 /**
  * Extract version from a model ID string.
@@ -67,13 +67,15 @@ export function formatModelName(modelId: string | null | undefined, format: Mode
 
 /**
  * Render model element.
+ *
+ * Value-only: the model name speaks for itself (e.g. "Opus 4.8"), so no
+ * "Model:" prefix is rendered.
  */
 export function renderModel(
   modelId: string | null | undefined,
   format: ModelFormat = 'versioned',
-  labels: Pick<HudLabels, 'model'> = DEFAULT_HUD_LABELS,
 ): string | null {
   const name = formatModelName(modelId, format);
   if (!name) return null;
-  return cyan(`${labels.model}: ${name}`);
+  return cyan(name);
 }

@@ -56,28 +56,25 @@ describe('model element', () => {
   });
 
   describe('renderModel', () => {
-    it('renders formatted model name', () => {
+    it('renders the model name value-only (no "Model:" prefix)', () => {
       const result = renderModel('claude-opus-4-7-20260416');
       expect(result).not.toBeNull();
-      expect(result).toContain('Model: Opus 4.7');
+      expect(result).toContain('Opus 4.7');
+      expect(result).not.toContain('Model:');
     });
 
     it('renders versioned format', () => {
       const result = renderModel('claude-opus-4-7-20260416', 'versioned');
       expect(result).not.toBeNull();
-      expect(result).toContain('Model: Opus 4.7');
+      expect(result).toContain('Opus 4.7');
+      expect(result).not.toContain('Model:');
     });
 
     it('renders full format', () => {
       const result = renderModel('claude-opus-4-7-20260416', 'full');
       expect(result).not.toBeNull();
-      expect(result).toContain('Model: claude-opus-4-7');
-    });
-
-    it('renders configured model label', () => {
-      const result = renderModel('Claude Sonnet 4.5', 'versioned', { model: '模型' });
-      expect(result).not.toBeNull();
-      expect(result).toContain('模型: Sonnet 4.5');
+      expect(result).toContain('claude-opus-4-7');
+      expect(result).not.toContain('Model:');
     });
 
     it('returns null for null input', () => {

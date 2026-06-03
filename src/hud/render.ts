@@ -279,7 +279,6 @@ export async function render(
     const modelElement = renderModel(
       modelSource,
       enabledElements.modelFormat,
-      hudLabels,
     );
     if (modelElement) rendered.set("model", modelElement);
   }

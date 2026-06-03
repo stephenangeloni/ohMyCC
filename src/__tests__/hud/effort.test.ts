@@ -13,10 +13,10 @@ describe('renderEffort', () => {
     expect(renderEffort('   ')).toBeNull();
   });
 
-  it('renders the effort level with the effort: label', () => {
+  it('renders the effort level value-only (no "effort:" prefix)', () => {
     const out = renderEffort('xhigh')!;
-    expect(out).toContain('effort:');
     expect(out).toContain('xhigh');
+    expect(out).not.toContain('effort:');
   });
 
   it('trims surrounding whitespace from the level', () => {

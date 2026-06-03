@@ -174,6 +174,9 @@ describe('HUD labels', () => {
     expect(output).toContain('上下文:67%');
     expect(output).toContain('后台:1/5');
     expect(output).toContain('工具:5 智能体:3 技能:2');
-    expect(output).toContain('模型: Sonnet 4.5');
+    // The model element renders value-only — the locale label prefix (模型:) is
+    // intentionally not applied to the model name.
+    expect(output).toContain('Sonnet 4.5');
+    expect(output).not.toContain('模型:');
   });
 });

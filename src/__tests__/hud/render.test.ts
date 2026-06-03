@@ -896,7 +896,8 @@ describe('HUD model display', () => {
 
     expect(output.split('\n')).toHaveLength(1);
     expect(output).toContain('OhMy:4.14.0');
-    expect(output).toContain('Model: Sonnet 4.5');
+    expect(output).toContain('Sonnet 4.5');
+    expect(output).not.toContain('Model:');
   });
 
   it('renders full format from raw model id when display name is also available', async () => {
@@ -911,11 +912,12 @@ describe('HUD model display', () => {
       },
     });
 
-    expect(output).toContain('Model: claude-sonnet-4-5-20250929');
+    expect(output).toContain('claude-sonnet-4-5-20250929');
+    expect(output).not.toContain('Model:');
     expect(output).not.toContain('Claude Sonnet 4.5');
   });
 
-  it('renders configured model label through HUD labels', async () => {
+  it('renders the model value-only regardless of configured HUD labels', async () => {
     const output = await render(createModelContext('Claude Sonnet 4.5'), {
       ...modelConfig,
       labels: {
@@ -924,8 +926,9 @@ describe('HUD model display', () => {
       },
     });
 
-    expect(output).toContain('模型: Sonnet 4.5');
-    expect(output).not.toContain('Model: Sonnet 4.5');
+    expect(output).toContain('Sonnet 4.5');
+    expect(output).not.toContain('模型:');
+    expect(output).not.toContain('Model:');
   });
 
   it('omits the model segment when model metadata is unavailable', async () => {
