@@ -45,6 +45,7 @@ describe('HUD CLI diagnostic (no stdin, no watch mode)', () => {
       readStdinCache: vi.fn(overrides.readStdinCache ?? (() => null)),
       getContextPercent: vi.fn(() => 0),
       getModelName: vi.fn(() => 'unknown'),
+      getCcVersion: vi.fn(() => null),
       stabilizeContextPercent: vi.fn((_s: unknown) => _s),
     }));
 

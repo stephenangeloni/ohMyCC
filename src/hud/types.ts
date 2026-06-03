@@ -51,6 +51,9 @@ export interface StatuslineStdin {
   /** Current working directory */
   cwd?: string;
 
+  /** Claude Code version running this session (e.g. "2.1.161") */
+  version?: string;
+
   /** Model information from Claude Code statusline stdin */
   model?: {
     id?: string;
@@ -434,6 +437,9 @@ export interface HudRenderContext {
 
   /** Open PR for the current branch (null when none/unavailable) */
   pr?: PrInfo | null;
+
+  /** Claude Code version from statusline stdin (null/undefined hides the badge) */
+  ccVersion?: string | null;
 }
 
 // ============================================================================
@@ -603,6 +609,7 @@ export interface HudElementConfig {
   profile: boolean;            // Show active profile name (from CLAUDE_CONFIG_DIR)
   effort: boolean;             // Show reasoning-effort badge from $CLAUDE_EFFORT
   pr: boolean;                 // Show open PR for current branch (uses `gh`, cached, non-blocking)
+  ccVersion: boolean;          // Show Claude Code version badge (v2.1.161) from statusline stdin
   missionBoard?: boolean;      // Show opt-in mission board above existing HUD detail lines
   promptTime: boolean;        // Show last prompt submission time (HH:MM:SS)
   sessionHealth: boolean;     // Show session health/duration
@@ -669,7 +676,7 @@ export const DEFAULT_ELEMENT_ORDER: Required<LayoutConfig> = {
     'omcLabel', 'model', 'enterpriseCost', 'rateLimits', 'customBuckets', 'permission', 'thinking',
     'promptTime', 'session', 'tokens', 'ralph', 'autopilot', 'prd',
     'skills', 'lastSkill', 'contextBar', 'agents', 'background',
-    'callCounts', 'lastTool', 'sessionSummary', 'effort', 'pr',
+    'callCounts', 'lastTool', 'sessionSummary', 'effort', 'pr', 'ccVersion',
   ],
   detail: ['missionBoard', 'agents', 'contextWarning', 'payloadWarning', 'todos'],
 };
@@ -738,6 +745,7 @@ export const DEFAULT_HUD_CONFIG: HudConfig = {
     profile: true,  // Show profile name when CLAUDE_CONFIG_DIR is set
     effort: false,  // Opt-in: reasoning-effort badge from $CLAUDE_EFFORT ("auto" when unset)
     pr: false,      // Opt-in: requires `gh` and a network call (cached, non-blocking)
+    ccVersion: true,  // Show Claude Code version (free: read straight from statusline stdin)
     missionBoard: false,  // Opt-in mission board for whole-run progress tracking
     promptTime: true,  // Show last prompt time by default
     sessionHealth: true,

@@ -46,6 +46,7 @@ import { renderSessionSummary } from "./elements/session-summary.js";
 import { renderLastTool } from "./elements/last-tool.js";
 import { renderEffort } from "./elements/effort.js";
 import { renderPr } from "./elements/pr.js";
+import { renderCcVersion } from "./elements/cc-version.js";
 
 /**
  * ANSI escape sequence regex (matches SGR and other CSI sequences).
@@ -492,6 +493,11 @@ export async function render(
   if (enabledElements.pr) {
     const pr = renderPr(context.pr);
     if (pr) rendered.set("pr", pr);
+  }
+
+  if (enabledElements.ccVersion) {
+    const ccVersion = renderCcVersion(context.ccVersion);
+    if (ccVersion) rendered.set("ccVersion", ccVersion);
   }
 
   // -- detail-group elements --

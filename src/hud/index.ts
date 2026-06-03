@@ -13,6 +13,7 @@ import {
   getContextPercent,
   getModelId,
   getModelName,
+  getCcVersion,
   getRateLimitsFromStdin,
   stabilizeContextPercent,
 } from "./stdin.js";
@@ -503,6 +504,8 @@ async function main(watchMode = false, skipInit = false): Promise<void> {
       effort: process.env.CLAUDE_EFFORT ?? "auto",
       // PR badge: only do the (cached, non-blocking) gh work when enabled.
       pr: config.elements.pr ? getPrInfo(cwd) : null,
+      // Claude Code version: read straight from statusline stdin (free).
+      ccVersion: getCcVersion(stdin),
     };
 
     // Debug: log data if OMC_DEBUG is set

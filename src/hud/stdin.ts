@@ -398,3 +398,13 @@ export function getModelName(stdin: StatuslineStdin): string | null {
   const displayName = stdin.model?.display_name?.trim();
   return displayName || getModelId(stdin);
 }
+
+/**
+ * Get the Claude Code version from stdin (e.g. "2.1.161").
+ * Returns null when Claude Code does not provide it so the HUD omits the
+ * badge instead of rendering an empty marker.
+ */
+export function getCcVersion(stdin: StatuslineStdin): string | null {
+  const version = stdin.version?.trim();
+  return version || null;
+}

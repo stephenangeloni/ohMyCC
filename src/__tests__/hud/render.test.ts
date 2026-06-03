@@ -766,6 +766,30 @@ describe('layout element ordering', () => {
     expect(mainLine).toBeDefined();
     expect(mainLine!.indexOf('OhMy')).toBeLessThan(mainLine!.indexOf('ctx:'));
   });
+
+  it('renders the Claude Code version badge at the end of the main line by default', async () => {
+    const context: HudRenderContext = { ...createMockContext(), ccVersion: '2.1.161' };
+    const config = createLayoutConfig(); // default order; ccVersion enabled by default
+
+    const result = await render(context, config);
+    const stripAnsi = (s: string) => s.replace(/\x1b\[[0-9;]*m/g, '');
+    const mainLine = result.split('\n').map(stripAnsi).find(l => l.includes('OhMy'));
+
+    expect(mainLine).toBeDefined();
+    expect(mainLine!).toContain('v2.1.161');
+    // It is the trailing element — after the OMC label and every other badge.
+    expect(mainLine!.trimEnd().endsWith('v2.1.161')).toBe(true);
+    expect(mainLine!.indexOf('OhMy')).toBeLessThan(mainLine!.indexOf('v2.1.161'));
+  });
+
+  it('omits the Claude Code version badge when stdin provides no version', async () => {
+    const context: HudRenderContext = { ...createMockContext(), ccVersion: null };
+    const config = createLayoutConfig();
+
+    const result = await render(context, config);
+
+    expect(result).not.toMatch(/v\d+\.\d+\.\d+/);
+  });
 });
 
 describe('optional HUD line defaults', () => {
