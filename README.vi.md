@@ -4,18 +4,17 @@
 
 [![npm version](https://img.shields.io/npm/v/oh-my-claude-sisyphus?color=cb3837)](https://www.npmjs.com/package/oh-my-claude-sisyphus)
 [![npm downloads](https://img.shields.io/npm/dm/oh-my-claude-sisyphus?color=blue)](https://www.npmjs.com/package/oh-my-claude-sisyphus)
-[![GitHub stars](https://img.shields.io/github/stars/Yeachan-Heo/oh-my-claudecode?style=flat&color=yellow)](https://github.com/Yeachan-Heo/oh-my-claudecode/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/stephenangeloni/ohMyCC?style=flat&color=yellow)](https://github.com/stephenangeloni/ohMyCC/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red?style=flat&logo=github)](https://github.com/sponsors/Yeachan-Heo)
+[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red?style=flat&logo=github)](https://github.com/sponsors/stephenangeloni)
 [![Discord](https://img.shields.io/discord/1452487457085063218?color=5865F2&logo=discord&logoColor=white&label=Discord)](https://discord.gg/sj4exxQ9v)
 
-> **Dành cho người dùng Codex:** Hãy xem [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) — cùng trải nghiệm điều phối cho OpenAI Codex CLI.
 
 **Điều phối đa tác tử cho Claude Code. Không cần thời gian làm quen.**
 
 *Đừng học Claude Code. Cứ dùng OMC.*
 
-[Bắt đầu nhanh](#bắt-đầu-nhanh) • [Tài liệu](https://yeachan-heo.github.io/oh-my-claudecode-website) • [Tham chiếu CLI](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#cli-reference) • [Quy trình](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#workflows) • [Hướng dẫn di chuyển](docs/MIGRATION.md) • [Discord](https://discord.gg/sj4exxQ9v)
+[Bắt đầu nhanh](#bắt-đầu-nhanh) • [Tài liệu](https://stephenangeloni.github.io/oh-my-claudecode-website) • [Tham chiếu CLI](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#cli-reference) • [Quy trình](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#workflows) • [Hướng dẫn di chuyển](docs/MIGRATION.md) • [Discord](https://discord.gg/sj4exxQ9v)
 
 ---
 
@@ -23,7 +22,7 @@
 
 **Bước 1: Cài đặt**
 ```bash
-/plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode
+/plugin marketplace add https://github.com/stephenangeloni/ohMyCC
 /plugin install oh-my-claudecode
 ```
 
@@ -146,7 +145,7 @@ Nếu gặp sự cố sau khi cập nhật, hãy xóa cache plugin cũ:
 ## Tính năng
 
 ### Các chế độ điều phối
-Nhiều chiến lược cho nhiều tình huống — từ điều phối dựa trên Team đến refactor tiết kiệm token. [Tìm hiểu thêm →](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#execution-modes)
+Nhiều chiến lược cho nhiều tình huống — từ điều phối dựa trên Team đến refactor tiết kiệm token. [Tìm hiểu thêm →](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#execution-modes)
 
 | Mode | Nó là gì | Dùng cho |
 |------|------------|---------|
@@ -333,11 +332,11 @@ Xem `scripts/openclaw-gateway-demo.mjs` để tham khảo gateway chuyển tiế
 ## Tài liệu
 
 - **[Tham chiếu đầy đủ](docs/REFERENCE.md)** - Tài liệu đầy đủ về tính năng
-- **[Tham chiếu CLI](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#cli-reference)** - Tất cả lệnh, cờ và công cụ `omc`
-- **[Hướng dẫn thông báo](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#notifications)** - Thiết lập Discord, Telegram, Slack và webhook
-- **[Quy trình khuyến nghị](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#workflows)** - Chuỗi skill đã qua thực chiến cho các tác vụ phổ biến
-- **[Ghi chú phát hành](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#release-notes)** - Có gì mới trong mỗi phiên bản
-- **[Website](https://yeachan-heo.github.io/oh-my-claudecode-website)** - Hướng dẫn tương tác và ví dụ
+- **[Tham chiếu CLI](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#cli-reference)** - Tất cả lệnh, cờ và công cụ `omc`
+- **[Hướng dẫn thông báo](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#notifications)** - Thiết lập Discord, Telegram, Slack và webhook
+- **[Quy trình khuyến nghị](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#workflows)** - Chuỗi skill đã qua thực chiến cho các tác vụ phổ biến
+- **[Ghi chú phát hành](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#release-notes)** - Có gì mới trong mỗi phiên bản
+- **[Website](https://stephenangeloni.github.io/oh-my-claudecode-website)** - Hướng dẫn tương tác và ví dụ
 - **[Hướng dẫn di chuyển](docs/MIGRATION.md)** - Nâng cấp từ v2.x
 - **[Kiến trúc](docs/ARCHITECTURE.md)** - Cách nó hoạt động phía sau
 - **[Theo dõi hiệu năng](docs/PERFORMANCE-MONITORING.md)** - Theo dõi tác tử, gỡ lỗi và tối ưu
@@ -378,13 +377,13 @@ MIT
 
 ## Lịch sử sao
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Yeachan-Heo/oh-my-claudecode&type=date&legend=top-left)](https://www.star-history.com/#Yeachan-Heo/oh-my-claudecode&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=stephenangeloni/ohMyCC&type=date&legend=top-left)](https://www.star-history.com/#stephenangeloni/ohMyCC&type=date&legend=top-left)
 
 ## 💖 Ủng hộ dự án này
 
 Nếu Oh-My-ClaudeCode giúp ích cho quy trình làm việc của bạn, hãy cân nhắc tài trợ:
 
-[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-❤️-red?style=for-the-badge&logo=github)](https://github.com/sponsors/Yeachan-Heo)
+[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-❤️-red?style=for-the-badge&logo=github)](https://github.com/sponsors/stephenangeloni)
 
 ### Vì sao nên tài trợ?
 

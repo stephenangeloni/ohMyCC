@@ -4,18 +4,17 @@
 
 [![npm version](https://img.shields.io/npm/v/oh-my-claude-sisyphus?color=cb3837)](https://www.npmjs.com/package/oh-my-claude-sisyphus)
 [![npm downloads](https://img.shields.io/npm/dm/oh-my-claude-sisyphus?color=blue)](https://www.npmjs.com/package/oh-my-claude-sisyphus)
-[![GitHub stars](https://img.shields.io/github/stars/Yeachan-Heo/oh-my-claudecode?style=flat&color=yellow)](https://github.com/Yeachan-Heo/oh-my-claudecode/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/stephenangeloni/ohMyCC?style=flat&color=yellow)](https://github.com/stephenangeloni/ohMyCC/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red?style=flat&logo=github)](https://github.com/sponsors/Yeachan-Heo)
+[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red?style=flat&logo=github)](https://github.com/sponsors/stephenangeloni)
 [![Discord](https://img.shields.io/discord/1452487457085063218?color=5865F2&logo=discord&logoColor=white&label=Discord)](https://discord.gg/sj4exxQ9v)
 
-> **Codex 사용자분들께:** [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex)를 확인해보세요 — OpenAI Codex CLI를 위한 동일한 오케스트레이션 경험을 제공합니다.
 
 **Claude Code를 위한 멀티 에이전트 오케스트레이션. 학습 곡선 제로.**
 
 *Claude Code를 배우지 마세요. 그냥 OMC를 쓰세요.*
 
-[시작하기](#빠른-시작) • [문서](https://yeachan-heo.github.io/oh-my-claudecode-website) • [CLI 레퍼런스](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#cli-reference) • [워크플로우](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#workflows) • [마이그레이션 가이드](docs/MIGRATION.md) • [Discord](https://discord.gg/sj4exxQ9v)
+[시작하기](#빠른-시작) • [문서](https://stephenangeloni.github.io/oh-my-claudecode-website) • [CLI 레퍼런스](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#cli-reference) • [워크플로우](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#workflows) • [마이그레이션 가이드](docs/MIGRATION.md) • [Discord](https://discord.gg/sj4exxQ9v)
 
 ---
 
@@ -23,7 +22,7 @@
 
 **Step 1: 설치**
 ```bash
-/plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode
+/plugin marketplace add https://github.com/stephenangeloni/ohMyCC
 /plugin install oh-my-claudecode
 ```
 
@@ -150,7 +149,7 @@ omc team shutdown auth-review
 ## 기능
 
 ### 실행 모드
-다양한 사용 사례를 위한 여러 전략 - 완전 자율 빌드부터 토큰 효율적인 리팩토링까지. [자세히 보기 →](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#execution-modes)
+다양한 사용 사례를 위한 여러 전략 - 완전 자율 빌드부터 토큰 효율적인 리팩토링까지. [자세히 보기 →](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#execution-modes)
 
 | 모드 | 특징 | 용도 |
 |------|---------|---------|
@@ -340,11 +339,11 @@ OpenClaw 페이로드를 ClawdBot을 통해 Discord에 전달하는 레퍼런스
 ## 문서
 
 - **[전체 레퍼런스](docs/REFERENCE.md)** - 완전한 기능 문서
-- **[CLI 레퍼런스](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#cli-reference)** - 모든 `omc` 명령어, 플래그 및 도구
-- **[알림 가이드](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#notifications)** - Discord, Telegram, Slack 및 webhook 설정
-- **[추천 워크플로우](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#workflows)** - 일반 작업을 위한 검증된 스킬 체인
-- **[릴리스 노트](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#release-notes)** - 각 버전의 새로운 기능
-- **[웹사이트](https://yeachan-heo.github.io/oh-my-claudecode-website)** - 인터랙티브 가이드와 예제
+- **[CLI 레퍼런스](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#cli-reference)** - 모든 `omc` 명령어, 플래그 및 도구
+- **[알림 가이드](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#notifications)** - Discord, Telegram, Slack 및 webhook 설정
+- **[추천 워크플로우](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#workflows)** - 일반 작업을 위한 검증된 스킬 체인
+- **[릴리스 노트](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#release-notes)** - 각 버전의 새로운 기능
+- **[웹사이트](https://stephenangeloni.github.io/oh-my-claudecode-website)** - 인터랙티브 가이드와 예제
 - **[마이그레이션 가이드](docs/MIGRATION.md)** - v2.x에서 업그레이드
 - **[아키텍처](docs/ARCHITECTURE.md)** - 내부 작동 원리
 - **[성능 모니터링](docs/PERFORMANCE-MONITORING.md)** - 에이전트 추적, 디버깅 및 최적화
@@ -385,13 +384,13 @@ MIT
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Yeachan-Heo/oh-my-claudecode&type=date&legend=top-left)](https://www.star-history.com/#Yeachan-Heo/oh-my-claudecode&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=stephenangeloni/ohMyCC&type=date&legend=top-left)](https://www.star-history.com/#stephenangeloni/ohMyCC&type=date&legend=top-left)
 
 ## 💖 이 프로젝트 후원하기
 
 Oh-My-ClaudeCode가 당신의 워크플로우에 도움이 된다면, 후원을 고려해주세요:
 
-[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-❤️-red?style=for-the-badge&logo=github)](https://github.com/sponsors/Yeachan-Heo)
+[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-❤️-red?style=for-the-badge&logo=github)](https://github.com/sponsors/stephenangeloni)
 
 ### 왜 후원해야 하나요?
 

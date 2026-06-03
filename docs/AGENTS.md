@@ -72,7 +72,7 @@ This directory contains documentation for end-users and developers:
 
 Use raw GitHub URLs for external accessibility:
 
-[Migration Guide](https://raw.githubusercontent.com/Yeachan-Heo/oh-my-claudecode/main/docs/MIGRATION.md)
+[Migration Guide](https://raw.githubusercontent.com/stephenangeloni/ohMyCC/main/docs/MIGRATION.md)
 
 #### Version References
 

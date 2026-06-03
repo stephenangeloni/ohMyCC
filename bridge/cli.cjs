@@ -12024,8 +12024,8 @@ var init_auto_update = __esm({
     init_paths();
     init_security_config();
     init_paths3();
-    REPO_OWNER = "Yeachan-Heo";
-    REPO_NAME = "oh-my-claudecode";
+    REPO_OWNER = "stephenangeloni";
+    REPO_NAME = "ohMyCC";
     GITHUB_API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`;
     GITHUB_RAW_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}`;
     CLAUDE_CODE_NPM_PACKAGE = "@anthropic-ai/claude-code";
@@ -45572,13 +45572,6 @@ function renderRateLimits(limits, stale) {
     const monthlyPart = monthlyReset ? `${DIM4}mo:${RESET}${monthlyColor}${monthly}%${RESET}${staleMarker}${DIM4}(${resetPrefix}${monthlyReset})${RESET}` : `${DIM4}mo:${RESET}${monthlyColor}${monthly}%${RESET}${staleMarker}`;
     parts.push(monthlyPart);
   }
-  if (limits.sonnetWeeklyPercent != null) {
-    const sonnet = Math.min(100, Math.max(0, Math.round(limits.sonnetWeeklyPercent)));
-    const sonnetColor = getColor(sonnet);
-    const sonnetReset = formatResetTime(limits.sonnetWeeklyResetsAt);
-    const sonnetPart = sonnetReset ? `${DIM4}sn:${RESET}${sonnetColor}${sonnet}%${RESET}${staleMarker}${DIM4}(${resetPrefix}${sonnetReset})${RESET}` : `${DIM4}sn:${RESET}${sonnetColor}${sonnet}%${RESET}${staleMarker}`;
-    parts.push(sonnetPart);
-  }
   if (limits.opusWeeklyPercent != null) {
     const opus = Math.min(100, Math.max(0, Math.round(limits.opusWeeklyPercent)));
     const opusColor = getColor(opus);
@@ -45627,16 +45620,6 @@ function renderRateLimitsWithBar(limits, barWidth = 8, stale) {
     const monthlyReset = formatResetTime(limits.monthlyResetsAt);
     const monthlyPart = monthlyReset ? `${DIM4}mo:${RESET}[${monthlyBar}]${monthlyColor}${monthly}%${RESET}${staleMarker}${DIM4}(${resetPrefix}${monthlyReset})${RESET}` : `${DIM4}mo:${RESET}[${monthlyBar}]${monthlyColor}${monthly}%${RESET}${staleMarker}`;
     parts.push(monthlyPart);
-  }
-  if (limits.sonnetWeeklyPercent != null) {
-    const sonnet = Math.min(100, Math.max(0, Math.round(limits.sonnetWeeklyPercent)));
-    const sonnetColor = getColor(sonnet);
-    const sonnetFilled = Math.round(sonnet / 100 * barWidth);
-    const sonnetEmpty = barWidth - sonnetFilled;
-    const sonnetBar = `${sonnetColor}${"\u2588".repeat(sonnetFilled)}${DIM4}${"\u2591".repeat(sonnetEmpty)}${RESET}`;
-    const sonnetReset = formatResetTime(limits.sonnetWeeklyResetsAt);
-    const sonnetPart = sonnetReset ? `${DIM4}sn:${RESET}[${sonnetBar}]${sonnetColor}${sonnet}%${RESET}${staleMarker}${DIM4}(${resetPrefix}${sonnetReset})${RESET}` : `${DIM4}sn:${RESET}[${sonnetBar}]${sonnetColor}${sonnet}%${RESET}${staleMarker}`;
-    parts.push(sonnetPart);
   }
   if (limits.opusWeeklyPercent != null) {
     const opus = Math.min(100, Math.max(0, Math.round(limits.opusWeeklyPercent)));
@@ -46188,17 +46171,16 @@ function formatModelName(modelId, format = "short") {
   }
   return shortName;
 }
-function renderModel(modelId, format = "versioned", labels = DEFAULT_HUD_LABELS) {
+function renderModel(modelId, format = "versioned") {
   const name = formatModelName(modelId, format);
   if (!name) return null;
-  return cyan(`${labels.model}: ${name}`);
+  return cyan(name);
 }
 var init_model = __esm({
   "src/hud/elements/model.ts"() {
     "use strict";
     init_colors();
     init_string_width();
-    init_types4();
   }
 });
 
@@ -46338,7 +46320,7 @@ function renderEffort(effort) {
   if (!effort) return null;
   const value = effort.trim();
   if (!value) return null;
-  return `${dim("effort:")}${cyan(bold(value))}`;
+  return cyan(bold(value));
 }
 var init_effort = __esm({
   "src/hud/elements/effort.ts"() {
@@ -46587,8 +46569,7 @@ async function render(context, config2) {
   if (enabledElements.model && modelSource) {
     const modelElement = renderModel(
       modelSource,
-      enabledElements.modelFormat,
-      hudLabels
+      enabledElements.modelFormat
     );
     if (modelElement) rendered.set("model", modelElement);
   }

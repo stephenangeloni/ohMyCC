@@ -4,18 +4,17 @@
 
 [![npm version](https://img.shields.io/npm/v/oh-my-claude-sisyphus?color=cb3837)](https://www.npmjs.com/package/oh-my-claude-sisyphus)
 [![npm downloads](https://img.shields.io/npm/dm/oh-my-claude-sisyphus?color=blue)](https://www.npmjs.com/package/oh-my-claude-sisyphus)
-[![GitHub stars](https://img.shields.io/github/stars/Yeachan-Heo/oh-my-claudecode?style=flat&color=yellow)](https://github.com/Yeachan-Heo/oh-my-claudecode/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/stephenangeloni/ohMyCC?style=flat&color=yellow)](https://github.com/stephenangeloni/ohMyCC/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red?style=flat&logo=github)](https://github.com/sponsors/Yeachan-Heo)
+[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red?style=flat&logo=github)](https://github.com/sponsors/stephenangeloni)
 [![Discord](https://img.shields.io/discord/1452487457085063218?color=5865F2&logo=discord&logoColor=white&label=Discord)](https://discord.gg/sj4exxQ9v)
 
-> **Codex ユーザーの方へ:** [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) をチェックしてください — OpenAI Codex CLI 向けの同じオーケストレーション体験を提供します。
 
 **Claude Code のためのマルチエージェント・オーケストレーション。学習コストゼロ。**
 
 *Claude Code を学ぶ必要はありません。OMC を使うだけ。*
 
-[はじめる](#クイックスタート) • [ドキュメント](https://yeachan-heo.github.io/oh-my-claudecode-website) • [CLI リファレンス](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#cli-reference) • [ワークフロー](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#workflows) • [移行ガイド](docs/MIGRATION.md) • [Discord](https://discord.gg/sj4exxQ9v)
+[はじめる](#クイックスタート) • [ドキュメント](https://stephenangeloni.github.io/oh-my-claudecode-website) • [CLI リファレンス](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#cli-reference) • [ワークフロー](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#workflows) • [移行ガイド](docs/MIGRATION.md) • [Discord](https://discord.gg/sj4exxQ9v)
 
 ---
 
@@ -23,7 +22,7 @@
 
 **ステップ 1: インストール**
 ```bash
-/plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode
+/plugin marketplace add https://github.com/stephenangeloni/ohMyCC
 /plugin install oh-my-claudecode
 ```
 
@@ -146,7 +145,7 @@ Codex + Gemini を一つのコマンドで使うには **`/ccg`** スキルを�
 ## 機能
 
 ### 実行モード
-用途に応じた複数の戦略 - 完全自律ビルドからトークン効率の良いリファクタリングまで。[詳しくはこちら →](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#execution-modes)
+用途に応じた複数の戦略 - 完全自律ビルドからトークン効率の良いリファクタリングまで。[詳しくはこちら →](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#execution-modes)
 
 | モード | 特徴 | 用途 |
 |------|---------|------|
@@ -335,11 +334,11 @@ OpenClaw ペイロードを ClawdBot 経由で Discord にリレーするリフ�
 ## ドキュメント
 
 - **[完全リファレンス](docs/REFERENCE.md)** - 全機能の詳細ドキュメント
-- **[CLI リファレンス](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#cli-reference)** - すべての `omc` コマンド、フラグ、ツール
-- **[通知ガイド](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#notifications)** - Discord、Telegram、Slack、webhook のセットアップ
-- **[推奨ワークフロー](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#workflows)** - 一般的なタスクのための実績あるスキルチェーン
-- **[リリースノート](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#release-notes)** - 各バージョンの新機能
-- **[ウェブサイト](https://yeachan-heo.github.io/oh-my-claudecode-website)** - インタラクティブガイドと例
+- **[CLI リファレンス](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#cli-reference)** - すべての `omc` コマンド、フラグ、ツール
+- **[通知ガイド](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#notifications)** - Discord、Telegram、Slack、webhook のセットアップ
+- **[推奨ワークフロー](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#workflows)** - 一般的なタスクのための実績あるスキルチェーン
+- **[リリースノート](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#release-notes)** - 各バージョンの新機能
+- **[ウェブサイト](https://stephenangeloni.github.io/oh-my-claudecode-website)** - インタラクティブガイドと例
 - **[移行ガイド](docs/MIGRATION.md)** - v2.x からのアップグレード
 - **[アーキテクチャ](docs/ARCHITECTURE.md)** - 内部の仕組み
 - **[パフォーマンス監視](docs/PERFORMANCE-MONITORING.md)** - エージェント追跡、デバッグ、最適化
@@ -380,13 +379,13 @@ MIT
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Yeachan-Heo/oh-my-claudecode&type=date&legend=top-left)](https://www.star-history.com/#Yeachan-Heo/oh-my-claudecode&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=stephenangeloni/ohMyCC&type=date&legend=top-left)](https://www.star-history.com/#stephenangeloni/ohMyCC&type=date&legend=top-left)
 
 ## 💖 このプロジェクトを支援
 
 Oh-My-ClaudeCode があなたのワークフローに役立っているなら、スポンサーをご検討ください:
 
-[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-❤️-red?style=for-the-badge&logo=github)](https://github.com/sponsors/Yeachan-Heo)
+[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-❤️-red?style=for-the-badge&logo=github)](https://github.com/sponsors/stephenangeloni)
 
 ### スポンサーになる理由は?
 

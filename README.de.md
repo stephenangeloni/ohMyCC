@@ -4,16 +4,16 @@
 
 [![npm version](https://img.shields.io/npm/v/oh-my-claude-sisyphus?color=cb3837)](https://www.npmjs.com/package/oh-my-claude-sisyphus)
 [![npm downloads](https://img.shields.io/npm/dm/oh-my-claude-sisyphus?color=blue)](https://www.npmjs.com/package/oh-my-claude-sisyphus)
-[![GitHub stars](https://img.shields.io/github/stars/Yeachan-Heo/oh-my-claudecode?style=flat&color=yellow)](https://github.com/Yeachan-Heo/oh-my-claudecode/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/stephenangeloni/ohMyCC?style=flat&color=yellow)](https://github.com/stephenangeloni/ohMyCC/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red?style=flat&logo=github)](https://github.com/sponsors/Yeachan-Heo)
+[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red?style=flat&logo=github)](https://github.com/sponsors/stephenangeloni)
 [![Discord](https://img.shields.io/discord/1452487457085063218?color=5865F2&logo=discord&logoColor=white&label=Discord)](https://discord.gg/sj4exxQ9v)
 
 **Multi-Agenten-Orchestrierung für Claude Code. Null Lernkurve.**
 
 _Lernen Sie nicht Claude Code. Nutzen Sie einfach OMC._
 
-[Loslegen](#schnellstart) • [Dokumentation](https://yeachan-heo.github.io/oh-my-claudecode-website) • [Migrationsleitfaden](docs/MIGRATION.md) • [Discord](https://discord.gg/sj4exxQ9v)
+[Loslegen](#schnellstart) • [Dokumentation](https://stephenangeloni.github.io/oh-my-claudecode-website) • [Migrationsleitfaden](docs/MIGRATION.md) • [Discord](https://discord.gg/sj4exxQ9v)
 
 ---
 
@@ -22,7 +22,7 @@ _Lernen Sie nicht Claude Code. Nutzen Sie einfach OMC._
 **Schritt 1: Installation**
 
 ```bash
-/plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode
+/plugin marketplace add https://github.com/stephenangeloni/ohMyCC
 /plugin install oh-my-claudecode
 ```
 
@@ -111,7 +111,7 @@ Bei Problemen nach der Aktualisierung leeren Sie den alten Plugin-Cache:
 
 ### Orchestrierungsmodi
 
-Mehrere Strategien für verschiedene Anwendungsfälle — von Team-gestützter Orchestrierung bis token-effizientem Refactoring. [Mehr erfahren →](https://yeachan-heo.github.io/oh-my-claudecode-website/docs/#execution-modes)
+Mehrere Strategien für verschiedene Anwendungsfälle — von Team-gestützter Orchestrierung bis token-effizientem Refactoring. [Mehr erfahren →](https://stephenangeloni.github.io/oh-my-claudecode-website/docs/#execution-modes)
 
 | Modus                             | Beschreibung                                                                               | Verwendung                                                                           |
 | --------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
@@ -296,7 +296,7 @@ Siehe `scripts/openclaw-gateway-demo.mjs` für ein Referenz-Gateway, das OpenCla
 
 - **[Vollständige Referenz](docs/REFERENCE.md)** — Umfassende Feature-Dokumentation
 - **[Performance-Monitoring](docs/PERFORMANCE-MONITORING.md)** — Agentenverfolgung, Debugging und Optimierung
-- **[Website](https://yeachan-heo.github.io/oh-my-claudecode-website)** — Interaktive Anleitungen und Beispiele
+- **[Website](https://stephenangeloni.github.io/oh-my-claudecode-website)** — Interaktive Anleitungen und Beispiele
 - **[Migrationsleitfaden](docs/MIGRATION.md)** — Upgrade von v2.x
 - **[Architektur](docs/ARCHITECTURE.md)** — Wie es unter der Haube funktioniert
 
@@ -336,13 +336,13 @@ MIT
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Yeachan-Heo/oh-my-claudecode&type=date&legend=top-left)](https://www.star-history.com/#Yeachan-Heo/oh-my-claudecode&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=stephenangeloni/ohMyCC&type=date&legend=top-left)](https://www.star-history.com/#stephenangeloni/ohMyCC&type=date&legend=top-left)
 
 ## 💖 Dieses Projekt unterstützen
 
 Wenn Oh-My-ClaudeCode Ihren Workflow verbessert, erwägen Sie ein Sponsoring:
 
-[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-❤️-red?style=for-the-badge&logo=github)](https://github.com/sponsors/Yeachan-Heo)
+[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-❤️-red?style=for-the-badge&logo=github)](https://github.com/sponsors/stephenangeloni)
 
 ### Warum sponsern?
 

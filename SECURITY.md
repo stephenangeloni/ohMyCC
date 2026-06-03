@@ -127,4 +127,4 @@ These are structural characteristics that cannot be fully resolved by configurat
 
 ## Reporting Security Issues
 
-If you discover a security vulnerability, please report it via [GitHub Issues](https://github.com/Yeachan-Heo/oh-my-claudecode/issues) with the `security` label.
+If you discover a security vulnerability, please report it via [GitHub Issues](https://github.com/stephenangeloni/ohMyCC/issues) with the `security` label.

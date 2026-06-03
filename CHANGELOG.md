@@ -23,10 +23,10 @@ npm install -g oh-my-claude-sisyphus@4.14.4
 
 Or reinstall/update the Claude plugin from the marketplace when v4.14.4 appears.
 
-**Full Changelog**: https://github.com/Yeachan-Heo/oh-my-claudecode/compare/v4.14.3...v4.14.4
+**Full Changelog**: https://github.com/stephenangeloni/ohMyCC/compare/v4.14.3...v4.14.4
 
 ## Contributors
 
 Thank you to all contributors who made this release possible!
 
-@Yeachan-Heo
+@stephenangeloni

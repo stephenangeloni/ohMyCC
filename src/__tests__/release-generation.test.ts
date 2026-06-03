@@ -19,8 +19,8 @@ describe('release generation', () => {
     const prNumbers = extractPullRequestNumbers([
       'feat(hud): add configurable call count icon format (#2151)',
       'fix(hud): replace misleading CLI error with installation diagnostic (#2129)',
-      'Merge pull request #2146 from Yeachan-Heo/issue-2143-omc-launch-followup',
-      'Merge pull request #2162 from Yeachan-Heo/release/4.10.2',
+      'Merge pull request #2146 from stephenangeloni/issue-2143-omc-launch-followup',
+      'Merge pull request #2162 from stephenangeloni/release/4.10.2',
       'feat(hud): add configurable call count icon format (#2151)',
     ]);
 
@@ -47,20 +47,20 @@ describe('release generation', () => {
   it('derives sorted deduped contributor handles from PR and compare metadata', () => {
     const contributors = deriveContributorLogins(
       [
-        { author: 'Yeachan-Heo' },
+        { author: 'stephenangeloni' },
         { author: 'blue-int' },
         { author: 'EthanJStark' },
         { author: 'blue-int' },
       ],
-      ['tjsingleton', 'DdangJin', 'Yeachan-Heo', 'EthanJStark', null],
+      ['tjsingleton', 'DdangJin', 'stephenangeloni', 'EthanJStark', null],
     );
 
     expect(contributors).toEqual([
       'blue-int',
       'DdangJin',
       'EthanJStark',
+      'stephenangeloni',
       'tjsingleton',
-      'Yeachan-Heo',
     ]);
   });
 
@@ -71,11 +71,11 @@ describe('release generation', () => {
       { number: '2122', title: 'fix(state-tools): add skill-active to STATE_TOOL_MODES so cancel can clear it', author: 'tjsingleton', headRefName: 'fix/cancel-clear-skill-active-state' },
       { number: '2127', title: 'fix(hud): show worktree name instead of volatile main repo HEAD', author: 'blue-int', headRefName: 'fix/hud-worktree-name' },
       { number: '2129', title: 'fix(hud): replace misleading CLI error with installation diagnostic', author: 'DdangJin', headRefName: 'fix/hud-cli-diagnostic' },
-      { number: '2137', title: 'Fix team tmux pane geometry collapse and bundled agent path resolution', author: 'Yeachan-Heo', headRefName: 'fix-issue-2135-pane-geometry' },
-      { number: '2144', title: 'fix: preserve existing global CLAUDE.md during setup', author: 'Yeachan-Heo', headRefName: 'issue-2143-safe-setup-config' },
-      { number: '2146', title: 'fix: follow up #2143 with explicit overwrite choice + omc launch profile', author: 'Yeachan-Heo', headRefName: 'issue-2143-omc-launch-followup' },
-      { number: '2149', title: 'fix: resolve global HUD npm package lookup outside Node projects', author: 'Yeachan-Heo', headRefName: 'fix/issue-2148-hud-global-npm' },
-      { number: '2151', title: 'feat(hud): make call-count icon rendering configurable', author: 'Yeachan-Heo', headRefName: 'issue-2150-hud-call-count-icons' },
+      { number: '2137', title: 'Fix team tmux pane geometry collapse and bundled agent path resolution', author: 'stephenangeloni', headRefName: 'fix-issue-2135-pane-geometry' },
+      { number: '2144', title: 'fix: preserve existing global CLAUDE.md during setup', author: 'stephenangeloni', headRefName: 'issue-2143-safe-setup-config' },
+      { number: '2146', title: 'fix: follow up #2143 with explicit overwrite choice + omc launch profile', author: 'stephenangeloni', headRefName: 'issue-2143-omc-launch-followup' },
+      { number: '2149', title: 'fix: resolve global HUD npm package lookup outside Node projects', author: 'stephenangeloni', headRefName: 'fix/issue-2148-hud-global-npm' },
+      { number: '2151', title: 'feat(hud): make call-count icon rendering configurable', author: 'stephenangeloni', headRefName: 'issue-2150-hud-call-count-icons' },
     ];
 
     const categories = categorizeReleaseNoteEntries(
@@ -119,13 +119,13 @@ describe('release generation', () => {
     const body = generateReleaseBody(
       '4.10.2',
       '# oh-my-claudecode v4.10.2: Bug Fixes',
-      ['blue-int', 'DdangJin', 'Yeachan-Heo'],
+      ['blue-int', 'DdangJin', 'stephenangeloni'],
       'v4.10.1',
     );
 
     expect(body).toContain('npm install -g oh-my-claude-sisyphus@4.10.2');
-    expect(body).toContain('https://github.com/Yeachan-Heo/oh-my-claudecode/compare/v4.10.1...v4.10.2');
-    expect(body).toContain('@blue-int @DdangJin @Yeachan-Heo');
+    expect(body).toContain('https://github.com/stephenangeloni/ohMyCC/compare/v4.10.1...v4.10.2');
+    expect(body).toContain('@blue-int @DdangJin @stephenangeloni');
     expect(body.match(/## Contributors/g)).toHaveLength(1);
   });
 
