@@ -7,6 +7,25 @@ import { getAgentDefinitions } from '../agents/definitions.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const AGENTS_DIR = path.join(__dirname, '../../agents');
+
+// AGENTS.md is the catalog doc, not an agent. Fleet agents (fleet-reviewer,
+// fleet-verifier) are command-scoped specialists spawned only by the
+// /fleet-review pipeline via subagent_type; they ship as plugin agent .md files
+// but are intentionally NOT part of the core agent registry (getAgentDefinitions).
+// All are excluded from the core-registry file counts below.
+const NON_REGISTRY_AGENT_FILES = new Set([
+  'AGENTS.md',
+  'fleet-reviewer.md',
+  'fleet-verifier.md',
+]);
+
+function listCoreAgentPromptFiles(): string[] {
+  return fs
+    .readdirSync(AGENTS_DIR)
+    .filter((file) => file.endsWith('.md') && !NON_REGISTRY_AGENT_FILES.has(file));
+}
+
 const MODEL_ENV_KEYS = [
   'CLAUDE_MODEL',
   'ANTHROPIC_MODEL',
@@ -46,8 +65,7 @@ describe('Agent Registry Validation', () => {
     }
   });
   test('agent count matches documentation', () => {
-    const agentsDir = path.join(__dirname, '../../agents');
-    const promptFiles = fs.readdirSync(agentsDir).filter((file) => file.endsWith('.md') && file !== 'AGENTS.md');
+    const promptFiles = listCoreAgentPromptFiles();
     expect(promptFiles.length).toBe(19);
   });
 
@@ -64,11 +82,25 @@ describe('Agent Registry Validation', () => {
 
   test('all agents have .md prompt files', () => {
     const agents = Object.keys(getAgentDefinitions());
-    const agentsDir = path.join(__dirname, '../../agents');
-    const promptFiles = fs.readdirSync(agentsDir).filter((file) => file.endsWith('.md') && file !== 'AGENTS.md');
+    const promptFiles = listCoreAgentPromptFiles();
     for (const file of promptFiles) {
       const name = file.replace(/\.md$/, '');
       expect(agents, `Missing registry entry for agent: ${name}`).toContain(name);
+    }
+  });
+
+  test('command-scoped fleet agents ship as prompt files but stay out of the core registry', () => {
+    const registry = Object.keys(getAgentDefinitions());
+    for (const file of ['fleet-reviewer.md', 'fleet-verifier.md']) {
+      const name = file.replace(/\.md$/, '');
+      expect(
+        fs.existsSync(path.join(AGENTS_DIR, file)),
+        `${file} must exist for the /fleet-review pipeline`,
+      ).toBe(true);
+      expect(
+        registry,
+        `${name} is command-scoped and must NOT be in the core agent registry`,
+      ).not.toContain(name);
     }
   });
 
