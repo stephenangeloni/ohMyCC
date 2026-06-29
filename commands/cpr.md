@@ -2,13 +2,13 @@
 description: ""
 ---
 
-# OMC fleet-review
+# OMC cpr
 
-This compatibility command keeps `/oh-my-claudecode:fleet-review` available without loading the full `fleet-review` skill description in every Claude Code session.
+This compatibility command keeps `/oh-my-claudecode:cpr` available without loading the full `cpr` skill description in every Claude Code session.
 
 ## Dispatch
 
-1. Read the full bundled skill instructions from the active OMC plugin/install: `skills/fleet-review/SKILL.md`.
+1. Read the full bundled skill instructions from the active OMC plugin/install: `skills/cpr/SKILL.md`.
 2. Follow that SKILL.md exactly, treating the user's arguments as:
 
 ```text

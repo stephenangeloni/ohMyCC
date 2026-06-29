@@ -3770,7 +3770,7 @@ function buildDefaultConfig() {
       scientist: { model: defaultTierModels.MEDIUM },
       tracer: { model: defaultTierModels.MEDIUM },
       gitMaster: { model: defaultTierModels.MEDIUM },
-      codeSimplifier: { model: defaultTierModels.HIGH },
+      codeSimplifier: { model: defaultTierModels.MEDIUM },
       critic: { model: defaultTierModels.HIGH },
       documentSpecialist: { model: defaultTierModels.MEDIUM }
     },
@@ -5263,10 +5263,10 @@ var init_definitions = __esm({
     };
     codeSimplifierAgent = {
       name: "code-simplifier",
-      description: "Simplifies and refines code for clarity, consistency, and maintainability (Opus).",
+      description: "Simplifies and refines code for clarity, consistency, and maintainability (Sonnet).",
       prompt: loadAgentPrompt("code-simplifier"),
-      model: "opus",
-      defaultModel: "opus"
+      model: "sonnet",
+      defaultModel: "sonnet"
     };
     AGENT_CONFIG_KEY_MAP = {
       explore: "explore",
@@ -5322,7 +5322,7 @@ You coordinate specialized subagents to accomplish complex software engineering 
 - **scientist**: Data analysis (sonnet) \u2014 statistics and research
 - **git-master**: Git operations (sonnet) \u2014 commits, rebasing, history
 - **document-specialist**: External docs & reference lookup (sonnet) \u2014 SDK/API/package research
-- **code-simplifier**: Code clarity (opus) \u2014 simplification and maintainability
+- **code-simplifier**: Code clarity (sonnet) \u2014 simplification and maintainability
 
 ### Coordination
 - **critic**: Plan review + thorough gap analysis (opus) \u2014 critical challenge, multi-perspective investigation, structured "What's Missing" analysis
@@ -9631,6 +9631,18 @@ function buildStatusLineCommand(nodeBin, hudScriptPath, findNodePath, cacheWrapp
 function createLineAnchoredMarkerRegex(marker, flags = "gm") {
   return new RegExp(`^${escapeRegex2(marker)}$`, flags);
 }
+function stripOrphanedOmcBlockBodies(content, startMarker, endMarker) {
+  let result = content;
+  result = result.replace(
+    new RegExp(`^${escapeRegex2(startMarker)}$[\\s\\S]*`, "m"),
+    ""
+  );
+  result = result.replace(
+    new RegExp(`^[\\s\\S]*?${escapeRegex2(endMarker)}$\\r?\\n?`, "m"),
+    ""
+  );
+  return result;
+}
 function stripGeneratedUserCustomizationHeaders(content) {
   return content.replace(
     /^<!-- User customizations(?: \([^)]+\))? -->\r?\n?/gm,
@@ -10577,10 +10589,12 @@ ${END_MARKER}
 `;
   }
   const strippedExistingContent = existingContent.replace(OMC_BLOCK_PATTERN, "");
+  const removedCompleteOmcBlock = strippedExistingContent !== existingContent;
   const hasResidualStartMarker = markerStartRegex.test(strippedExistingContent);
   const hasResidualEndMarker = markerEndRegex.test(strippedExistingContent);
   if (hasResidualStartMarker || hasResidualEndMarker) {
-    const recoveredContent = strippedExistingContent.replace(markerStartRegex, "").replace(markerEndRegex, "").trim();
+    const candidateRecovered = removedCompleteOmcBlock ? stripOrphanedOmcBlockBodies(strippedExistingContent, START_MARKER, END_MARKER) : strippedExistingContent;
+    const recoveredContent = candidateRecovered.replace(markerStartRegex, "").replace(markerEndRegex, "").trim();
     return `${START_MARKER}
 ${versionMarker}${cleanOmcContent}
 ${END_MARKER}
@@ -10603,6 +10617,30 @@ ${END_MARKER}
 
 ${USER_CUSTOMIZATIONS}
 ${preservedUserContent}`;
+}
+function buildClaudeMdBackupFilename(date3, existingNames) {
+  const stamp = date3.toISOString().replace(/[:.]/g, "-").replace(/Z$/, "");
+  const taken = new Set(existingNames);
+  let candidate = `${CLAUDE_MD_BACKUP_PREFIX}${stamp}`;
+  let counter = 1;
+  while (taken.has(candidate)) {
+    candidate = `${CLAUDE_MD_BACKUP_PREFIX}${stamp}-${counter}`;
+    counter++;
+  }
+  return candidate;
+}
+function pruneClaudeMdBackups(dir, keep = CLAUDE_MD_BACKUP_KEEP) {
+  if (keep < 0 || !(0, import_fs37.existsSync)(dir)) {
+    return;
+  }
+  const backups = (0, import_fs37.readdirSync)(dir).filter((name) => name.startsWith(CLAUDE_MD_BACKUP_PREFIX)).sort();
+  const stale = backups.slice(0, Math.max(0, backups.length - keep));
+  for (const name of stale) {
+    try {
+      (0, import_fs37.unlinkSync)((0, import_path49.join)(dir, name));
+    } catch {
+    }
+  }
 }
 function install(options = {}) {
   const result = {
@@ -10790,10 +10828,14 @@ function install(options = {}) {
         existingContent = (0, import_fs37.readFileSync)(claudeMdPath, "utf-8");
       }
       if (existingContent !== null) {
-        const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/:/g, "-").split(".")[0];
-        const backupPath = (0, import_path49.join)(CLAUDE_CONFIG_DIR, `CLAUDE.md.backup.${timestamp}`);
+        const existingBackups = (0, import_fs37.readdirSync)(CLAUDE_CONFIG_DIR).filter(
+          (name) => name.startsWith("CLAUDE.md.backup.")
+        );
+        const backupName = buildClaudeMdBackupFilename(/* @__PURE__ */ new Date(), existingBackups);
+        const backupPath = (0, import_path49.join)(CLAUDE_CONFIG_DIR, backupName);
         (0, import_fs37.writeFileSync)(backupPath, existingContent);
         log3(`Backed up existing CLAUDE.md to ${backupPath}`);
+        pruneClaudeMdBackups(CLAUDE_CONFIG_DIR);
       }
       const mergedContent = mergeClaudeMd(existingContent, omcContent, targetVersion);
       (0, import_fs37.writeFileSync)(claudeMdPath, mergedContent);
@@ -10939,7 +10981,7 @@ function getInstallInfo() {
     return null;
   }
 }
-var import_fs37, import_path49, import_url9, import_os11, import_child_process13, CLAUDE_CONFIG_DIR, AGENTS_DIR, COMMANDS_DIR, SKILLS_DIR, HOOKS_DIR, HUD_DIR, SETTINGS_FILE, VERSION_FILE, OMC_MANAGED_SKILL_MARKER, PLUGIN_FULL_SKILL_BODIES_DIR, PLUGIN_COMPACT_SKILL_SHIM_MARKER, CORE_COMMANDS, VERSION, OMC_VERSION_MARKER_PATTERN, CC_NATIVE_COMMANDS, SKININTHEGAMEBROS_ONLY_SKILLS, OMC_HOOK_FILENAMES, STANDALONE_HOOK_TEMPLATE_FILES, PLUGIN_SYNC_PAYLOAD;
+var import_fs37, import_path49, import_url9, import_os11, import_child_process13, CLAUDE_CONFIG_DIR, AGENTS_DIR, COMMANDS_DIR, SKILLS_DIR, HOOKS_DIR, HUD_DIR, SETTINGS_FILE, VERSION_FILE, OMC_MANAGED_SKILL_MARKER, PLUGIN_FULL_SKILL_BODIES_DIR, PLUGIN_COMPACT_SKILL_SHIM_MARKER, CORE_COMMANDS, VERSION, OMC_VERSION_MARKER_PATTERN, CC_NATIVE_COMMANDS, SKININTHEGAMEBROS_ONLY_SKILLS, OMC_HOOK_FILENAMES, STANDALONE_HOOK_TEMPLATE_FILES, PLUGIN_SYNC_PAYLOAD, CLAUDE_MD_BACKUP_PREFIX, CLAUDE_MD_BACKUP_KEEP;
 var init_installer = __esm({
   "src/installer/index.ts"() {
     "use strict";
@@ -11024,6 +11066,8 @@ var init_installer = __esm({
       "LICENSE",
       "package.json"
     ];
+    CLAUDE_MD_BACKUP_PREFIX = "CLAUDE.md.backup.";
+    CLAUDE_MD_BACKUP_KEEP = 5;
   }
 });
 
@@ -13186,6 +13230,8 @@ function createRalphLoopHook(directory) {
       );
       return false;
     }
+    const existing = readRalphState(directory, sessionId);
+    const hasActiveLoop = !!existing && existing.active === true;
     const enableUltrawork = !options?.disableUltrawork;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const normalizedPrompt = stripCriticModeFlag(stripNoPrdFlag(prompt));
@@ -13215,9 +13261,9 @@ function createRalphLoopHook(directory) {
     }
     const state = {
       active: true,
-      iteration: 1,
-      max_iterations: options?.maxIterations ?? DEFAULT_MAX_ITERATIONS,
-      started_at: now,
+      iteration: hasActiveLoop ? existing.iteration : 1,
+      max_iterations: hasActiveLoop ? existing.max_iterations : options?.maxIterations ?? DEFAULT_MAX_ITERATIONS,
+      started_at: hasActiveLoop ? existing.started_at : now,
       prompt: normalizedPrompt,
       session_id: sessionId,
       project_path: directory,
@@ -14892,7 +14938,8 @@ var init_types4 = __esm({
         "lastTool",
         "sessionSummary",
         "effort",
-        "pr"
+        "pr",
+        "ccVersion"
       ],
       detail: ["missionBoard", "agents", "contextWarning", "payloadWarning", "todos"]
     };
@@ -14950,6 +14997,8 @@ var init_types4 = __esm({
         // Opt-in: reasoning-effort badge from $CLAUDE_EFFORT ("auto" when unset)
         pr: false,
         // Opt-in: requires `gh` and a network call (cached, non-blocking)
+        ccVersion: true,
+        // Show Claude Code version (free: read straight from statusline stdin)
         missionBoard: false,
         // Opt-in mission board for whole-run progress tracking
         promptTime: true,
@@ -15261,19 +15310,13 @@ async function cleanupStaleBackgroundTasks(thresholdMs = STALE_TASK_THRESHOLD_MS
   }
   return removedCount;
 }
-async function detectOrphanedTasks(directory, sessionId) {
-  const state = readHudState(directory, sessionId);
-  if (!state || !state.backgroundTasks) {
-    return [];
-  }
+function findOrphanedTasks(tasks, now = Date.now()) {
   const orphaned = [];
-  for (const task of state.backgroundTasks) {
-    if (task.status === "running") {
-      const taskAge = Date.now() - new Date(task.startedAt).getTime();
-      const TWO_HOURS_MS = 2 * 60 * 60 * 1e3;
-      if (taskAge > TWO_HOURS_MS) {
-        orphaned.push(task);
-      }
+  for (const task of tasks) {
+    if (task.status !== "running") continue;
+    const startMs = getTaskStartMs(task);
+    if (Number.isNaN(startMs) || now - startMs > ORPHANED_TASK_THRESHOLD_MS) {
+      orphaned.push(task);
     }
   }
   return orphaned;
@@ -15283,26 +15326,23 @@ async function markOrphanedTasksAsStale(directory, sessionId) {
   if (!state || !state.backgroundTasks) {
     return 0;
   }
-  const orphaned = await detectOrphanedTasks(directory, sessionId);
-  let marked = 0;
-  for (const orphanedTask of orphaned) {
-    const task = state.backgroundTasks.find((t) => t.id === orphanedTask.id);
-    if (task && task.status === "running") {
-      task.status = "completed";
-      marked++;
-    }
+  const orphaned = findOrphanedTasks(state.backgroundTasks);
+  for (const task of orphaned) {
+    task.status = "completed";
+    task.completedAt = (/* @__PURE__ */ new Date()).toISOString();
   }
-  if (marked > 0) {
+  if (orphaned.length > 0) {
     writeHudState(state, directory, sessionId);
   }
-  return marked;
+  return orphaned.length;
 }
-var STALE_TASK_THRESHOLD_MS;
+var STALE_TASK_THRESHOLD_MS, ORPHANED_TASK_THRESHOLD_MS;
 var init_background_cleanup = __esm({
   "src/hud/background-cleanup.ts"() {
     "use strict";
     init_state2();
     STALE_TASK_THRESHOLD_MS = 30 * 60 * 1e3;
+    ORPHANED_TASK_THRESHOLD_MS = 2 * 60 * 60 * 1e3;
   }
 });
 
@@ -31865,7 +31905,7 @@ var init_stage_router = __esm({
       "test-engineer": "MEDIUM",
       designer: "MEDIUM",
       writer: "LOW",
-      "code-simplifier": "HIGH",
+      "code-simplifier": "MEDIUM",
       explore: "LOW",
       "document-specialist": "MEDIUM"
     };
@@ -44085,6 +44125,10 @@ function getModelName(stdin) {
   const displayName = stdin.model?.display_name?.trim();
   return displayName || getModelId(stdin);
 }
+function getCcVersion(stdin) {
+  const version3 = stdin.version?.trim();
+  return version3 || null;
+}
 var import_fs104, import_path123, TRANSIENT_CONTEXT_PERCENT_TOLERANCE, SESSION_ID_ENV_VARS;
 var init_stdin = __esm({
   "src/hud/stdin.ts"() {
@@ -46434,6 +46478,21 @@ var init_pr = __esm({
   }
 });
 
+// src/hud/elements/cc-version.ts
+function renderCcVersion(version3) {
+  if (!version3) return null;
+  const value = version3.trim();
+  if (!value) return null;
+  const label = value.startsWith("v") ? value : `v${value}`;
+  return dim(label);
+}
+var init_cc_version = __esm({
+  "src/hud/elements/cc-version.ts"() {
+    "use strict";
+    init_colors();
+  }
+});
+
 // src/hud/render.ts
 function buildMainElementOrder(elementOrder) {
   if (!Array.isArray(elementOrder) || elementOrder.length === 0) {
@@ -46736,6 +46795,10 @@ async function render(context, config2) {
     const pr = renderPr(context.pr);
     if (pr) rendered.set("pr", pr);
   }
+  if (enabledElements.ccVersion) {
+    const ccVersion = renderCcVersion(context.ccVersion);
+    if (ccVersion) rendered.set("ccVersion", ccVersion);
+  }
   if (context.missionBoard && (config2.missionBoard?.enabled ?? config2.elements.missionBoard ?? false)) {
     const mbLines = renderMissionBoard(context.missionBoard, config2.missionBoard);
     if (mbLines.length > 0) renderedDetail.set("missionBoard", mbLines);
@@ -46855,6 +46918,7 @@ var init_render = __esm({
     init_last_tool();
     init_effort();
     init_pr();
+    init_cc_version();
     ANSI_REGEX = /\x1b\[[0-9;]*[a-zA-Z]|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)/;
     PLAIN_SEPARATOR = " | ";
     DIM_SEPARATOR = dim(PLAIN_SEPARATOR);
@@ -47221,7 +47285,9 @@ async function main2(watchMode = false, skipInit = false) {
       // to "auto" so the badge still renders when the var is absent.
       effort: process.env.CLAUDE_EFFORT ?? "auto",
       // PR badge: only do the (cached, non-blocking) gh work when enabled.
-      pr: config2.elements.pr ? getPrInfo(cwd2) : null
+      pr: config2.elements.pr ? getPrInfo(cwd2) : null,
+      // Claude Code version: read straight from statusline stdin (free).
+      ccVersion: getCcVersion(stdin)
     };
     if (process.env.OMC_DEBUG) {
       console.error(
@@ -88058,7 +88124,7 @@ async function executeTeamApiOperation(operation, args, fallbackCwd) {
         }
         let message = null;
         const target = await findWorkerDispatchTarget(teamName, toWorker, cwd2);
-        await queueDirectMailboxMessage({
+        const dispatchOutcome = await queueDirectMailboxMessage({
           teamName,
           fromWorker,
           toWorker,
@@ -88079,6 +88145,16 @@ async function executeTeamApiOperation(operation, args, fallbackCwd) {
             }
           }
         });
+        if (message === null) {
+          return {
+            ok: false,
+            operation,
+            error: {
+              code: "operation_failed",
+              message: `send-message dispatch produced no message (reason: ${dispatchOutcome.reason})`
+            }
+          };
+        }
         return { ok: true, operation, data: { message } };
       }
       case "broadcast": {
