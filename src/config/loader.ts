@@ -62,7 +62,7 @@ export function buildDefaultConfig(): PluginConfig {
       scientist: { model: defaultTierModels.MEDIUM },
       tracer: { model: defaultTierModels.MEDIUM },
       gitMaster: { model: defaultTierModels.MEDIUM },
-      codeSimplifier: { model: defaultTierModels.HIGH },
+      codeSimplifier: { model: defaultTierModels.MEDIUM },
       critic: { model: defaultTierModels.HIGH },
       documentSpecialist: { model: defaultTierModels.MEDIUM },
     },

@@ -17,7 +17,7 @@ This is the single source of truth for all agent tier information. All skill fil
 | **Critique** | - | - | critic |
 | **Pre-Planning** | - | - | analyst |
 | **Testing** | - | qa-tester | - |
-| **Security** | security-reviewer-low | - | security-reviewer |
+| **Security** | security-reviewer-low | security-reviewer | - |
 | **TDD** | test-engineer (model=haiku) | test-engineer | - |
 | **Code Review** | - | - | code-reviewer |
 | **Data Science** | - | scientist | scientist-high |
@@ -51,7 +51,7 @@ This is the single source of truth for all agent tier information. All skill fil
 | Review/critique plan | critic | HIGH |
 | Pre-planning analysis | analyst | HIGH |
 | Interactive CLI testing | qa-tester | MEDIUM |
-| Security review | security-reviewer | HIGH |
+| Security review | security-reviewer | MEDIUM |
 | Quick security scan | security-reviewer-low | LOW |
 | Fix build errors | debugger | MEDIUM |
 | Simple build fix | debugger (model=haiku) | LOW |

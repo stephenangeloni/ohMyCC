@@ -80,7 +80,7 @@ const agents = getAgentDefinitions();
 | CLI testing | `qa-tester` | sonnet | Bash, Read, Grep, Glob, TodoWrite |
 | Data analysis | `scientist` | sonnet | Read, Glob, Grep, Bash, python_repl |
 | ML/hypothesis | `scientist-high` | opus | Read, Glob, Grep, Bash, python_repl |
-| Security audit | `security-reviewer` | opus | Read, Grep, Glob, Bash |
+| Security audit | `security-reviewer` | sonnet | Read, Grep, Glob, Bash |
 | Quick security scan | `security-reviewer-low` | haiku | Read, Grep, Glob, Bash |
 | Build errors | `debugger` | sonnet | Read, Grep, Glob, Edit, Write, Bash |
 | TDD workflow | `test-engineer` | sonnet | Read, Grep, Glob, Edit, Write, Bash |

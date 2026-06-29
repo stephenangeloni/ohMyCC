@@ -138,7 +138,7 @@ describe('Installer Constants', () => {
         'debugger.md': 'sonnet',
         'verifier.md': 'sonnet',
         'test-engineer.md': 'sonnet',
-        'security-reviewer.md': 'opus',
+        'security-reviewer.md': 'sonnet',
         'git-master.md': 'sonnet',
       };
 

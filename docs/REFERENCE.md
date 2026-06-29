@@ -563,7 +563,7 @@ Always use `oh-my-claudecode:` prefix when calling via Task tool.
 | Quick data inspection          | `scientist` (model=haiku)                                              | haiku  |
 | Complex ML/hypothesis          | `scientist-high`                                                       | opus   |
 | Git operations                 | `git-master`                                                           | sonnet |
-| Code simplification            | `code-simplifier`                                                      | opus   |
+| Code simplification            | `code-simplifier`                                                      | sonnet |
 
 ---
 
