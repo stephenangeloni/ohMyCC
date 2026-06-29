@@ -23,6 +23,7 @@
     "./skills/cancel/",
     "./skills/ccg/",
     "./skills/configure-notifications/",
+    "./skills/cpr/",
     "./skills/debug/",
     "./skills/deep-dive/",
     "./skills/deep-interview/",

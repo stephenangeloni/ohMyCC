@@ -1874,7 +1874,7 @@ function buildDefaultConfig() {
       scientist: { model: defaultTierModels.MEDIUM },
       tracer: { model: defaultTierModels.MEDIUM },
       gitMaster: { model: defaultTierModels.MEDIUM },
-      codeSimplifier: { model: defaultTierModels.HIGH },
+      codeSimplifier: { model: defaultTierModels.MEDIUM },
       critic: { model: defaultTierModels.HIGH },
       documentSpecialist: { model: defaultTierModels.MEDIUM }
     },
@@ -2801,10 +2801,10 @@ var gitMasterAgent = {
 };
 var codeSimplifierAgent = {
   name: "code-simplifier",
-  description: "Simplifies and refines code for clarity, consistency, and maintainability (Opus).",
+  description: "Simplifies and refines code for clarity, consistency, and maintainability (Sonnet).",
   prompt: loadAgentPrompt("code-simplifier"),
-  model: "opus",
-  defaultModel: "opus"
+  model: "sonnet",
+  defaultModel: "sonnet"
 };
 
 // src/features/delegation-enforcer.ts
@@ -6253,7 +6253,7 @@ var ROLE_DEFAULT_TIER = {
   "test-engineer": "MEDIUM",
   designer: "MEDIUM",
   writer: "LOW",
-  "code-simplifier": "HIGH",
+  "code-simplifier": "MEDIUM",
   explore: "LOW",
   "document-specialist": "MEDIUM"
 };

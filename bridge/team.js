@@ -3404,7 +3404,7 @@ function buildDefaultConfig() {
       scientist: { model: defaultTierModels.MEDIUM },
       tracer: { model: defaultTierModels.MEDIUM },
       gitMaster: { model: defaultTierModels.MEDIUM },
-      codeSimplifier: { model: defaultTierModels.HIGH },
+      codeSimplifier: { model: defaultTierModels.MEDIUM },
       critic: { model: defaultTierModels.HIGH },
       documentSpecialist: { model: defaultTierModels.MEDIUM }
     },
@@ -4459,10 +4459,10 @@ var init_definitions = __esm({
     };
     codeSimplifierAgent = {
       name: "code-simplifier",
-      description: "Simplifies and refines code for clarity, consistency, and maintainability (Opus).",
+      description: "Simplifies and refines code for clarity, consistency, and maintainability (Sonnet).",
       prompt: loadAgentPrompt("code-simplifier"),
-      model: "opus",
-      defaultModel: "opus"
+      model: "sonnet",
+      defaultModel: "sonnet"
     };
   }
 });
@@ -6352,7 +6352,7 @@ var init_stage_router = __esm({
       "test-engineer": "MEDIUM",
       designer: "MEDIUM",
       writer: "LOW",
-      "code-simplifier": "HIGH",
+      "code-simplifier": "MEDIUM",
       explore: "LOW",
       "document-specialist": "MEDIUM"
     };
@@ -9817,7 +9817,7 @@ async function executeTeamApiOperation(operation, args, fallbackCwd) {
         }
         let message = null;
         const target = await findWorkerDispatchTarget(teamName, toWorker, cwd);
-        await queueDirectMailboxMessage({
+        const dispatchOutcome = await queueDirectMailboxMessage({
           teamName,
           fromWorker,
           toWorker,
@@ -9838,6 +9838,16 @@ async function executeTeamApiOperation(operation, args, fallbackCwd) {
             }
           }
         });
+        if (message === null) {
+          return {
+            ok: false,
+            operation,
+            error: {
+              code: "operation_failed",
+              message: `send-message dispatch produced no message (reason: ${dispatchOutcome.reason})`
+            }
+          };
+        }
         return { ok: true, operation, data: { message } };
       }
       case "broadcast": {
