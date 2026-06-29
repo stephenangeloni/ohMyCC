@@ -35,6 +35,23 @@ function extractTagContent(template: string, tag: string): string | undefined {
   return match?.[0];
 }
 
+/**
+ * Consensus mode spans several "###" sub-sections (Consensus Mode, the workflow
+ * variant, and the approval/handoff steps) before the next top-level *mode*
+ * heading (e.g. "### Review Mode"). Capturing only the first "###" block (as
+ * extractSection does) misses the ralph/team handoff + ADR steps that live
+ * further down, so consensus-mode assertions use this wider region instead.
+ */
+function extractConsensusRegion(template: string): string | undefined {
+  const start = template.search(/###\s+Consensus Mode/);
+  if (start === -1) return undefined;
+  const body = template.slice(start);
+  // End just before the next *mode* heading; our own heading sits at index 0
+  // with no preceding newline, so the \n### anchor cannot match it.
+  const nextMode = body.search(/\n###\s+[A-Za-z][\w ]*Mode\b/);
+  return nextMode === -1 ? body : body.slice(0, nextMode);
+}
+
 describe('Issue #595: Consensus mode execution handoff', () => {
   beforeEach(() => {
     clearSkillsCache();
@@ -45,7 +62,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
       expect(consensusSection).toContain('AskUserQuestion');
     });
@@ -54,7 +71,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
       expect(consensusSection).toContain('Skill("oh-my-claudecode:ralph")');
     });
@@ -63,7 +80,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
       expect(consensusSection).toMatch(/\*\*MUST\*\*.*invoke.*Skill/i);
     });
@@ -72,7 +89,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
       expect(consensusSection).toMatch(/Do NOT implement directly/i);
     });
@@ -123,7 +140,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
       expect(consensusSection).toContain('RALPLAN-DR');
       expect(consensusSection).toContain('**Principles** (3-5)');
@@ -136,7 +153,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
       expect(consensusSection).toContain('ADR');
       expect(consensusSection).toContain('**Decision**');
@@ -151,7 +168,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
       expect(consensusSection).toContain('**Deliberate**');
       expect(consensusSection).toContain('`--deliberate`');
@@ -166,7 +183,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
 
       // Step ordering: Planner must come before User feedback,
@@ -187,7 +204,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
 
       // The user feedback step must use MUST + AskUserQuestion
@@ -198,7 +215,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
 
       expect(consensusSection).toContain('Proceed to review');
@@ -210,7 +227,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
 
       const architectIdx = consensusSection!.indexOf('**Architect** reviews');
@@ -225,7 +242,7 @@ describe('Issue #595: Consensus mode execution handoff', () => {
       const skill = getBuiltinSkill('omc-plan');
       expect(skill).toBeDefined();
 
-      const consensusSection = extractSection(skill!.template, 'Consensus Mode');
+      const consensusSection = extractConsensusRegion(skill!.template);
       expect(consensusSection).toBeDefined();
       expect(consensusSection).toContain('steelman counterargument (antithesis)');
       expect(consensusSection).toContain('tradeoff tension');
