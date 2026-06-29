@@ -357,7 +357,7 @@ You can change the AI model used by each agent:
 | `critic` | opus | Plan review |
 | `analyst` | opus | Requirements analysis |
 | `code-reviewer` | opus | Comprehensive code review |
-| `code-simplifier` | opus | Code clarity and simplification |
+| `code-simplifier` | sonnet | Code clarity and simplification |
 
 ### Customizing magic keywords
 

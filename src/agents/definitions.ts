@@ -131,14 +131,14 @@ export const gitMasterAgent: AgentConfig = {
 };
 
 /**
- * Code-Simplifier Agent - Code Simplification & Refactoring (Opus)
+ * Code-Simplifier Agent - Code Simplification & Refactoring (Sonnet)
  */
 export const codeSimplifierAgent: AgentConfig = {
   name: 'code-simplifier',
-  description: 'Simplifies and refines code for clarity, consistency, and maintainability (Opus).',
+  description: 'Simplifies and refines code for clarity, consistency, and maintainability (Sonnet).',
   prompt: loadAgentPrompt('code-simplifier'),
-  model: 'opus',
-  defaultModel: 'opus'
+  model: 'sonnet',
+  defaultModel: 'sonnet'
 };
 
 // ============================================================
@@ -320,7 +320,7 @@ You coordinate specialized subagents to accomplish complex software engineering 
 - **scientist**: Data analysis (sonnet) — statistics and research
 - **git-master**: Git operations (sonnet) — commits, rebasing, history
 - **document-specialist**: External docs & reference lookup (sonnet) — SDK/API/package research
-- **code-simplifier**: Code clarity (opus) — simplification and maintainability
+- **code-simplifier**: Code clarity (sonnet) — simplification and maintainability
 
 ### Coordination
 - **critic**: Plan review + thorough gap analysis (opus) — critical challenge, multi-perspective investigation, structured "What's Missing" analysis

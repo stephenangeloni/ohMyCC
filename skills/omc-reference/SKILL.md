@@ -29,7 +29,7 @@ Prefix: `oh-my-claudecode:`. See `agents/*.md` for full prompts.
 - `scientist` (sonnet) — data analysis and statistical reasoning
 - `document-specialist` (sonnet) — SDK/API/framework documentation lookup
 - `git-master` (sonnet) — commit strategy and history hygiene
-- `code-simplifier` (opus) — behavior-preserving simplification
+- `code-simplifier` (sonnet) — behavior-preserving simplification
 - `critic` (opus) — plan/design challenge and review
 
 ## Model Routing

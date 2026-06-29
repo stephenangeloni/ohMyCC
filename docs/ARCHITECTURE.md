@@ -88,7 +88,7 @@ Domain experts called in when needed.
 | `scientist` | sonnet | Data analysis, statistical research |
 | `git-master` | sonnet | Git operations, commits, rebase, history management |
 | `document-specialist` | sonnet | External documentation, API/SDK reference lookup |
-| `code-simplifier` | opus | Code clarity, simplification, maintainability improvement |
+| `code-simplifier` | sonnet | Code clarity, simplification, maintainability improvement |
 
 ### Coordination Lane
 

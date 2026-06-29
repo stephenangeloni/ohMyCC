@@ -60,7 +60,7 @@ const ROLE_DEFAULT_TIER: Record<CanonicalTeamRole, TeamRoleTier> = {
   'test-engineer': 'MEDIUM',
   designer: 'MEDIUM',
   writer: 'LOW',
-  'code-simplifier': 'HIGH',
+  'code-simplifier': 'MEDIUM',
   explore: 'LOW',
   'document-specialist': 'MEDIUM',
 };
