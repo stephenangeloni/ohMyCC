@@ -29,6 +29,8 @@
     "./skills/deepinit/",
     "./skills/external-context/",
     "./skills/fleet-audit/",
+    "./skills/fleet-fix/",
+    "./skills/fleet-review/",
     "./skills/hud/",
     "./skills/learner/",
     "./skills/mcp-setup/",
