@@ -95,7 +95,10 @@ final story's `/goal` reports done, run the quality gate (`aiSlopCleaner` + `ver
 separate-reviewer verification with fresh test/build/lint evidence is required, hand that gate to
 `ralph`'s reviewer pass (Step 7 → 7.5 → 7.6) — the baton-pass in `docs/shared/workflow-gating.md` §6.
 At that handoff the `/goal` loop is resolved to `artifact_only`; only the verification turn is
-authoritative. Never run `/goal` and a `ralph` loop concurrently — pick one authority at a time.
+authoritative. Never run `/goal` and a `ralph` loop concurrently — enforce one authority at a time
+via an explicit loop-conflict policy: **refuse** to start a second authority, **adopt_existing** to
+defer to the loop already running, or **artifact_only** to keep this layer emitting plan/ledger
+artifacts without claiming authority (the resolution used at the `ralph` handoff above).
 
 **When to prefer which:** stay on `/goal`/ultragoal alone when the condition is cleanly surfaceable
 and no separate-reviewer verification is required; escalate to the `ralph` double-check when the
