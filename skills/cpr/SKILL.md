@@ -95,12 +95,31 @@ knowledge:
 >    - PR URL (or "existing: <url>")
 >    - one-line description of the change
 
-## Step 4 — Relay the result
+## Step 4 — Confirm the outcome, then relay
 
-When the subagent returns, relay its compact summary to the user verbatim-ish
-(branch, commit SHA, PR URL, one-liner). Do not re-fetch the diff or re-run git
-to "verify" — that would re-pollute the parent context the skill exists to
-protect. If the subagent reports "no changes" or an error, surface that plainly.
+**Do not trust the subagent's free-text return.** A subagent may complete the
+entire flow correctly yet return something useless like `"Ready."` instead of the
+contracted summary — and you cannot read its transcript to recover the details
+(that would overflow your context). So **always** run a cheap outcome probe
+yourself before reporting, regardless of what the subagent said:
+
+```sh
+git log -1 --format='%h  %s'                                    # commit landed?
+git status -sb | head -1                                        # pushed? upstream set?
+gh pr view --json url,number,state,title --jq '"#\(.number) [\(.state)] \(.title)\n\(.url)"'
+```
+
+This is a **cheap outcome check** (a few hundred bytes), NOT a re-fetch of the
+diff. The distinction is the whole game:
+
+- **Banned**: `git diff` / `git show` / dumping `git status` *content* — that
+  re-pollutes the parent with the diff the skill exists to keep out.
+- **Required**: the SHA + push state + PR URL above — tiny, and the only reliable
+  source of truth when the subagent's return is unreliable.
+
+Relay the verified result to the user: branch, commit SHA, PR URL, one-liner. If
+the probe shows nothing committed / no PR (and the subagent reported "no changes"
+or an error), surface that plainly instead.
 
 ## When NOT to use this
 
