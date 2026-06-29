@@ -23,6 +23,7 @@
     "./skills/cancel/",
     "./skills/ccg/",
     "./skills/configure-notifications/",
+    "./skills/context-handoff/",
     "./skills/cpr/",
     "./skills/debug/",
     "./skills/deep-dive/",
