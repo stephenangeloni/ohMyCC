@@ -36,6 +36,8 @@
     "./skills/hud/",
     "./skills/learner/",
     "./skills/mcp-setup/",
+    "./skills/mpc/",
+    "./skills/mpcw/",
     "./skills/omc-doctor/",
     "./skills/omc-reference/",
     "./skills/omc-setup/",
