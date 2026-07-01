@@ -131,6 +131,19 @@ one-line recap — but the git/gh probe above remains the **authoritative** sour
 of truth. Never report a sentinel value that the probe contradicts; trust the
 probe.
 
+Note: a background/async subagent's *captured* return is often a trailing no-op
+(e.g. `(no action needed)`) rather than its real final message, so the
+`CPR_RESULT` line may be missing from what the harness hands back even when the
+subagent emitted it correctly. If the probe is ambiguous and you still need the
+sentinel, recover it with a targeted grep of the subagent's transcript file (the
+`output_file` path from the dispatch result) — a few bytes, NOT a diff re-fetch:
+
+```sh
+grep -o 'CPR_RESULT: [^"\\]*' <output_file> | tail -1
+```
+
+Still reconcile against the probe; on any conflict, the probe wins.
+
 ## When NOT to use this
 
 If the change is tiny and you've *already* got the full diff in context from
