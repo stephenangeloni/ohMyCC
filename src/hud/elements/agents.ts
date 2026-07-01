@@ -38,7 +38,7 @@ const AGENT_TYPE_CODES: Record<string, string> = {
   architect: 'A',           // opus
 
   // Debugger - 'g' for debuGger (d taken by designer)
-  debugger: 'g',            // sonnet
+  debugger: 'g',            // opus
 
   // Executor - 'x' for eXecutor (sonnet default, opus for complex tasks)
   executor: 'x',            // sonnet/opus
@@ -56,7 +56,7 @@ const AGENT_TYPE_CODES: Record<string, string> = {
   'api-reviewer': 'i',      // sonnet
 
   // Security Reviewer - 'K' for Security (S taken by Scientist)
-  'security-reviewer': 'K',      // sonnet
+  'security-reviewer': 'K',      // opus
 
   // Performance Reviewer - 'O' for perfOrmance
   'performance-reviewer': 'o',   // sonnet

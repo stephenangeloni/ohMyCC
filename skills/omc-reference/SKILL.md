@@ -16,11 +16,11 @@ Prefix: `oh-my-claudecode:`. See `agents/*.md` for full prompts.
 - `analyst` (opus) — requirements clarity and hidden constraints
 - `planner` (opus) — sequencing and execution plans
 - `architect` (opus) — system design, boundaries, and long-horizon tradeoffs
-- `debugger` (sonnet) — root-cause analysis and failure diagnosis
+- `debugger` (opus) — root-cause analysis and failure diagnosis
 - `executor` (sonnet) — implementation and refactoring
 - `verifier` (sonnet) — completion evidence and validation
-- `tracer` (sonnet) — trace gathering and evidence capture
-- `security-reviewer` (sonnet) — trust boundaries and vulnerabilities
+- `tracer` (opus) — trace gathering and evidence capture
+- `security-reviewer` (opus) — trust boundaries and vulnerabilities
 - `code-reviewer` (opus) — comprehensive code review
 - `test-engineer` (sonnet) — testing strategy and regression coverage
 - `designer` (sonnet) — UX and interaction design

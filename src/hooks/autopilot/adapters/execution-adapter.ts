@@ -59,7 +59,7 @@ Match agent types to task complexity:
 - Simple tasks (single file, config): \`executor\` with \`model="haiku"\`
 - Standard implementation: \`executor\` with \`model="sonnet"\`
 - Complex work (architecture, refactoring): \`executor\` with \`model="opus"\`
-- Build issues: \`debugger\` with \`model="sonnet"\`
+- Build issues: \`debugger\` with \`model="opus"\`
 - Test creation: \`test-engineer\` with \`model="sonnet"\`
 - UI work: \`designer\` with \`model="sonnet"\`
 

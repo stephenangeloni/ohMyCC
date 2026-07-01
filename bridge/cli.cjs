@@ -3758,17 +3758,17 @@ function buildDefaultConfig() {
       analyst: { model: defaultTierModels.HIGH },
       planner: { model: defaultTierModels.HIGH },
       architect: { model: defaultTierModels.HIGH },
-      debugger: { model: defaultTierModels.MEDIUM },
+      debugger: { model: defaultTierModels.HIGH },
       executor: { model: defaultTierModels.MEDIUM },
       verifier: { model: defaultTierModels.MEDIUM },
-      securityReviewer: { model: defaultTierModels.MEDIUM },
+      securityReviewer: { model: defaultTierModels.HIGH },
       codeReviewer: { model: defaultTierModels.HIGH },
       testEngineer: { model: defaultTierModels.MEDIUM },
       designer: { model: defaultTierModels.MEDIUM },
       writer: { model: defaultTierModels.LOW },
       qaTester: { model: defaultTierModels.MEDIUM },
       scientist: { model: defaultTierModels.MEDIUM },
-      tracer: { model: defaultTierModels.MEDIUM },
+      tracer: { model: defaultTierModels.HIGH },
       gitMaster: { model: defaultTierModels.MEDIUM },
       codeSimplifier: { model: defaultTierModels.MEDIUM },
       critic: { model: defaultTierModels.HIGH },
@@ -5051,8 +5051,8 @@ var init_tracer = __esm({
       name: "tracer",
       description: "Evidence-driven causal tracing specialist. Explains observed outcomes using competing hypotheses, evidence for and against, uncertainty tracking, and next-probe recommendations.",
       prompt: loadAgentPrompt("tracer"),
-      model: "sonnet",
-      defaultModel: "sonnet",
+      model: "opus",
+      defaultModel: "opus",
       metadata: TRACER_PROMPT_METADATA
     };
   }
@@ -5221,10 +5221,10 @@ var init_definitions = __esm({
     init_document_specialist();
     debuggerAgent = {
       name: "debugger",
-      description: "Root-cause analysis, regression isolation, failure diagnosis (Sonnet).",
+      description: "Root-cause analysis, regression isolation, failure diagnosis (Opus).",
       prompt: loadAgentPrompt("debugger"),
-      model: "sonnet",
-      defaultModel: "sonnet"
+      model: "opus",
+      defaultModel: "opus"
     };
     verifierAgent = {
       name: "verifier",
@@ -5242,10 +5242,10 @@ var init_definitions = __esm({
     };
     securityReviewerAgent = {
       name: "security-reviewer",
-      description: "Security vulnerability detection specialist (Sonnet). Use for security audits and OWASP detection.",
+      description: "Security vulnerability detection specialist (Opus). Use for security audits and OWASP detection.",
       prompt: loadAgentPrompt("security-reviewer"),
-      model: "sonnet",
-      defaultModel: "sonnet"
+      model: "opus",
+      defaultModel: "opus"
     };
     codeReviewerAgent = {
       name: "code-reviewer",
@@ -5305,13 +5305,13 @@ You coordinate specialized subagents to accomplish complex software engineering 
 - **analyst**: Requirements clarity (opus) \u2014 hidden constraint analysis
 - **planner**: Task sequencing (opus) \u2014 execution plans and risk flags
 - **architect**: System design (opus) \u2014 boundaries, interfaces, tradeoffs
-- **debugger**: Root-cause analysis + build error fixing (sonnet) \u2014 regression isolation, diagnosis, type/compilation errors
+- **debugger**: Root-cause analysis + build error fixing (opus) \u2014 regression isolation, diagnosis, type/compilation errors
 - **executor**: Code implementation (sonnet) \u2014 features, refactoring, autonomous complex tasks (use model=opus for complex multi-file changes)
 - **verifier**: Completion validation (sonnet) \u2014 evidence, claims, test adequacy
-- **tracer**: Evidence-driven causal tracing (sonnet) \u2014 competing hypotheses, evidence for/against, next probes
+- **tracer**: Evidence-driven causal tracing (opus) \u2014 competing hypotheses, evidence for/against, next probes
 
 ### Review Lane
-- **security-reviewer**: Security audits (sonnet) \u2014 vulns, trust boundaries, authn/authz
+- **security-reviewer**: Security audits (opus) \u2014 vulns, trust boundaries, authn/authz
 - **code-reviewer**: Comprehensive review (opus) \u2014 API contracts, versioning, backward compatibility, logic defects, maintainability, anti-patterns, performance, quality strategy
 
 ### Domain Specialists
@@ -20484,7 +20484,7 @@ Match agent types to task complexity:
 - Simple tasks (single file, config): \`executor\` with \`model="haiku"\`
 - Standard implementation: \`executor\` with \`model="sonnet"\`
 - Complex work (architecture, refactoring): \`executor\` with \`model="opus"\`
-- Build issues: \`debugger\` with \`model="sonnet"\`
+- Build issues: \`debugger\` with \`model="opus"\`
 - Test creation: \`test-engineer\` with \`model="sonnet"\`
 - UI work: \`designer\` with \`model="sonnet"\`
 
@@ -31898,10 +31898,10 @@ var init_stage_router = __esm({
       analyst: "HIGH",
       architect: "HIGH",
       executor: "MEDIUM",
-      debugger: "MEDIUM",
+      debugger: "HIGH",
       critic: "HIGH",
       "code-reviewer": "HIGH",
-      "security-reviewer": "MEDIUM",
+      "security-reviewer": "HIGH",
       "test-engineer": "MEDIUM",
       designer: "MEDIUM",
       writer: "LOW",
@@ -45249,7 +45249,7 @@ var init_agents = __esm({
       // opus
       // Debugger - 'g' for debuGger (d taken by designer)
       debugger: "g",
-      // sonnet
+      // opus
       // Executor - 'x' for eXecutor (sonnet default, opus for complex tasks)
       executor: "x",
       // sonnet/opus
@@ -45267,7 +45267,7 @@ var init_agents = __esm({
       // sonnet
       // Security Reviewer - 'K' for Security (S taken by Scientist)
       "security-reviewer": "K",
-      // sonnet
+      // opus
       // Performance Reviewer - 'O' for perfOrmance
       "performance-reviewer": "o",
       // sonnet
@@ -93337,7 +93337,7 @@ Examples:
       console.log("    vision              - Visual analysis (Sonnet)");
       console.log("    critic               - Plan review (Opus)");
       console.log("    analyst               - Pre-planning analysis (Opus)");
-      console.log("    debugger            - Root-cause diagnosis (Sonnet)");
+      console.log("    debugger            - Root-cause diagnosis (Opus)");
       console.log("    executor            - Focused execution (Sonnet)");
       console.log("    planner          - Strategic planning (Opus)");
       console.log("    qa-tester           - Interactive CLI testing (Sonnet)");

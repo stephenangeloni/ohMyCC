@@ -2,6 +2,7 @@
 name: explore
 description: Codebase search specialist for finding files and code patterns
 model: haiku
+effort: medium
 level: 3
 disallowedTools: Write, Edit
 ---

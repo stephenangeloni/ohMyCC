@@ -61,10 +61,10 @@ Covers the full development lifecycle from exploration to verification.
 | `analyst` | opus | Requirements analysis, hidden constraint discovery |
 | `planner` | opus | Task sequencing, execution plan creation |
 | `architect` | opus | System design, interface definition, trade-off analysis |
-| `debugger` | sonnet | Root-cause analysis, build error resolution |
+| `debugger` | opus | Root-cause analysis, build error resolution |
 | `executor` | sonnet | Code implementation, refactoring |
 | `verifier` | sonnet | Completion verification, test adequacy confirmation |
-| `tracer` | sonnet | Evidence-driven causal tracing, competing hypothesis analysis |
+| `tracer` | opus | Evidence-driven causal tracing, competing hypothesis analysis |
 
 ### Review Lane
 
@@ -72,7 +72,7 @@ Quality gates before handoff. Catches correctness and security issues.
 
 | Agent | Default Model | Role |
 |-------|---------------|------|
-| `security-reviewer` | sonnet | Security vulnerabilities, trust boundaries, authn/authz review |
+| `security-reviewer` | opus | Security vulnerabilities, trust boundaries, authn/authz review |
 | `code-reviewer` | opus | Comprehensive code review, API contracts, backward compatibility |
 
 ### Domain Lane
@@ -110,8 +110,8 @@ OMC uses three model tiers:
 
 Default assignments by role:
 - **haiku**: Fast lookups and simple tasks (`explore`, `writer`)
-- **sonnet**: Code implementation, debugging, testing (`executor`, `debugger`, `test-engineer`)
-- **opus**: Architecture, strategic analysis, review (`architect`, `planner`, `critic`, `code-reviewer`)
+- **sonnet**: Code implementation, testing (`executor`, `test-engineer`)
+- **opus**: Architecture, strategic analysis, review, debugging (`architect`, `planner`, `critic`, `code-reviewer`, `debugger`, `tracer`, `security-reviewer`)
 
 ### Delegation
 
@@ -144,12 +144,12 @@ Task(
 | Quick code lookup | `explore` | haiku |
 | Feature implementation | `executor` | sonnet |
 | Complex refactoring | `executor` (model=opus) | opus |
-| Simple bug fix | `debugger` | sonnet |
+| Simple bug fix | `debugger` | opus |
 | Complex debugging | `architect` | opus |
 | UI component | `designer` | sonnet |
 | Documentation | `writer` | haiku |
 | Test strategy | `test-engineer` | sonnet |
-| Security review | `security-reviewer` | sonnet |
+| Security review | `security-reviewer` | opus |
 | Code review | `code-reviewer` | opus |
 | Data analysis | `scientist` | sonnet |
 

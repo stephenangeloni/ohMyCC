@@ -1,7 +1,8 @@
 ---
 name: debugger
 description: Root-cause analysis, regression isolation, stack trace analysis, build/compilation error resolution
-model: sonnet
+model: opus
+effort: xhigh
 level: 3
 ---
 

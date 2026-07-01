@@ -51,9 +51,9 @@ This is the single source of truth for all agent tier information. All skill fil
 | Review/critique plan | critic | HIGH |
 | Pre-planning analysis | analyst | HIGH |
 | Interactive CLI testing | qa-tester | MEDIUM |
-| Security review | security-reviewer | MEDIUM |
+| Security review | security-reviewer | HIGH |
 | Quick security scan | security-reviewer-low | LOW |
-| Fix build errors | debugger | MEDIUM |
+| Fix build errors | debugger | HIGH |
 | Simple build fix | debugger (model=haiku) | LOW |
 | TDD workflow | test-engineer | MEDIUM |
 | Quick test suggestions | test-engineer (model=haiku) | LOW |
@@ -66,7 +66,7 @@ This is the single source of truth for all agent tier information. All skill fil
 | Get file/workspace symbol outline | explore | LOW |
 | Structural code pattern search | explore | LOW |
 | Structural code transformation | executor-high | HIGH |
-| Project-wide type checking | debugger | MEDIUM |
+| Project-wide type checking | debugger | HIGH |
 | Check single file for errors | executor-low | LOW |
 | Data analysis / computation | scientist | MEDIUM |
 | Complex autonomous work | executor-high | HIGH |

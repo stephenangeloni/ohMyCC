@@ -342,11 +342,11 @@ You can change the AI model used by each agent:
 | `explore` | haiku | Codebase discovery |
 | `writer` | haiku | Documentation writing |
 | `executor` | sonnet | Code implementation |
-| `debugger` | sonnet | Debugging |
+| `debugger` | opus | Debugging |
 | `designer` | sonnet | UI/UX design |
 | `verifier` | sonnet | Verification |
-| `tracer` | sonnet | Evidence-driven causal tracing |
-| `security-reviewer` | sonnet | Security vulnerabilities and trust boundaries |
+| `tracer` | opus | Evidence-driven causal tracing |
+| `security-reviewer` | opus | Security vulnerabilities and trust boundaries |
 | `test-engineer` | sonnet | Test strategy and coverage |
 | `qa-tester` | sonnet | Interactive CLI/service runtime validation |
 | `scientist` | sonnet | Data and statistical analysis |

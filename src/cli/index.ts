@@ -950,7 +950,7 @@ Examples:
         console.log('    vision              - Visual analysis (Sonnet)');
         console.log('    critic               - Plan review (Opus)');
         console.log('    analyst               - Pre-planning analysis (Opus)');
-        console.log('    debugger            - Root-cause diagnosis (Sonnet)');
+        console.log('    debugger            - Root-cause diagnosis (Opus)');
         console.log('    executor            - Focused execution (Sonnet)');
         console.log('    planner          - Strategic planning (Opus)');
         console.log('    qa-tester           - Interactive CLI testing (Sonnet)');

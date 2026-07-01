@@ -1862,17 +1862,17 @@ function buildDefaultConfig() {
       analyst: { model: defaultTierModels.HIGH },
       planner: { model: defaultTierModels.HIGH },
       architect: { model: defaultTierModels.HIGH },
-      debugger: { model: defaultTierModels.MEDIUM },
+      debugger: { model: defaultTierModels.HIGH },
       executor: { model: defaultTierModels.MEDIUM },
       verifier: { model: defaultTierModels.MEDIUM },
-      securityReviewer: { model: defaultTierModels.MEDIUM },
+      securityReviewer: { model: defaultTierModels.HIGH },
       codeReviewer: { model: defaultTierModels.HIGH },
       testEngineer: { model: defaultTierModels.MEDIUM },
       designer: { model: defaultTierModels.MEDIUM },
       writer: { model: defaultTierModels.LOW },
       qaTester: { model: defaultTierModels.MEDIUM },
       scientist: { model: defaultTierModels.MEDIUM },
-      tracer: { model: defaultTierModels.MEDIUM },
+      tracer: { model: defaultTierModels.HIGH },
       gitMaster: { model: defaultTierModels.MEDIUM },
       codeSimplifier: { model: defaultTierModels.MEDIUM },
       critic: { model: defaultTierModels.HIGH },
@@ -2694,8 +2694,8 @@ var tracerAgent = {
   name: "tracer",
   description: "Evidence-driven causal tracing specialist. Explains observed outcomes using competing hypotheses, evidence for and against, uncertainty tracking, and next-probe recommendations.",
   prompt: loadAgentPrompt("tracer"),
-  model: "sonnet",
-  defaultModel: "sonnet",
+  model: "opus",
+  defaultModel: "opus",
   metadata: TRACER_PROMPT_METADATA
 };
 
@@ -2759,10 +2759,10 @@ var documentSpecialistAgent = {
 // src/agents/definitions.ts
 var debuggerAgent = {
   name: "debugger",
-  description: "Root-cause analysis, regression isolation, failure diagnosis (Sonnet).",
+  description: "Root-cause analysis, regression isolation, failure diagnosis (Opus).",
   prompt: loadAgentPrompt("debugger"),
-  model: "sonnet",
-  defaultModel: "sonnet"
+  model: "opus",
+  defaultModel: "opus"
 };
 var verifierAgent = {
   name: "verifier",
@@ -2780,10 +2780,10 @@ var testEngineerAgent = {
 };
 var securityReviewerAgent = {
   name: "security-reviewer",
-  description: "Security vulnerability detection specialist (Sonnet). Use for security audits and OWASP detection.",
+  description: "Security vulnerability detection specialist (Opus). Use for security audits and OWASP detection.",
   prompt: loadAgentPrompt("security-reviewer"),
-  model: "sonnet",
-  defaultModel: "sonnet"
+  model: "opus",
+  defaultModel: "opus"
 };
 var codeReviewerAgent = {
   name: "code-reviewer",
@@ -6246,10 +6246,10 @@ var ROLE_DEFAULT_TIER = {
   analyst: "HIGH",
   architect: "HIGH",
   executor: "MEDIUM",
-  debugger: "MEDIUM",
+  debugger: "HIGH",
   critic: "HIGH",
   "code-reviewer": "HIGH",
-  "security-reviewer": "MEDIUM",
+  "security-reviewer": "HIGH",
   "test-engineer": "MEDIUM",
   designer: "MEDIUM",
   writer: "LOW",

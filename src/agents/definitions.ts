@@ -51,14 +51,14 @@ export { loadAgentPrompt };
 // ============================================================
 
 /**
- * Debugger Agent - Root-Cause Analysis & Debugging (Sonnet)
+ * Debugger Agent - Root-Cause Analysis & Debugging (Opus)
  */
 export const debuggerAgent: AgentConfig = {
   name: 'debugger',
-  description: 'Root-cause analysis, regression isolation, failure diagnosis (Sonnet).',
+  description: 'Root-cause analysis, regression isolation, failure diagnosis (Opus).',
   prompt: loadAgentPrompt('debugger'),
-  model: 'sonnet',
-  defaultModel: 'sonnet'
+  model: 'opus',
+  defaultModel: 'opus'
 };
 
 /**
@@ -97,14 +97,14 @@ export const testEngineerAgent: AgentConfig = {
 // ============================================================
 
 /**
- * Security-Reviewer Agent - Security Vulnerability Detection (Sonnet)
+ * Security-Reviewer Agent - Security Vulnerability Detection (Opus)
  */
 export const securityReviewerAgent: AgentConfig = {
   name: 'security-reviewer',
-  description: 'Security vulnerability detection specialist (Sonnet). Use for security audits and OWASP detection.',
+  description: 'Security vulnerability detection specialist (Opus). Use for security audits and OWASP detection.',
   prompt: loadAgentPrompt('security-reviewer'),
-  model: 'sonnet',
-  defaultModel: 'sonnet'
+  model: 'opus',
+  defaultModel: 'opus'
 };
 
 /**
@@ -303,13 +303,13 @@ You coordinate specialized subagents to accomplish complex software engineering 
 - **analyst**: Requirements clarity (opus) — hidden constraint analysis
 - **planner**: Task sequencing (opus) — execution plans and risk flags
 - **architect**: System design (opus) — boundaries, interfaces, tradeoffs
-- **debugger**: Root-cause analysis + build error fixing (sonnet) — regression isolation, diagnosis, type/compilation errors
+- **debugger**: Root-cause analysis + build error fixing (opus) — regression isolation, diagnosis, type/compilation errors
 - **executor**: Code implementation (sonnet) — features, refactoring, autonomous complex tasks (use model=opus for complex multi-file changes)
 - **verifier**: Completion validation (sonnet) — evidence, claims, test adequacy
-- **tracer**: Evidence-driven causal tracing (sonnet) — competing hypotheses, evidence for/against, next probes
+- **tracer**: Evidence-driven causal tracing (opus) — competing hypotheses, evidence for/against, next probes
 
 ### Review Lane
-- **security-reviewer**: Security audits (sonnet) — vulns, trust boundaries, authn/authz
+- **security-reviewer**: Security audits (opus) — vulns, trust boundaries, authn/authz
 - **code-reviewer**: Comprehensive review (opus) — API contracts, versioning, backward compatibility, logic defects, maintainability, anti-patterns, performance, quality strategy
 
 ### Domain Specialists

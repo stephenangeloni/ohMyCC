@@ -266,13 +266,13 @@ describe('Agents Element', () => {
       { type: 'explore', model: 'haiku', expected: 'e' },
       { type: 'executor', model: 'sonnet', expected: 'x' },
       { type: 'deep-executor', model: 'opus', expected: 'D' }, // deprecated: falls back to first char
-      { type: 'debugger', model: 'sonnet', expected: 'g' },
+      { type: 'debugger', model: 'opus', expected: 'G' },
       { type: 'verifier', model: 'sonnet', expected: 'v' },
       // Review Lane
       { type: 'style-reviewer', model: 'haiku', expected: 'y' },
       { type: 'quality-reviewer', model: 'sonnet', expected: 'q' }, // deprecated: falls back to first char
       { type: 'api-reviewer', model: 'sonnet', expected: 'i' },
-      { type: 'security-reviewer', model: 'sonnet', expected: 'k' },
+      { type: 'security-reviewer', model: 'opus', expected: 'K' },
       { type: 'performance-reviewer', model: 'sonnet', expected: 'o' },
       { type: 'code-reviewer', model: 'opus', expected: 'R' },
       // Domain Specialists

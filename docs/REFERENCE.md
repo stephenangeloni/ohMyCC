@@ -550,10 +550,10 @@ Always use `oh-my-claudecode:` prefix when calling via Task tool.
 | Review/critique plan           | `critic`                                                               | opus   |
 | Pre-planning analysis          | `analyst`                                                              | opus   |
 | Test CLI interactively         | `qa-tester`                                                            | sonnet |
-| Evidence-driven causal tracing | `tracer`                                                               | sonnet |
-| Security review                | `security-reviewer`                                                    | sonnet |
+| Evidence-driven causal tracing | `tracer`                                                               | opus   |
+| Security review                | `security-reviewer`                                                    | opus   |
 | Quick security scan            | `security-reviewer-low`                                                | haiku  |
-| Fix build errors               | `debugger`                                                             | sonnet |
+| Fix build errors               | `debugger`                                                             | opus   |
 | Simple build fix               | `debugger` (model=haiku)                                               | haiku  |
 | TDD workflow                   | `test-engineer`                                                        | sonnet |
 | Quick test suggestions         | `test-engineer` (model=haiku)                                          | haiku  |

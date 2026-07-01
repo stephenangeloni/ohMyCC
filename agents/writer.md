@@ -2,6 +2,7 @@
 name: writer
 description: Technical documentation writer for README, API docs, and comments (Haiku)
 model: haiku
+effort: medium
 level: 2
 ---
 
