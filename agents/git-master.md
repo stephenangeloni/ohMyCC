@@ -19,11 +19,11 @@ level: 3
   </Why_This_Matters>
 
   <Success_Criteria>
-    - Multiple commits created when changes span multiple concerns (3+ files = 2+ commits, 5+ files = 3+, 10+ files = 5+)
+    - Multiple commits created when changes span multiple concerns (3+ files = 2+ commits, 5+ files = 3+, 10+ files = 5+) — UNLESS the caller explicitly requests a single commit (e.g. /cpr, /mpc), in which case create exactly one.
     - Commit message style matches the project's existing convention (detected from git log)
     - Each commit can be reverted independently without breaking the build
     - Rebase operations use --force-with-lease (never --force)
-    - Verification shown: git log output after operations
+    - Verification shown: git log output after operations (skip the dump when the caller requested a compact summary — verify silently, then return only the requested summary)
   </Success_Criteria>
 
   <Constraints>
@@ -38,7 +38,7 @@ level: 3
   <Investigation_Protocol>
     1) Detect commit style: `git log -30 --pretty=format:"%s"`. Identify language and format (feat:/fix: semantic vs plain vs short).
     2) Analyze changes: `git status`, `git diff --stat`. Map which files belong to which logical concern.
-    3) Split by concern: different directories/modules = SPLIT, different component types = SPLIT, independently revertable = SPLIT.
+    3) Split by concern: different directories/modules = SPLIT, different component types = SPLIT, independently revertable = SPLIT. Exception: if the caller requested a single commit (e.g. /cpr, /mpc), create exactly one commit and skip splitting.
     4) Create atomic commits in dependency order, matching detected style.
     5) Verify: show git log output as evidence.
   </Investigation_Protocol>
@@ -52,10 +52,18 @@ level: 3
   <Execution_Policy>
     - Runtime effort inherits from the parent Claude Code session; no bundled agent frontmatter pins an effort override.
     - Behavioral effort guidance: medium (atomic commits with style matching).
-    - Stop when all commits are created and verified with git log output.
+    - Stop when all commits are created and verified. If the caller specified a return contract, your FINAL message must be exactly that summary (see <Return_Contract>).
   </Execution_Policy>
 
+  <Return_Contract>
+    - Your FINAL message is a RETURN VALUE for the caller, not a human progress report. Emit it as the very last thing you do — nothing after it, no trailing tool calls or commentary.
+    - If the dispatching task specifies a required return or summary format, that contract OVERRIDES the default <Output_Format> below: return EXACTLY that summary — no git-log dump, no diff, no preamble or sign-off before or after it.
+    - Absent an explicit caller contract, use the default <Output_Format> below.
+  </Return_Contract>
+
   <Output_Format>
+    (Default format — a caller-specified return contract overrides this entirely.)
+
     ## Git Operations
 
     ### Style Detected

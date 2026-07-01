@@ -89,11 +89,16 @@ knowledge:
 >    PR with `gh pr create`, writing a title and a body that explains **what and
 >    why** using the intent above (add a short test-plan line if known). Honor
 >    `draft` / base-branch overrides.
-> 6. Return ONLY this compact summary — no diff, no raw command output:
+> 6. Return ONLY this compact summary — no diff, no raw command output. This
+>    summary is your RETURN VALUE, so it must be the FINAL thing you emit (nothing
+>    after it). End with a single machine-parseable sentinel line in exactly this
+>    form so the caller can recover the result even if the rest of your message is
+>    lost:
 >    - branch name
 >    - commit SHA (short)
 >    - PR URL (or "existing: <url>")
 >    - one-line description of the change
+>    - final line: `CPR_RESULT: <branch> | <short-sha> | <pr-url-or-"none"> | <one-liner>`
 
 ## Step 4 — Confirm the outcome, then relay
 
@@ -120,6 +125,11 @@ diff. The distinction is the whole game:
 Relay the verified result to the user: branch, commit SHA, PR URL, one-liner. If
 the probe shows nothing committed / no PR (and the subagent reported "no changes"
 or an error), surface that plainly instead.
+
+If the subagent's return includes the `CPR_RESULT: …` sentinel line, it's a handy
+one-line recap — but the git/gh probe above remains the **authoritative** source
+of truth. Never report a sentinel value that the probe contradicts; trust the
+probe.
 
 ## When NOT to use this
 
