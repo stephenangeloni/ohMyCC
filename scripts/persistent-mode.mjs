@@ -1149,7 +1149,17 @@ async function main() {
         : !autopilot.state.session_id || autopilot.state.session_id === sessionId;
       if (sessionMatches) {
         const phase = getAutopilotPhase(autopilot.state);
-        if (phase !== "complete") {
+
+        // Evidence gate: a self-set `phase: "complete"` is NOT sufficient to
+        // exit. It must be backed by a fresh green verification receipt for the
+        // current code state (degrades to a warning when no verify command is
+        // configured). Mirrors the ultraqa gate — `phase === "complete"` is the
+        // same self-report cheat class as ultraqa's `all_passing`.
+        const claimedComplete = phase === "complete";
+        const gate = claimedComplete ? evaluateReceiptGate(stateDir, directory) : null;
+        const verifiedComplete = claimedComplete && gate.allowExit;
+
+        if (!verifiedComplete) {
           const newCount = (autopilot.state.reinforcement_count || 0) + 1;
           if (newCount <= 20) {
             const toolError = readLastToolError(stateDir);
@@ -1162,7 +1172,13 @@ async function main() {
             const cancelGuidance = hasValidSessionId && autopilot.state.session_id === sessionId
               ? " When all phases are complete, run /oh-my-claudecode:cancel to cleanly exit and clean up this session's autopilot state files. If cancel fails, retry with /oh-my-claudecode:cancel --force."
               : "";
-            let reason = `[AUTOPILOT - Phase: ${phase}] Autopilot not complete. Continue working.${cancelGuidance}`;
+            let reason;
+            if (claimedComplete && gate && !gate.allowExit) {
+              // The loop reports complete, but external evidence disagrees or is missing.
+              reason = `[AUTOPILOT GATE - Phase: ${phase}] Autopilot reported complete, but completion is NOT verified. ${gate.reason} Do not exit until verify-gate is green.${cancelGuidance}`;
+            } else {
+              reason = `[AUTOPILOT - Phase: ${phase}] Autopilot not complete. Continue working.${cancelGuidance}`;
+            }
             if (errorGuidance) {
               reason = errorGuidance + reason;
             }
