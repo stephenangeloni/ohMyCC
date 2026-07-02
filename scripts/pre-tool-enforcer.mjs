@@ -12,6 +12,7 @@ import { execSync } from 'child_process';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { getClaudeConfigDir } from './lib/config-dir.mjs';
 import { evaluateAgentHeavyPreflight } from './lib/pre-tool-enforcer-preflight.mjs';
+import { evaluateEvaluatorSeal } from './lib/evaluator-seal.mjs';
 import { resolveOmcStateRoot } from './lib/state-root.mjs';
 import { readStdin } from './lib/stdin.mjs';
 
@@ -1090,6 +1091,38 @@ async function main() {
 
     const modeActive = hasActiveMode(stateDir, sessionId);
 
+    // Evaluator seal (I2): while a persistence loop is active, flag/deny edits
+    // that target the grader (test files, CI config, or the verify-gate
+    // machinery) so a loop can't make the completion gate pass by weakening what
+    // "verified" means. Default is a warning (non-breaking, so legit TDD loops
+    // are not trapped); OMC_SEAL_EVALUATOR=deny or sealEvaluator in
+    // .claude/omc.jsonc upgrades it to a hard deny. Friction, not security —
+    // Bash writes are an acknowledged bypass (see lib/evaluator-seal.mjs).
+    let evaluatorSealWarning = '';
+    if (modeActive) {
+      const sealInput = data.toolInput || data.tool_input || {};
+      const seal = evaluateEvaluatorSeal({
+        toolName,
+        toolInput: sealInput,
+        modeActive,
+        directory,
+      });
+      if (seal && seal.level === 'deny') {
+        console.log(JSON.stringify({
+          continue: true,
+          hookSpecificOutput: {
+            hookEventName: 'PreToolUse',
+            permissionDecision: 'deny',
+            permissionDecisionReason: seal.reason,
+          },
+        }));
+        return;
+      }
+      if (seal && seal.level === 'warn') {
+        evaluatorSealWarning = seal.reason;
+      }
+    }
+
     // Force-inherit check: deny Task/Agent calls with invalid model param when forceInherit is
     // enabled (Bedrock, Vertex, CC Switch, etc.) - issues #1135, #1201, #1767, #1868
     //
@@ -1245,7 +1278,7 @@ async function main() {
     } else {
       message = generateMessage(toolName, todoStatus, modeActive);
     }
-    message = combineHookMessages(slopWarning, message);
+    message = combineHookMessages(evaluatorSealWarning, slopWarning, message);
 
     if (!message) {
       console.log(JSON.stringify({ continue: true, suppressOutput: true }));
