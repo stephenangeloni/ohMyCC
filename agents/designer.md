@@ -2,6 +2,7 @@
 name: designer
 description: UI/UX Designer-Developer for stunning interfaces (Sonnet)
 model: sonnet
+effort: high
 level: 2
 ---
 

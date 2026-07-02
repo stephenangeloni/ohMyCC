@@ -2,7 +2,7 @@
  * Shared types for Oh-My-ClaudeCode
  */
 
-export type ModelType = "sonnet" | "opus" | "haiku" | "inherit";
+export type ModelType = "sonnet" | "opus" | "haiku" | "fable" | "inherit";
 
 export interface AgentConfig {
   name: string;
@@ -123,7 +123,7 @@ export interface PluginConfig {
      *
      * Env: OMC_MODEL_ALIAS_HAIKU, OMC_MODEL_ALIAS_SONNET, OMC_MODEL_ALIAS_OPUS
      */
-    modelAliases?: Partial<Record<"haiku" | "sonnet" | "opus", ModelType>>;
+    modelAliases?: Partial<Record<"haiku" | "sonnet" | "opus" | "fable", ModelType>>;
     /** Keywords that force escalation to higher tier */
     escalationKeywords?: string[];
     /** Keywords that suggest lower tier */

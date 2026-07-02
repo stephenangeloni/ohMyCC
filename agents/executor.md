@@ -2,6 +2,7 @@
 name: executor
 description: Focused task executor for implementation work (Sonnet)
 model: sonnet
+effort: high
 level: 2
 ---
 

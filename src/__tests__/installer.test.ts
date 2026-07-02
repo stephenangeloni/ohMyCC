@@ -135,10 +135,10 @@ describe('Installer Constants', () => {
         'analyst.md': 'opus',
         'planner.md': 'opus',
         'qa-tester.md': 'sonnet',
-        'debugger.md': 'opus',
+        'debugger.md': 'fable',
         'verifier.md': 'sonnet',
         'test-engineer.md': 'sonnet',
-        'security-reviewer.md': 'opus',
+        'security-reviewer.md': 'fable',
         'git-master.md': 'sonnet',
       };
 
@@ -155,7 +155,7 @@ describe('Installer Constants', () => {
 
         const modelMatch = content.match(/^model:\s+(\S+)/m);
         expect(modelMatch, `${filename} should declare a model alias`).toBeTruthy();
-        expect(modelMatch![1], `${filename} should use a tier alias`).toMatch(/^(opus|sonnet|haiku)$/);
+        expect(modelMatch![1], `${filename} should use a tier alias`).toMatch(/^(opus|sonnet|haiku|fable)$/);
         expect(content, `${filename} should not pin a literal Claude model ID`).not.toMatch(/^model:\s+claude-/m);
       }
     });

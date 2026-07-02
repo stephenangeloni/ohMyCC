@@ -1,8 +1,8 @@
 ---
 name: fleet-verifier
 description: Cross-checks /fleet-review findings against actual source. Independently confirms, refutes, or marks-likely each finding and returns structured VERDICT blocks. Read-only.
-model: opus
-effort: xhigh
+model: fable
+effort: high
 disallowedTools: Write, Edit, NotebookEdit
 ---
 

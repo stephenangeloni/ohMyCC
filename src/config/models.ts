@@ -1,11 +1,11 @@
 import { validateAnthropicBaseUrl } from '../utils/ssrf-guard.js';
 
-export type ModelTier = 'LOW' | 'MEDIUM' | 'HIGH';
-export type ClaudeModelFamily = 'HAIKU' | 'SONNET' | 'OPUS';
+export type ModelTier = 'LOW' | 'MEDIUM' | 'HIGH' | 'MAX';
+export type ClaudeModelFamily = 'HAIKU' | 'SONNET' | 'OPUS' | 'FABLE';
 
 const DIRECT_MODEL_ENV_KEYS = ['CLAUDE_MODEL', 'ANTHROPIC_MODEL'] as const;
-const INHERIT_TIER_PRIORITY: readonly ModelTier[] = ['MEDIUM', 'HIGH', 'LOW'];
-const CLAUDE_TIER_ALIASES = new Set(['sonnet', 'opus', 'haiku']);
+const INHERIT_TIER_PRIORITY: readonly ModelTier[] = ['MEDIUM', 'HIGH', 'LOW', 'MAX'];
+const CLAUDE_TIER_ALIASES = new Set(['sonnet', 'opus', 'haiku', 'fable']);
 
 const TIER_ENV_KEYS: Record<ModelTier, readonly string[]> = {
   LOW: [
@@ -23,6 +23,11 @@ const TIER_ENV_KEYS: Record<ModelTier, readonly string[]> = {
     'CLAUDE_CODE_BEDROCK_OPUS_MODEL',
     'ANTHROPIC_DEFAULT_OPUS_MODEL',
   ],
+  MAX: [
+    'OMC_MODEL_MAX',
+    'CLAUDE_CODE_BEDROCK_FABLE_MODEL',
+    'ANTHROPIC_DEFAULT_FABLE_MODEL',
+  ],
 };
 
 /**
@@ -33,6 +38,7 @@ export const CLAUDE_FAMILY_DEFAULTS: Record<ClaudeModelFamily, string> = {
   HAIKU: 'claude-haiku-4-5',
   SONNET: 'claude-sonnet-4-6',
   OPUS: 'claude-opus-4-8',
+  FABLE: 'claude-fable-5',
 };
 
 /** Canonical tier->model mapping used as built-in defaults */
@@ -40,6 +46,7 @@ export const BUILTIN_TIER_MODEL_DEFAULTS: Record<ModelTier, string> = {
   LOW: CLAUDE_FAMILY_DEFAULTS.HAIKU,
   MEDIUM: CLAUDE_FAMILY_DEFAULTS.SONNET,
   HIGH: CLAUDE_FAMILY_DEFAULTS.OPUS,
+  MAX: CLAUDE_FAMILY_DEFAULTS.FABLE,
 };
 
 /** Built-in defaults for external provider models */
@@ -55,6 +62,7 @@ export const BUILTIN_EXTERNAL_MODEL_DEFAULTS = {
  * via environment variables without editing source code.
  *
  * Environment variables (highest precedence):
+ *   OMC_MODEL_MAX     - Model ID for MAX tier (fable-class)
  *   OMC_MODEL_HIGH    - Model ID for HIGH tier (opus-class)
  *   OMC_MODEL_MEDIUM  - Model ID for MEDIUM tier (sonnet-class)
  *   OMC_MODEL_LOW     - Model ID for LOW tier (haiku-class)
@@ -148,6 +156,10 @@ export function hasTierModelEnvOverrides(): boolean {
   );
 }
 
+export function getDefaultModelMax(): string {
+  return resolveTierModelFromEnv('MAX') || BUILTIN_TIER_MODEL_DEFAULTS.MAX;
+}
+
 export function getDefaultModelHigh(): string {
   return resolveTierModelFromEnv('HIGH') || BUILTIN_TIER_MODEL_DEFAULTS.HIGH;
 }
@@ -169,6 +181,7 @@ export function getDefaultTierModels(): Record<ModelTier, string> {
     LOW: getDefaultModelLow(),
     MEDIUM: getDefaultModelMedium(),
     HIGH: getDefaultModelHigh(),
+    MAX: getDefaultModelMax(),
   };
 }
 
@@ -183,6 +196,7 @@ export function resolveClaudeFamily(modelId: string): ClaudeModelFamily | null {
   if (lower.includes('sonnet')) return 'SONNET';
   if (lower.includes('opus')) return 'OPUS';
   if (lower.includes('haiku')) return 'HAIKU';
+  if (lower.includes('fable')) return 'FABLE';
 
   return null;
 }

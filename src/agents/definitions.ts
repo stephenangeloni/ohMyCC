@@ -51,14 +51,14 @@ export { loadAgentPrompt };
 // ============================================================
 
 /**
- * Debugger Agent - Root-Cause Analysis & Debugging (Opus)
+ * Debugger Agent - Root-Cause Analysis & Debugging (Fable)
  */
 export const debuggerAgent: AgentConfig = {
   name: 'debugger',
-  description: 'Root-cause analysis, regression isolation, failure diagnosis (Opus).',
+  description: 'Root-cause analysis, regression isolation, failure diagnosis (Fable).',
   prompt: loadAgentPrompt('debugger'),
-  model: 'opus',
-  defaultModel: 'opus'
+  model: 'fable',
+  defaultModel: 'fable'
 };
 
 /**
@@ -97,25 +97,25 @@ export const testEngineerAgent: AgentConfig = {
 // ============================================================
 
 /**
- * Security-Reviewer Agent - Security Vulnerability Detection (Opus)
+ * Security-Reviewer Agent - Security Vulnerability Detection (Fable)
  */
 export const securityReviewerAgent: AgentConfig = {
   name: 'security-reviewer',
-  description: 'Security vulnerability detection specialist (Opus). Use for security audits and OWASP detection.',
+  description: 'Security vulnerability detection specialist (Fable). Use for security audits and OWASP detection.',
   prompt: loadAgentPrompt('security-reviewer'),
-  model: 'opus',
-  defaultModel: 'opus'
+  model: 'fable',
+  defaultModel: 'fable'
 };
 
 /**
- * Code-Reviewer Agent - Expert Code Review (Opus)
+ * Code-Reviewer Agent - Expert Code Review (Fable)
  */
 export const codeReviewerAgent: AgentConfig = {
   name: 'code-reviewer',
-  description: 'Expert code review specialist (Opus). Use for comprehensive code quality review.',
+  description: 'Expert code review specialist (Fable). Use for comprehensive code quality review.',
   prompt: loadAgentPrompt('code-reviewer'),
-  model: 'opus',
-  defaultModel: 'opus'
+  model: 'fable',
+  defaultModel: 'fable'
 };
 
 
@@ -131,14 +131,14 @@ export const gitMasterAgent: AgentConfig = {
 };
 
 /**
- * Code-Simplifier Agent - Code Simplification & Refactoring (Sonnet)
+ * Code-Simplifier Agent - Code Simplification & Refactoring (Fable)
  */
 export const codeSimplifierAgent: AgentConfig = {
   name: 'code-simplifier',
-  description: 'Simplifies and refines code for clarity, consistency, and maintainability (Sonnet).',
+  description: 'Simplifies and refines code for clarity, consistency, and maintainability (Fable).',
   prompt: loadAgentPrompt('code-simplifier'),
-  model: 'sonnet',
-  defaultModel: 'sonnet'
+  model: 'fable',
+  defaultModel: 'fable'
 };
 
 // ============================================================
@@ -303,14 +303,14 @@ You coordinate specialized subagents to accomplish complex software engineering 
 - **analyst**: Requirements clarity (opus) — hidden constraint analysis
 - **planner**: Task sequencing (opus) — execution plans and risk flags
 - **architect**: System design (opus) — boundaries, interfaces, tradeoffs
-- **debugger**: Root-cause analysis + build error fixing (opus) — regression isolation, diagnosis, type/compilation errors
+- **debugger**: Root-cause analysis + build error fixing (fable) — regression isolation, diagnosis, type/compilation errors
 - **executor**: Code implementation (sonnet) — features, refactoring, autonomous complex tasks (use model=opus for complex multi-file changes)
 - **verifier**: Completion validation (sonnet) — evidence, claims, test adequacy
-- **tracer**: Evidence-driven causal tracing (opus) — competing hypotheses, evidence for/against, next probes
+- **tracer**: Evidence-driven causal tracing (fable) — competing hypotheses, evidence for/against, next probes
 
 ### Review Lane
-- **security-reviewer**: Security audits (opus) — vulns, trust boundaries, authn/authz
-- **code-reviewer**: Comprehensive review (opus) — API contracts, versioning, backward compatibility, logic defects, maintainability, anti-patterns, performance, quality strategy
+- **security-reviewer**: Security audits (fable) — vulns, trust boundaries, authn/authz
+- **code-reviewer**: Comprehensive review (fable) — API contracts, versioning, backward compatibility, logic defects, maintainability, anti-patterns, performance, quality strategy
 
 ### Domain Specialists
 - **test-engineer**: Test strategy (sonnet) — coverage, flaky test hardening
@@ -320,7 +320,7 @@ You coordinate specialized subagents to accomplish complex software engineering 
 - **scientist**: Data analysis (sonnet) — statistics and research
 - **git-master**: Git operations (sonnet) — commits, rebasing, history
 - **document-specialist**: External docs & reference lookup (sonnet) — SDK/API/package research
-- **code-simplifier**: Code clarity (sonnet) — simplification and maintainability
+- **code-simplifier**: Code clarity (fable) — simplification and maintainability
 
 ### Coordination
 - **critic**: Plan review + thorough gap analysis (opus) — critical challenge, multi-perspective investigation, structured "What's Missing" analysis
