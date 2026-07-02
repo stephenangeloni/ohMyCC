@@ -26,6 +26,7 @@ import { homedir } from "os";
 import { fileURLToPath, pathToFileURL } from "url";
 import { getClaudeConfigDir } from "./lib/config-dir.mjs";
 import { resolveOmcStateRoot } from "./lib/state-root.mjs";
+import { evaluateReceiptGate } from "./lib/verification-receipt.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -1360,7 +1361,15 @@ async function main() {
     ) {
       const cycle = ultraqa.state.cycle || 1;
       const maxCycles = ultraqa.state.max_cycles || 10;
-      if (cycle < maxCycles && !ultraqa.state.all_passing) {
+
+      // Evidence gate: a self-reported `all_passing` is NOT sufficient to exit.
+      // It must be backed by a fresh green verification receipt for the current
+      // code state (degrades to a warning when no verify command is configured).
+      const claimedPassing = Boolean(ultraqa.state.all_passing);
+      const gate = claimedPassing ? evaluateReceiptGate(stateDir, directory) : null;
+      const verifiedComplete = claimedPassing && gate.allowExit;
+
+      if (cycle < maxCycles && !verifiedComplete) {
         const toolError = readLastToolError(stateDir);
         const errorGuidance = getToolErrorRetryGuidance(toolError);
 
@@ -1368,7 +1377,13 @@ async function main() {
         ultraqa.state.last_checked_at = new Date().toISOString();
         writeJsonFile(ultraqa.path, ultraqa.state);
 
-        let reason = `[ULTRAQA - Cycle ${cycle + 1}/${maxCycles}] Tests not all passing. Continue fixing. When all tests pass, run /oh-my-claudecode:cancel to cleanly exit and clean up state files. If cancel fails, retry with /oh-my-claudecode:cancel --force.`;
+        let reason;
+        if (claimedPassing && gate && !gate.allowExit) {
+          // The loop claims done, but external evidence disagrees or is missing.
+          reason = `[ULTRAQA GATE - Cycle ${cycle + 1}/${maxCycles}] all_passing was set, but completion is NOT verified. ${gate.reason} Do not exit until verify-gate is green.`;
+        } else {
+          reason = `[ULTRAQA - Cycle ${cycle + 1}/${maxCycles}] Tests not all passing. Continue fixing. When all tests pass, run scripts/verify-gate.mjs to stamp a green receipt, then /oh-my-claudecode:cancel to cleanly exit. If cancel fails, retry with /oh-my-claudecode:cancel --force.`;
+        }
         if (errorGuidance) {
           reason = errorGuidance + reason;
         }
