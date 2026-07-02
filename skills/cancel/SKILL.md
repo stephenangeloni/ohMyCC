@@ -108,6 +108,8 @@ fi
 - Swarm is a shared SQLite/marker mode (`.omc/state/swarm.db` / `.omc/state/swarm-active.marker`) and is not session-scoped.
 - The default cleanup flow calls `state_clear` with the session id to remove only the matching session files; modes stay bound to their originating session.
 
+> **Completion evidence (persistence loops):** for evidence-gated loops (ralph, ultraqa), completion should be backed by a GREEN verification receipt (`.omc/state/verification-receipt.json`) stamped by `scripts/verify-gate.mjs` for the current code state. If you are cancelling because the work is genuinely done, stamp/refresh that receipt first (the Stop hook surfaces its status each iteration). `--force`/`--all` skip this expectation for emergency teardown.
+
 Active modes are still cancelled in dependency order:
 1. Autopilot (includes linked ralph/ultraqa/ cleanup)
 2. Ralph (cleans its linked ultrawork or )

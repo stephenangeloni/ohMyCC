@@ -127,7 +127,7 @@ By default, ralph operates in PRD mode. A scaffold `prd.json` is auto-generated 
 - If regression fails, roll back the cleaner changes or fix the regression, then rerun the verification loop until it passes.
 - Only proceed to completion after the post-deslop regression run passes (or `--no-deslop` was explicitly specified).
 
-8. **On approval**: After Step 7.6 passes (with Step 7.5 completed, or skipped via `--no-deslop`), run `/oh-my-claudecode:cancel` to cleanly exit and clean up all state files
+8. **On approval**: After Step 7.6 passes (with Step 7.5 completed, or skipped via `--no-deslop`), stamp a green completion receipt with `node "$CLAUDE_PLUGIN_ROOT"/scripts/verify-gate.mjs` — it runs the repo's verify command (`.claude/omc.jsonc` `verify`, or project-memory test/lint/build) and records the **exit code bound to the current code state**. The Stop hook surfaces this receipt's status every iteration. Only when it is GREEN, run `/oh-my-claudecode:cancel` to cleanly exit and clean up all state files. Do NOT cancel while the receipt is red or missing — the loop is not actually done; `--force` overrides for genuine emergencies only.
 
 9. **On rejection**: Fix the issues raised, re-verify with the same reviewer, then loop back to check if the story needs to be marked incomplete
    </Steps>

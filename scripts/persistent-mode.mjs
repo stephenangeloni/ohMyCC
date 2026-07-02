@@ -1026,7 +1026,18 @@ async function main() {
           }
           writeJsonFile(ralph.path, ralph.state);
 
-          let reason = `[RALPH LOOP - ITERATION ${iteration + 1}/${maxIter}] Work is NOT done. Continue working.\nWhen FULLY complete (after Architect verification), run /oh-my-claudecode:cancel to cleanly exit ralph mode and clean up all state files. If cancel fails, retry with /oh-my-claudecode:cancel --force.\n${ralph.state.prompt ? `Task: ${ralph.state.prompt}` : ""}`;
+          // Surface the verification receipt status every heartbeat so completion
+          // requires command-derived evidence, not just a self-declared /cancel.
+          // Cheap when no receipt exists (returns "missing" before touching git).
+          const ralphGate = evaluateReceiptGate(stateDir, directory);
+          const receiptNote =
+            ralphGate.status === "no-command"
+              ? "\n[VERIFY] No verify command configured — completion is UNVERIFIED. Set `verify` in .claude/omc.jsonc to enforce a real completion gate."
+              : ralphGate.allowExit
+                ? "\n[VERIFY] ✅ Verification receipt is GREEN for the current code. Once the reviewer also approves, run /oh-my-claudecode:cancel to exit."
+                : `\n[VERIFY] ⚠️ Not verified (${ralphGate.status}). Before completing, run: node "$CLAUDE_PLUGIN_ROOT"/scripts/verify-gate.mjs — then /oh-my-claudecode:cancel. ${ralphGate.reason}`;
+
+          let reason = `[RALPH LOOP - ITERATION ${iteration + 1}/${maxIter}] Work is NOT done. Continue working.\nWhen FULLY complete (after Architect verification AND a green verify-gate receipt), run /oh-my-claudecode:cancel to cleanly exit ralph mode and clean up all state files. If cancel fails, retry with /oh-my-claudecode:cancel --force.${receiptNote}\n${ralph.state.prompt ? `Task: ${ralph.state.prompt}` : ""}`;
           if (errorGuidance) {
             reason = errorGuidance + reason;
           }
