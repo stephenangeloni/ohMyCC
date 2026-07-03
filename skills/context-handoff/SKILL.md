@@ -45,19 +45,37 @@ the entire point.
 
 ## How to build it
 
-**1. Reconstruct the whole arc — don't just look at recent messages.** Read from the top:
+**1. Check for supplied direction.** The dispatcher passes anything typed after the command
+through as `$ARGUMENTS`. If that's non-empty (or the user appended an instruction in the same
+message), treat it as a **directive layered on top of the default process below** — not as
+just more context to summarize. Common forms and how to apply them:
+- **Scope/focus** ("focus on the auth thread", "just the bug fix, skip the refactor") → narrow
+  coverage to that thread; still mention the dropped thread(s) in one line so nothing vanishes
+  silently.
+- **Next-action override** ("next action should be X instead", "have the next session start
+  with Y") → replace the auto-detected `## Next action` with the supplied one for that thread.
+- **Emphasis** ("make sure to call out the flaky test", "flag the perf regression risk") →
+  fold it into the relevant existing section rather than bolting on a new one.
+
+If no direction was supplied, skip straight to step 2. If it was, add a one-line note (in the
+title area or the Honesty note) that this handoff's scope/next-action was shaped by explicit
+user direction — so the reader knows it reflects an ask, not pure inference from the
+conversation.
+
+**2. Reconstruct the whole arc — don't just look at recent messages.** Read from the top:
 the *first* user message usually states the real goal and constraints. Then scan forward for
 the load-bearing moments: decisions made, corrections the user gave you, hypotheses that were
 tried and abandoned, and where things stand right now. The recent tail is only the resume
 point, not the whole picture.
 
-**2. Identify the threads.** Note whether the session is **one** body of work or **several**
+**3. Identify the threads.** Note whether the session is **one** body of work or **several**
 distinct threads — each with its own goal and state (e.g. a feature plus an unrelated bug
-found along the way, or a work task plus a tooling/meta task). Cover **every** active thread;
-a thread you drop is a thread the fresh agent won't know to resume. A thread that's fully
-finished with no follow-up can be a one-line note rather than a full section.
+found along the way, or a work task plus a tooling/meta task). Cover **every** active thread
+that step 1 didn't explicitly ask you to drop; a thread you silently drop is a thread the
+fresh agent won't know to resume. A thread that's fully finished with no follow-up can be a
+one-line note rather than a full section.
 
-**3. Gather the concrete anchors.** Pull the real pointers a fresh agent needs:
+**4. Gather the concrete anchors.** Pull the real pointers a fresh agent needs:
 - Files created or changed, and the key files to *read first*. Use `git status` / `git log`
   / `git diff --stat` and your own edit history to get this right rather than from memory.
 - Commits, branches, PRs, deploys, built artifacts (tables, datasets, generated files),
@@ -65,7 +83,7 @@ finished with no follow-up can be a one-line note rather than a full section.
 - Existing project memory, handoff docs, or notes already on disk — point to them instead of
   re-explaining their contents.
 
-**4. Separate durable from ephemeral.** If something is already written down (a file, a
+**5. Separate durable from ephemeral.** If something is already written down (a file, a
 commit, a doc, project memory), **point to it** — don't inline it. Spend the handoff's words
 on what exists *only in this conversation*: the unrecorded decision, the half-finished
 reasoning, the "we agreed to do X next." This keeps the handoff lean and honest about where
@@ -78,12 +96,12 @@ the source of truth lives.
    *specific* rule is load-bearing for the next action and easy to miss; otherwise leave it
    out entirely.
 
-**5. Assemble into the template below, run the self-check, then write it to `HANDOFF.MD`**
+**6. Assemble into the template below, run the self-check, then write it to `HANDOFF.MD`**
 (see *Write the handoff*).
 
 ## Output template
 
-There are two shapes. Pick by thread count from step 2.
+There are two shapes. Pick by thread count from step 3.
 
 **Single thread** — use the flat structure: the per-thread sections, then the shared sections.
 
