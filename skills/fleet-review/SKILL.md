@@ -523,8 +523,8 @@ Focus ONLY on [ANGLE NAME]:
 Do NOT comment on style, naming, or issues outside your focus area.
 Read the surrounding code — not just the diff — to understand the full context.
 
-(Reasoning effort is already pinned to `high` via the fleet-reviewer subagent
-frontmatter — matching Codex's `model_reasoning_effort="high"` tier on the API
+(Reasoning effort is already pinned to `xhigh` via the fleet-reviewer subagent
+frontmatter — matching Codex's `model_reasoning_effort="xhigh"` tier on the API
 side. Do NOT add `ultrathink` to the prompt; that's a separate in-prompt nudge
 that doesn't change the effort tier, and mixing the two muddies the signal.)
 
@@ -557,24 +557,24 @@ Severity guide:
 ### Claude subagents (via Agent tool, all run_in_background: true)
 
 Spawn one Agent per selected angle using `subagent_type: "oh-my-claudecode:fleet-reviewer"` AND an
-explicit `model: "fable"` on the same spawn. Two knobs, two surfaces — set both:
+explicit `model: "opus"` on the same spawn. Two knobs, two surfaces — set both:
 
-- **Model — forced here, from the command.** Pass `model: "fable"` on every reviewer
+- **Model — forced here, from the command.** Pass `model: "opus"` on every reviewer
   spawn. This is authoritative: it overrides whatever model the subagent frontmatter
   defaults to, and it is REQUIRED when the session model carries a `[1m]` suffix
   (subagents cannot inherit `[1m]`, so an explicit model must be supplied or the
   spawn will not resolve). Never leave model to the session default — that silently
   degrades the review whenever the session runs a weaker model.
 - **Effort — carried by the subagent.** `subagent_type: "oh-my-claudecode:fleet-reviewer"` invokes
-  this plugin's `agents/fleet-reviewer.md`, which pins `effort: high` in its
+  this plugin's `agents/fleet-reviewer.md`, which pins `effort: xhigh` in its
   frontmatter — the only surface Claude Code exposes for per-subagent effort (the
   Agent/Task tool has no effort parameter; see anthropics/claude-code#25669).
-  `high` makes the Claude side match Codex's `model_reasoning_effort="high"` tier
-  exactly.
+  `xhigh` makes the Claude side match Codex's `model_reasoning_effort="xhigh"` tier
+  exactly — one notch above `high`, one below `max`.
 
-Pairing `model: "fable"` with the agent's `high` keeps the Claude reviewers at full
-flagship coding-reasoning depth. If the resolved Fable model does not support `high`,
-the effort downgrades silently — flag that to the user in the confirmation step.
+Pairing `model: "opus"` with the agent's `xhigh` keeps the Claude reviewers at full
+flagship depth. If the resolved Opus model does not support `xhigh`, the effort
+downgrades silently — flag that to the user in the confirmation step.
 
 Each spawn should:
 - Read the diff file
@@ -596,7 +596,7 @@ by default in codex v0.125+; the new override is `web_search` in
 ```bash
 "$CODEX_BIN" exec "[condensed prompt for this angle, referencing $DIFF_FILE]" \
   -s read-only \
-  -c 'model_reasoning_effort="high"' \
+  -c 'model_reasoning_effort="xhigh"' \
   < /dev/null \
   2>/dev/null
 ```
@@ -657,12 +657,12 @@ and the diff.
 
 ### Claude verifier (Agent tool):
 
-Invoke via `subagent_type: "oh-my-claudecode:fleet-verifier"` AND an explicit `model: "fable"` on the
+Invoke via `subagent_type: "oh-my-claudecode:fleet-verifier"` AND an explicit `model: "opus"` on the
 spawn. Model is forced here from the command (authoritative, and required under a
 `[1m]` session model so the spawn resolves); effort comes from the subagent. The
-dedicated subagent at this plugin's `agents/fleet-verifier.md` has `effort: high`
+dedicated subagent at this plugin's `agents/fleet-verifier.md` has `effort: xhigh`
 pinned in frontmatter,
-matching the Codex verifier's `model_reasoning_effort="high"` exactly. Do not
+matching the Codex verifier's `model_reasoning_effort="xhigh"` exactly. Do not
 add "ultrathink" to the prompt; effort is set upstream.
 
 ```
@@ -694,7 +694,7 @@ Findings:
 
 Output format: VERDICT: original_title, status(CONFIRMED/REFUTED/LIKELY), confidence(HIGH/MEDIUM/LOW), reasoning" \
   -s read-only \
-  -c 'model_reasoning_effort="high"' \
+  -c 'model_reasoning_effort="xhigh"' \
   < /dev/null \
   2>/dev/null
 ```
@@ -871,7 +871,7 @@ the user's responsibility (or `/fleet-fix`'s) to clean it up after the fixes lan
 
 If Codex CLI is not installed, run the pipeline with Claude subagents only — double the
 fleet-reviewer spawns per angle. Both still use `subagent_type: "oh-my-claudecode:fleet-reviewer"`, so
-the effort tier stays pinned at `high` identically on both — do NOT downgrade one to get
+the effort tier stays pinned at `xhigh` identically on both — do NOT downgrade one to get
 "diversity", that just makes the second pass weaker. Diversity instead comes from varying
 the prompt seed: give the two spawns for the same angle slightly different prompt framings
 (e.g. one starts from the diff, one starts from the changed files' call sites) so they

@@ -20,14 +20,14 @@ Route code to `executor` (use `model=opus` for complex work). Uncertain SDK usag
 </delegation_rules>
 
 <model_routing>
-`haiku` (quick lookups), `sonnet` (standard), `opus` (architecture, deep analysis), `fable` (hardest coding-reasoning tasks — debugging, code/security review).
+`haiku` (quick lookups), `sonnet` (standard), `opus` (architecture, deep analysis).
 Direct writes OK for: `~/.claude/**`, `.omc/**`, `.claude/**`, `CLAUDE.md`, `AGENTS.md`.
 </model_routing>
 
 <agent_catalog>
 Prefix: `oh-my-claudecode:`. See `agents/*.md` for full prompts.
 
-explore (haiku), analyst (opus), planner (opus), architect (opus), debugger (fable), executor (sonnet), verifier (sonnet), tracer (fable), security-reviewer (fable), code-reviewer (fable), test-engineer (sonnet), designer (sonnet), writer (haiku), qa-tester (sonnet), scientist (sonnet), document-specialist (sonnet), git-master (sonnet), code-simplifier (fable), critic (opus)
+explore (haiku), analyst (opus), planner (opus), architect (opus), debugger (opus), executor (sonnet), verifier (sonnet), tracer (opus), security-reviewer (opus), code-reviewer (opus), test-engineer (sonnet), designer (sonnet), writer (haiku), qa-tester (sonnet), scientist (sonnet), document-specialist (sonnet), git-master (sonnet), code-simplifier (sonnet), critic (opus)
 </agent_catalog>
 
 <tools>

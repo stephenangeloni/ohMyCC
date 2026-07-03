@@ -16,12 +16,12 @@ Prefix: `oh-my-claudecode:`. See `agents/*.md` for full prompts.
 - `analyst` (opus) — requirements clarity and hidden constraints
 - `planner` (opus) — sequencing and execution plans
 - `architect` (opus) — system design, boundaries, and long-horizon tradeoffs
-- `debugger` (fable) — root-cause analysis and failure diagnosis
+- `debugger` (opus) — root-cause analysis and failure diagnosis
 - `executor` (sonnet) — implementation and refactoring
 - `verifier` (sonnet) — completion evidence and validation
-- `tracer` (fable) — trace gathering and evidence capture
-- `security-reviewer` (fable) — trust boundaries and vulnerabilities
-- `code-reviewer` (fable) — comprehensive code review
+- `tracer` (opus) — trace gathering and evidence capture
+- `security-reviewer` (opus) — trust boundaries and vulnerabilities
+- `code-reviewer` (opus) — comprehensive code review
 - `test-engineer` (sonnet) — testing strategy and regression coverage
 - `designer` (sonnet) — UX and interaction design
 - `writer` (haiku) — documentation and concise content work
@@ -29,15 +29,14 @@ Prefix: `oh-my-claudecode:`. See `agents/*.md` for full prompts.
 - `scientist` (sonnet) — data analysis and statistical reasoning
 - `document-specialist` (sonnet) — SDK/API/framework documentation lookup
 - `git-master` (sonnet) — commit strategy and history hygiene
-- `code-simplifier` (fable) — behavior-preserving simplification
+- `code-simplifier` (sonnet) — behavior-preserving simplification
 - `critic` (opus) — plan/design challenge and review
 
 ## Model Routing
 
 - `haiku` — quick lookups, lightweight inspection, narrow docs work
 - `sonnet` — standard implementation, debugging, and review
-- `opus` — architecture, deep analysis, consensus planning, and high-risk review
-- `fable` — hardest coding-reasoning tasks: debugging, code/security review, tracing
+- `opus` — architecture, deep analysis, consensus planning, debugging, code/security review, and tracing
 
 ## Tools Reference
 

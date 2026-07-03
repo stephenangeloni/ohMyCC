@@ -1,8 +1,8 @@
 ---
 name: debugger
 description: Root-cause analysis, regression isolation, stack trace analysis, build/compilation error resolution
-model: fable
-effort: high
+model: opus
+effort: xhigh
 level: 3
 ---
 

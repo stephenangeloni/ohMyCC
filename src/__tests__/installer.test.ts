@@ -135,10 +135,10 @@ describe('Installer Constants', () => {
         'analyst.md': 'opus',
         'planner.md': 'opus',
         'qa-tester.md': 'sonnet',
-        'debugger.md': 'fable',
+        'debugger.md': 'opus',
         'verifier.md': 'sonnet',
         'test-engineer.md': 'sonnet',
-        'security-reviewer.md': 'fable',
+        'security-reviewer.md': 'opus',
         'git-master.md': 'sonnet',
       };
 

@@ -1,8 +1,8 @@
 ---
 name: fleet-reviewer
 description: Single-angle code review specialist for the /fleet-review fleet. Reads a diff plus surrounding source and reports structured FINDING blocks for one assigned review angle only. Read-only.
-model: fable
-effort: high
+model: opus
+effort: xhigh
 disallowedTools: Write, Edit, NotebookEdit
 ---
 

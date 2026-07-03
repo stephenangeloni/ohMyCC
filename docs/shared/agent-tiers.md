@@ -4,25 +4,25 @@ This is the single source of truth for all agent tier information. All skill fil
 
 ## Tier Matrix
 
-| Domain | LOW (Haiku) | MEDIUM (Sonnet) | HIGH (Opus) | MAX (Fable) |
-|--------|-------------|-----------------|-------------|-------------|
-| **Analysis** | architect-low | architect-medium | architect | - |
-| **Execution** | executor-low | executor | executor-high | - |
-| **Search** | explore | - | explore-high | - |
-| **Research** | - | document-specialist | - | - |
-| **Frontend** | designer-low | designer | designer-high | - |
-| **Docs** | writer | - | - | - |
-| **Visual** | - | vision | - | - |
-| **Planning** | - | - | planner | - |
-| **Critique** | - | - | critic | - |
-| **Pre-Planning** | - | - | analyst | - |
-| **Testing** | - | qa-tester | - | - |
-| **Security** | security-reviewer-low | - | - | security-reviewer |
-| **TDD** | test-engineer (model=haiku) | test-engineer | - | - |
-| **Code Review** | - | - | - | code-reviewer |
-| **Debugging** | debugger (model=haiku) | - | - | debugger |
-| **Tracing** | - | - | - | tracer |
-| **Data Science** | - | scientist | scientist-high | - |
+| Domain | LOW (Haiku) | MEDIUM (Sonnet) | HIGH (Opus) |
+|--------|-------------|-----------------|-------------|
+| **Analysis** | architect-low | architect-medium | architect |
+| **Execution** | executor-low | executor | executor-high |
+| **Search** | explore | - | explore-high |
+| **Research** | - | document-specialist | - |
+| **Frontend** | designer-low | designer | designer-high |
+| **Docs** | writer | - | - |
+| **Visual** | - | vision | - |
+| **Planning** | - | - | planner |
+| **Critique** | - | - | critic |
+| **Pre-Planning** | - | - | analyst |
+| **Testing** | - | qa-tester | - |
+| **Security** | security-reviewer-low | - | security-reviewer |
+| **TDD** | test-engineer (model=haiku) | test-engineer | - |
+| **Code Review** | - | - | code-reviewer |
+| **Debugging** | debugger (model=haiku) | - | debugger |
+| **Tracing** | - | - | tracer |
+| **Data Science** | - | scientist | scientist-high |
 
 ## Model Routing Guide
 
@@ -30,8 +30,7 @@ This is the single source of truth for all agent tier information. All skill fil
 |-----------------|------|-------|-------------|
 | Simple | LOW | haiku | Quick lookups, simple fixes, "What does X return?" |
 | Standard | MEDIUM | sonnet | Feature implementation, standard debugging, "Add validation" |
-| Complex | HIGH | opus | Architecture decisions, complex debugging, "Refactor system" |
-| Complex | MAX | fable | Hardest debugging/code-review/security tasks — see agent's own doc for eval basis |
+| Complex | HIGH | opus | Architecture decisions, complex debugging, code/security review, tracing — see agent's own doc for eval basis |
 
 ## Agent Selection by Task Type
 
@@ -54,13 +53,13 @@ This is the single source of truth for all agent tier information. All skill fil
 | Review/critique plan | critic | HIGH |
 | Pre-planning analysis | analyst | HIGH |
 | Interactive CLI testing | qa-tester | MEDIUM |
-| Security review | security-reviewer | MAX |
+| Security review | security-reviewer | HIGH |
 | Quick security scan | security-reviewer-low | LOW |
-| Fix build errors | debugger | MAX |
+| Fix build errors | debugger | HIGH |
 | Simple build fix | debugger (model=haiku) | LOW |
 | TDD workflow | test-engineer | MEDIUM |
 | Quick test suggestions | test-engineer (model=haiku) | LOW |
-| Code review | code-reviewer | MAX |
+| Code review | code-reviewer | HIGH |
 | Quick code check | code-reviewer (model=haiku) | LOW |
 | Data analysis/stats | scientist | MEDIUM |
 | Quick data inspection | scientist (model=haiku) | LOW |

@@ -37,7 +37,7 @@ export const tracerAgent: AgentConfig = {
   name: 'tracer',
   description: 'Evidence-driven causal tracing specialist. Explains observed outcomes using competing hypotheses, evidence for and against, uncertainty tracking, and next-probe recommendations.',
   prompt: loadAgentPrompt('tracer'),
-  model: 'fable',
-  defaultModel: 'fable',
+  model: 'opus',
+  defaultModel: 'opus',
   metadata: TRACER_PROMPT_METADATA,
 };
