@@ -22,6 +22,7 @@
     "./skills/autoresearch/",
     "./skills/cancel/",
     "./skills/ccg/",
+    "./skills/clip-it/",
     "./skills/configure-notifications/",
     "./skills/context-handoff/",
     "./skills/cpr/",
