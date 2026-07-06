@@ -277,7 +277,7 @@ For each failure:
 1. **Diagnose** - Understand the error
 \`\`\`
 Task(
-  subagent_type="oh-my-claudecode:architect-low",
+  subagent_type="oh-my-claudecode:architect",
   model="haiku",
   prompt="Diagnose this error and suggest fix: [ERROR]"
 )

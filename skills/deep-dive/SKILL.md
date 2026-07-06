@@ -131,7 +131,7 @@ Run the trace autonomously using the `oh-my-claudecode:trace` skill's behavioral
 Use **Claude built-in team mode** to run 3 parallel tracer lanes:
 
 1. **Restate the observed result** or "why" question precisely
-2. **Spawn 3 tracer lanes** — one per confirmed hypothesis
+2. **Spawn 3 tracer lanes** — one per confirmed hypothesis. Each lane MUST be spawned as `subagent_type="oh-my-claudecode:tracer"` (never as a generic teammate): the opus pin lives in the tracer agent's frontmatter and only engages when the agent type is named. Generic workers inherit the session model, which silently downgrades the causal reasoning on sonnet/haiku sessions.
 3. Each tracer worker must:
    - Own exactly one hypothesis lane
    - Gather evidence **for** the lane

@@ -25,23 +25,14 @@ person) with **zero memory of this conversation** but full access to the files, 
 tools. Your job is to give them exactly what they need to take the *next* action correctly —
 no more, no less.
 
+A summary explains what happened; a handoff lets someone *continue* — capturing the
+reasoning behind decisions (so they aren't silently reversed), the approaches already
+**ruled out** (so they aren't retried from scratch), and the conventions that live only in
+this conversation. A plain `/compact` or recap loses all of that.
+
 The deliverable is a file: **`HANDOFF.MD` at the repository root**. Its final lines are a
 fixed resume prompt, and that resume prompt is copied to the clipboard so the user can paste
 it straight into a new session. See *Write the handoff* below.
-
-## Why a handoff is not a summary
-
-A summary explains what happened. A handoff lets someone *continue*. The difference is
-everything that a recap leaves out because it feels obvious in the moment:
-
-- the **reasoning** behind decisions (so they aren't silently reversed),
-- the approaches you already **ruled out** (so they aren't tried again from scratch),
-- the **conventions and working agreements** that live only in this conversation,
-- the **precise next action**, not a vague "continue the work".
-
-A naive `/compact` or "summarize this" loses most of that and the fresh agent wastes a cycle
-rediscovering it — or worse, undoes a decision or re-walks a dead end. Avoiding that waste is
-the entire point.
 
 ## How to build it
 
@@ -94,7 +85,8 @@ the source of truth lives.
    fresh session loads those automatically, so the reader already has them; repeating them
    burns words and buries the action at hand. Reference such a file by path only when a
    *specific* rule is load-bearing for the next action and easy to miss; otherwise leave it
-   out entirely.
+   out entirely. (This is the standing rule applied by the self-check's leanness test below
+   and by the conventions section in the template.)
 
 **6. Assemble into the template below, run the self-check, then write it to `HANDOFF.MD`**
 (see *Write the handoff*).
@@ -126,7 +118,8 @@ and the definition of done. This is the destination; everything else is navigati
 
 ## Where we are now
 <Current state in a few lines: what's done, what's in flight, the single most important fact
-to hold onto. Be honest about uncertainty and unfinished work.>
+to hold onto. For anything claimed done, say how you know it — a passing test, a manual check,
+an observed output — not just that it was attempted.>
 
 ## Decisions made (and why)
 - **<decision>** — <the reasoning>; <consequence / what it rules in or out>.
@@ -136,9 +129,18 @@ to hold onto. Be honest about uncertainty and unfinished work.>
 - **<approach tried>** — looked right because <…>; abandoned because <…>.
 <The biggest time-saver in the whole handoff. Omit only if there genuinely were none.>
 
+## Out of bounds
+<Two distinct kinds — name which applies: (1) scope deliberately left untouched, so the reader
+doesn't assume adjacent work is covered; (2) areas the reader must not touch right now — code
+owned by someone else, a module mid-migration, anything that would conflict if edited. Omit
+only if genuinely neither applies.>
+
 ## Next action
-<The exact next concrete step — specific enough to start immediately. Note any decision
-pending on the user before work can continue.>
+<The exact next concrete step — specific enough to start immediately. Exactly one per thread:
+if several candidates exist, pick the single safest one and note the others were considered
+rather than listing multiple as equally next. Name the last gate the work is stopped at, if
+any — an approval, a choice, or a review pending on the user — so the reader knows whether to
+start immediately or wait.>
 
 ## Artifacts
 <Files created/changed, commits/branches/PRs, tables/datasets built, external state.
@@ -152,12 +154,14 @@ Pointers with one-line descriptions.>
 <Working agreements and environment muscle memory the fresh agent can't infer: tooling,
 naming, commit/deploy habits, gotchas, things the user has corrected before, how they like to
 be consulted. This is what a fresh agent most painfully lacks. Usually shared across threads —
-note any convention that applies to only one. Capture ONLY what isn't already written down:
-exclude anything an auto-loaded CLAUDE.md/AGENTS.md (user or repo level) already states.>
+note any convention that applies to only one. Capture only what step 5's standing-rule
+exclusion doesn't already cover.>
 
 ## Honesty note
-<What is unfinished, unverified, or uncertain across the work. A fresh agent will trust this
-prompt completely — flag anything it shouldn't take as settled.>
+<Two things, both required: (1) what is unfinished, unverified, uncertain, or an open risk —
+anything that might break or regress; (2) what the reader must NOT assume — the specific
+wrong inference they're likely to make if this isn't spelled out. A fresh agent will trust
+this prompt completely, so be explicit about both.>
 ````
 
 For the multi-thread shape, wrap the whole thing with a title and index:
@@ -192,10 +196,10 @@ Before you write it, apply one test, **per thread**:
 If not, find the gap and fill it. Common misses: the *why* behind a decision, an unwritten
 agreement, a convention that's second nature here, or a next step too vague to start.
 
-Then check the opposite failure: is it **lean**? Cut anything already captured in a file you've
-linked or in an auto-loaded `CLAUDE.md`/`AGENTS.md` (user or repo level), anything that's
-generic agent knowledge, and any narration of the journey that doesn't change the next action.
-Length is not the goal — resumability is.
+Then check the opposite failure: is it **lean**? Reapply step 5's standing-rule exclusion —
+nothing already captured in a linked file or auto-loaded `CLAUDE.md`/`AGENTS.md`, no generic
+agent knowledge, no narration of the journey that doesn't change the next action. Length is
+not the goal — resumability is.
 
 ## Write the handoff
 
@@ -213,8 +217,8 @@ single, always-current handoff, not an append log. (Note the literal filename `H
 uppercase extension, as the user specified.)
 
 **2. Write the full handoff** (everything you assembled from the template above) to that
-path, and make the **last lines of the file the resume prompt below**, verbatim, under a short
-heading. Nothing comes after the resume prompt — it must be the final content of the file:
+path, and make the **last line of the file the resume prompt below**, verbatim, under a short
+heading. Nothing comes after it — it must be the final content of the file:
 
 ````markdown
 ---
@@ -224,22 +228,16 @@ heading. Nothing comes after the resume prompt — it must be the final content 
 Copy the line below (already on your clipboard) and paste it as the first message of a
 brand-new session:
 
-Read HANDOFF.MD in the repository root and resume the work it describes. Start with the files under "Start by reading", honor every entry under "Decisions made (and why)" and "Dead ends — do not re-explore", then carry out the "Next action". If multiple threads are listed, resume all of them. Treat HANDOFF.MD as the source of truth — do not re-litigate settled decisions or re-walk the dead ends.
+Read HANDOFF.MD in the repository root and resume the work it describes. Start with the files under "Start by reading", honor every entry under "Decisions made (and why)", "Dead ends — do not re-explore", and "Out of bounds", then carry out the "Next action". If multiple threads are listed, resume all of them. Treat HANDOFF.MD as the source of truth — do not re-litigate settled decisions, re-walk the dead ends, or touch what's out of bounds.
 ````
 
-**3. Copy the resume prompt to the clipboard.** Run this verbatim after the file is written —
-the heredoc body is byte-for-byte the same prompt that ends the file, and the `command -v`
-guard keeps it graceful on machines without `pbcopy` (non-macOS):
+**3. Copy that same resume prompt to the clipboard** by reading it back from the file you
+just wrote — this keeps the file and clipboard byte-identical with no retyped copy to drift.
+macOS only, so no `pbcopy` availability check is needed:
 
 ```bash
-if command -v pbcopy >/dev/null 2>&1; then
-  pbcopy <<'OMC_RESUME_EOF'
-Read HANDOFF.MD in the repository root and resume the work it describes. Start with the files under "Start by reading", honor every entry under "Decisions made (and why)" and "Dead ends — do not re-explore", then carry out the "Next action". If multiple threads are listed, resume all of them. Treat HANDOFF.MD as the source of truth — do not re-litigate settled decisions or re-walk the dead ends.
-OMC_RESUME_EOF
-  echo "Resume prompt copied to clipboard."
-else
-  echo "pbcopy unavailable (non-macOS) — copy the resume prompt from the end of HANDOFF.MD manually."
-fi
+tail -n 1 "$ROOT/HANDOFF.MD" | pbcopy
+echo "Resume prompt copied to clipboard."
 ```
 
 **4. Confirm in chat — briefly.** The file is the source of truth, so do **not** re-dump the
@@ -250,3 +248,8 @@ whole handoff into the conversation. Report only:
 
 If `HANDOFF.MD` is tracked by git and the user does not want it committed, remind them to add
 it to `.gitignore` — but don't edit `.gitignore` unless asked.
+
+**5. Stop — do not begin the next action.** The handoff's job ends when it's written and
+confirmed. Even if the documented next action is obvious and you could start on it immediately,
+don't — the checkpoint only works if the next session (or the user, right now) is the one who
+decides when to resume it.

@@ -100,9 +100,9 @@ By default, ralph operates in PRD mode. A scaffold `prd.json` is auto-generated 
    c. If ALL complete, proceed to Step 7 (architect verification)
 
 7. **Reviewer verification** (tiered, against acceptance criteria):
-   - <5 files, <100 lines with full tests: STANDARD tier minimum (architect-medium / Sonnet)
-   - Standard changes: STANDARD tier (architect-medium / Sonnet)
-   - > 20 files or security/architectural changes: THOROUGH tier (architect / Opus)
+   - <5 files, <100 lines with full tests: STANDARD tier minimum — `Task(subagent_type="oh-my-claudecode:architect", model="sonnet")`
+   - Standard changes: STANDARD tier — `Task(subagent_type="oh-my-claudecode:architect", model="sonnet")` (the explicit `model="sonnet"` override is required: architect frontmatter pins opus, and there is no `architect-medium` agent)
+   - > 20 files or security/architectural changes: THOROUGH tier — `Task(subagent_type="oh-my-claudecode:architect")` (no override; frontmatter opus applies)
    - If `--critic=critic`, use the Claude `critic` agent for the approval pass
    - If `--critic=codex`, run `omc ask codex --agent-prompt critic "..."` for the approval pass. The Codex critic prompt MUST include:
      1. The full list of acceptance criteria from prd.json for verification

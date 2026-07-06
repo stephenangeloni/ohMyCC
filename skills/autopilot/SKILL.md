@@ -54,9 +54,10 @@ Most non-trivial software tasks require coordinated phases: understanding requir
    - Output: `.omc/plans/autopilot-impl.md`
 
 3. **Phase 2 - Execution**: Implement the plan using Ralph + Ultrawork
-   - Executor (Haiku): Simple tasks
-   - Executor (Sonnet): Standard tasks
-   - Executor (Opus): Complex tasks
+   - Route each task to an executor with an EXPLICIT `model` param — executor frontmatter defaults to sonnet, so the haiku and opus tiers only exist when passed at spawn time:
+     - `Task(subagent_type="oh-my-claudecode:executor", model="haiku", ...)` — simple tasks (typo fixes, exports, doc updates)
+     - `Task(subagent_type="oh-my-claudecode:executor", model="sonnet", ...)` — standard tasks (features, endpoints, tests)
+     - `Task(subagent_type="oh-my-claudecode:executor", model="opus", ...)` — complex tasks (multi-file refactors, concurrency, auth flows)
    - Run independent tasks in parallel
 
 4. **Phase 3 - QA**: Cycle until all tests pass (UltraQA mode)
