@@ -51,13 +51,13 @@ The consensus workflow:
 2. **User feedback** *(--interactive only)*: If `--interactive` is set, use `AskUserQuestion` to present the draft plan **plus the Principles / Drivers / Options summary** before review (Proceed to review / Request changes / Skip review). Otherwise, automatically proceed to review.
 3. **Architect** reviews for architectural soundness and must provide the strongest steelman antithesis, at least one real tradeoff tension, and (when possible) synthesis — **await completion before step 4**. In deliberate mode, Architect should explicitly flag principle violations.
 4. **Critic** evaluates against quality criteria — run only after step 3 completes. Critic must enforce principle-option consistency, fair alternatives, risk mitigation clarity, testable acceptance criteria, and concrete verification steps. In deliberate mode, Critic must reject missing/weak pre-mortem or expanded test plan.
-5. **Re-review loop** (max 5 iterations): Any non-`APPROVE` Critic verdict (`ITERATE` or `REJECT`) MUST run the same full closed loop:
+5. **Re-review loop** (max 5 iterations): Any non-pass Critic verdict — read from the `OMC-VERDICT: critic | …` sentinel (pass = `ACCEPT` or `ACCEPT-WITH-RESERVATIONS`; non-pass = `REVISE` or `REJECT`), never a fuzzy prose match; a missing/empty verdict is UNKNOWN, not pass — MUST run the same full closed loop:
    a. Collect Architect + Critic feedback
    b. Revise the plan with Planner
    c. Return to Architect review
    d. Return to Critic evaluation
-   e. Repeat this loop until Critic returns `APPROVE` or 5 iterations are reached
-   f. If 5 iterations are reached without `APPROVE`, present the best version to the user
+   e. Repeat this loop until the Critic sentinel status is `ACCEPT`/`ACCEPT-WITH-RESERVATIONS` or 5 iterations are reached
+   f. If 5 iterations are reached without an `ACCEPT`, present the best version to the user
 6. On Critic approval, mark the plan `pending approval` unless explicit execution approval has already been captured. *(--interactive only)* If `--interactive` is set, use `AskUserQuestion` to present the plan with approval options (Approve execution via team (Recommended) / Approve execution via ralph / Compact then return for execution approval / Request changes / Reject). Final plan must include ADR (Decision, Drivers, Alternatives considered, Why chosen, Consequences, Follow-ups). Otherwise, output the final plan and stop before any mutation or delegation.
 7. *(--interactive only)* User chooses: Approve (team or ralph), Request changes, or Reject
 8. *(--interactive only)* On approval: invoke `Skill("oh-my-claudecode:team")` for parallel team execution (recommended) or `Skill("oh-my-claudecode:ralph")` for sequential execution -- never implement directly

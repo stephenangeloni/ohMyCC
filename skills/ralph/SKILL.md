@@ -111,6 +111,7 @@ By default, ralph operates in PRD mode. A scaffold `prd.json` is auto-generated 
      4. The list of files changed during the ralph session for context
    - Ralph floor: always at least STANDARD, even for small changes
    - The selected reviewer verifies against the SPECIFIC acceptance criteria from prd.json, not vague "is it done?"
+   - **Read the verdict from the reviewer's `OMC-VERDICT` sentinel** (per `docs/shared/agent-return-contract.md`), testing its STATUS against that agent's pass-set: architect ⇒ `SOUND`, critic ⇒ `ACCEPT`/`ACCEPT-WITH-RESERVATIONS`. "APPROVAL" below means the parsed STATUS is in the pass-set — never a fuzzy prose match. For `--critic=codex` (external CLI, no sentinel), require the codex prompt to end with a literal `VERDICT: APPROVE|REJECT` line and read that line. A missing/empty verdict is UNKNOWN, not pass — recover from output or re-run; never proceed on an unread verdict.
    - **On APPROVAL: immediately proceed to Step 7.5 in the same turn. Do NOT pause to report the verdict to the user — reporting happens only at Step 8 (`/oh-my-claudecode:cancel`) or on rejection (Step 9). Treating an approved verdict as a reporting checkpoint is a polite-stop anti-pattern.**
 
 7.5 **Mandatory Deslop Pass** (runs unconditionally after Step 7 approval, unless `{{PROMPT}}` contains `--no-deslop`):

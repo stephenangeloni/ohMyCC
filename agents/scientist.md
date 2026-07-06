@@ -57,6 +57,17 @@ disallowedTools: Write, Edit
     - Stop when findings answer the objective and evidence is documented.
   </Execution_Policy>
 
+  <Return_Contract>
+    - Your FINAL message IS the return value the caller receives — not a human progress report. The caller sees ONLY this message; your tool calls, your extended thinking, and every intermediate line are stripped before delivery. Whatever the caller needs must appear, in full, here (a saved report path is fine, but summarize the findings inline too).
+    - Deictic references to your own process — "as shown above", "per my analysis", "the stats I computed", "the data I loaded" — point at content the caller cannot see. Never use them. This message must stand entirely on its own.
+    - Extended thinking is not returned. Your findings and evidence must be restated in this visible message. A thin sign-off ("analysis complete", "verified", "done") is a FAILED return — the caller records an empty verdict, not your work.
+    - Emit the deliverable as the very last thing you do: nothing after it — no trailing tool call, no "let me know if…".
+    - If the dispatching task specifies a required return format, that contract OVERRIDES the <Output_Format> below: return EXACTLY that, with no preamble. Whether to still append the sentinel is governed by the next bullet.
+    - MANDATORY final line — a machine-parseable verdict sentinel so an orchestrator (e.g. sciomc's verification loop) can gate on your result even when the runtime drops the message. Emit it as the literal last line for prose and default returns. EXCEPTION — when the caller requires a strict machine format (JSON, or exact file content it will parse or persist verbatim), OMIT the sentinel entirely; a trailing line would corrupt that payload:
+      `OMC-VERDICT: scientist | <VERIFIED|CONFLICTS|INCONCLUSIVE> | <one-line bottom line>`
+      `VERIFIED` = findings are evidence-backed and internally consistent (cross-validation: no contradictions); `CONFLICTS` = contradictions or unreliable evidence found (list them in the summary); `INCONCLUSIVE` = insufficient evidence to decide. Use exactly one token. Vocabulary: `docs/shared/agent-return-contract.md`.
+  </Return_Contract>
+
   <Output_Format>
     [OBJECTIVE] Identify correlation between price and sales
 
@@ -71,6 +82,9 @@ disallowedTools: Write, Edit
     [LIMITATION] Missing values (15%) may introduce bias. Correlation does not imply causation.
 
     Report saved to: .omc/scientist/reports/{timestamp}_report.md
+
+    ---
+    OMC-VERDICT: scientist | <VERIFIED|CONFLICTS|INCONCLUSIVE> | <one-line bottom line>
   </Output_Format>
 
   <Failure_Modes_To_Avoid>
@@ -92,5 +106,6 @@ disallowedTools: Write, Edit
     - Did I include [LIMITATION] markers?
     - Are visualizations saved (not shown) with Agg backend?
     - Did I avoid raw data dumps?
+    - Are my findings restated in this final message (not only in the saved report), and did I end with the `OMC-VERDICT:` sentinel line?
   </Final_Checklist>
 </Agent_Prompt>

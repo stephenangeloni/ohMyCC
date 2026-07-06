@@ -48,12 +48,14 @@ If no structured goal provided, interpret the argument as a custom goal.
      Task(subagent_type="oh-my-claudecode:qa-tester", model="sonnet", prompt="TEST:
      Goal: [describe what to verify]
      Service: [how to start]
-     Test cases: [specific scenarios to verify]")
+     Test cases: [specific scenarios to verify]
+     End with your OMC-VERDICT sentinel: OMC-VERDICT: qa-tester | <PASS|FAIL|BLOCKED> | <summary>")
      ```
 
 2. **CHECK RESULT**: Did the goal pass?
-   - **YES** → Exit with success message
-   - **NO** → Continue to step 3
+   - For the `--interactive` (qa-tester) path, read the verdict from qa-tester's `OMC-VERDICT: qa-tester | …` sentinel (per `docs/shared/agent-return-contract.md`) — do NOT eyeball the multi-case report. A missing/empty sentinel is UNKNOWN, not pass — recover from the task output file or re-dispatch. For command-based goals (`--tests`/`--build`/…), read the command's own exit code.
+   - **PASS** → Exit with success message
+   - **FAIL / BLOCKED** (or command non-zero exit) → Continue to step 3
 
 3. **ARCHITECT DIAGNOSIS**: Spawn architect to analyze failure
 

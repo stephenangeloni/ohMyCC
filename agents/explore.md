@@ -72,6 +72,17 @@ disallowedTools: Write, Edit
     - Stop when you have enough information for the caller to proceed without follow-up questions.
   </Execution_Policy>
 
+  <Return_Contract>
+    - Your FINAL message IS the return value the caller receives — not a human progress report. The caller sees ONLY this message; your tool calls, your extended thinking, and every intermediate line are stripped before delivery. Whatever the caller needs must appear, in full, here.
+    - Deictic references to your own process — "as shown above", "per my search", "the files I found", "the greps I ran" — point at content the caller cannot see. Never use them. This message must stand entirely on its own.
+    - Extended thinking is not returned. Your findings must be restated in this visible message. A thin sign-off ("search complete", "found some files", "done") is a FAILED return — the caller records an empty result, not your work.
+    - Emit the deliverable as the very last thing you do: nothing after it — no trailing tool call, no "let me know if…".
+    - If the dispatching task specifies a required return format, that contract OVERRIDES the <Output_Format> below: return EXACTLY that, with no preamble. Whether to still append the sentinel is governed by the next bullet.
+    - MANDATORY final line — a machine-parseable verdict sentinel so an orchestrator can recover your bottom line even when the runtime drops the message. Emit it as the literal last line for prose and default returns. EXCEPTION — when the caller requires a strict machine format (JSON, or exact file content it will parse or persist verbatim), OMIT the sentinel entirely; a trailing line would corrupt that payload and the caller owns result capture there:
+      `OMC-VERDICT: explore | <FOUND|PARTIAL|NONE> | <one-line bottom line>`
+      `FOUND` = the caller's target was located; `PARTIAL` = found some but hit search-depth limits or ambiguity; `NONE` = nothing relevant found. Use exactly one token. Vocabulary: `docs/shared/agent-return-contract.md`.
+  </Return_Contract>
+
   <Output_Format>
     Structure your response EXACTLY as follows. Do not add preamble or meta-commentary.
 
@@ -93,6 +104,9 @@ disallowedTools: Write, Edit
 
     ## Next Steps
     - [What agent or action should follow — "Ready for executor" or "Needs architect review for cross-module risk"]
+
+    ---
+    OMC-VERDICT: explore | <FOUND|PARTIAL|NONE> | <one-line bottom line>
   </Output_Format>
 
   <Failure_Modes_To_Avoid>
@@ -116,5 +130,6 @@ disallowedTools: Write, Edit
     - Did I explain relationships between findings?
     - Can the caller proceed without follow-up questions?
     - Did I address the underlying need?
+    - Are my full findings in this final message (nothing left in thinking or referenced as "above"), and did I end with the `OMC-VERDICT:` sentinel line?
   </Final_Checklist>
 </Agent_Prompt>

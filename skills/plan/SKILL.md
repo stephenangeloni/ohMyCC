@@ -105,7 +105,7 @@ Without cleanup, the stop hook blocks all subsequent stops with `[RALPLAN - CONS
    - **Skip review** — go directly to final approval (step 7)
      If NOT running with `--interactive`, automatically proceed to review (step 3).
 3. **Architect** reviews for architectural soundness using `Task(subagent_type="oh-my-claudecode:architect", ...)`. Architect review **MUST** include: strongest steelman counterargument (antithesis) against the favored option, at least one meaningful tradeoff tension, and (when possible) a synthesis path. In deliberate mode, Architect should explicitly flag principle violations. **Wait for this step to complete before proceeding to step 4.** Do NOT run steps 3 and 4 in parallel.
-4. **Critic** evaluates against quality criteria using `Task(subagent_type="oh-my-claudecode:critic", ...)`. Critic **MUST** verify principle-option consistency, fair alternative exploration, risk mitigation clarity, testable acceptance criteria, and concrete verification steps. Critic **MUST** explicitly reject shallow alternatives, driver contradictions, vague risks, or weak verification. In deliberate mode, Critic **MUST** reject missing/weak pre-mortem or missing/weak expanded test plan. Run only after step 3 is complete.
+4. **Critic** evaluates against quality criteria using `Task(subagent_type="oh-my-claudecode:critic", ...)`. Critic **MUST** verify principle-option consistency, fair alternative exploration, risk mitigation clarity, testable acceptance criteria, and concrete verification steps. Critic **MUST** explicitly reject shallow alternatives, driver contradictions, vague risks, or weak verification. In deliberate mode, Critic **MUST** reject missing/weak pre-mortem or missing/weak expanded test plan. Run only after step 3 is complete. Read the Architect and Critic verdicts via the **Verdict Capture Protocol** below — parse the `OMC-VERDICT:` sentinel; never infer a pass from prose, from silence, or from an empty return.
 5. **Re-review loop** (max 5 iterations): If Critic rejects, execute this closed loop:
    a. Collect all rejection feedback from Architect + Critic
    b. Pass feedback to Planner to produce a revised plan
@@ -113,6 +113,30 @@ Without cleanup, the stop hook blocks all subsequent stops with `[RALPLAN - CONS
    d. **Return to Step 4** — Critic evaluates the revised plan
    e. Repeat until Critic approves OR max 5 iterations reached
    f. If max iterations reached without approval, present the best version to user via `AskUserQuestion` with note that expert consensus was not reached
+
+### Verdict Capture Protocol (mandatory for every Architect/Critic dispatch)
+
+Architect and Critic run **read-only** — the returned message is the ONLY
+artifact; unlike an executor there is no file change or git state to fall back
+on. If you record a verdict you did not actually read, a **phantom pass** slips
+through (an empty return silently becomes "approved"). For every dispatch in
+steps 3–5:
+
+1. **Read the verdict from the `OMC-VERDICT:` sentinel line** the agent emits as
+   its last line — parse `OMC-VERDICT: <agent> | <STATUS> | <summary>`. Do NOT
+   fuzzy-match a status word in the prose (`I do NOT APPROVE` must never read as a
+   pass). Critic proceeds only on `ACCEPT` / `ACCEPT-WITH-RESERVATIONS`; Architect
+   is advisory but its `SOUND`/`CONCERNS`/`BLOCKED` status should inform the loop.
+2. **A missing sentinel or an empty acknowledgment means the verdict is UNKNOWN —
+   never a pass.** Recover it from the agent's task output file:
+   `grep -oE 'OMC-VERDICT:[^\n]*' <output_file> | tail -1`. This survives the
+   background-agent trailing-no-op capture bug.
+3. **If still unreadable, re-dispatch a FRESH agent** with the plan and the
+   return contract restated. Do NOT resume the confused agent (it will just
+   re-confirm "done"), and do NOT accept a secondhand assurance that "it was
+   fine." Absence of a readable verdict is a failure to recover from, not consensus.
+4. Record only verdicts you actually read from a sentinel. Full spec:
+   `docs/shared/agent-return-contract.md`.
 
 ### Step 5 (workflow variant): background consensus loop
 
@@ -125,8 +149,8 @@ step 5 `Task()` loop above** and note the fallback in one line. Never hard-fail.
 
 When taken, author a single `Workflow` (`meta.name: 'plan-consensus'`) that runs the bounded
 Planner→Architect→Critic loop sequentially within each iteration. Architect and Critic **MUST**
-use sequential `await agent(...)` calls — never `parallel()` for those two. On Critic APPROVE or
-5 iterations, return the final plan:
+use sequential `await agent(...)` calls — never `parallel()` for those two. On Critic ACCEPT (read
+from its `OMC-VERDICT:` sentinel, not matched in prose) or 5 iterations, return the final plan:
 
 ```js
 export const meta = {
@@ -137,11 +161,14 @@ export const meta = {
 let plan = await agent(INITIAL_PLAN_PROMPT,
   { label: 'planner:0', phase: 'Draft', agentType: 'oh-my-claudecode:planner' })
 for (let i = 0; i < 5; i++) {
-  const arch = await agent(`Review this plan for architectural soundness:\n${plan}`,
+  const arch = await agent(`Review this plan for architectural soundness. End with your OMC-VERDICT sentinel line:\n${plan}`,
     { label: `architect:${i}`, phase: 'Review', agentType: 'oh-my-claudecode:architect' })
-  const crit = await agent(`Evaluate this plan and architect verdict. APPROVE or REJECT:\n${plan}\n---\n${arch}`,
+  const crit = await agent(`Evaluate this plan and the architect review below. End with your OMC-VERDICT sentinel line:\n${plan}\n---\n${arch}`,
     { label: `critic:${i}`, phase: 'Review', agentType: 'oh-my-claudecode:critic' })
-  if (/\bAPPROVE\b/i.test(crit)) break
+  // Gate on the sentinel, NEVER on a status word in prose ("I do NOT APPROVE" is not a pass).
+  const status = (crit.match(/OMC-VERDICT:\s*critic\s*\|\s*([A-Z-]+)/) || [])[1]
+  if (!status) { log(`critic:${i}: no OMC-VERDICT sentinel — verdict UNKNOWN, re-dispatching fresh`); continue }
+  if (status === 'ACCEPT' || status === 'ACCEPT-WITH-RESERVATIONS') break
   plan = await agent(`Revise plan given this feedback:\nArchitect: ${arch}\nCritic: ${crit}`,
     { label: `planner:${i+1}`, phase: 'Draft', agentType: 'oh-my-claudecode:planner' })
 }
@@ -151,7 +178,7 @@ return await agent(`Produce final plan with ADR section. Plan: ${plan}`,
 
 Notes:
 - `arch` and `crit` are held in script variables; only the final plan returns to main context.
-- If Critic does not APPROVE after 5 iterations, the loop exits and the best plan is returned — present it via `AskUserQuestion` with a note that expert consensus was not reached (matching step 5f above).
+- If Critic does not ACCEPT after 5 iterations, the loop exits and the best plan is returned — present it via `AskUserQuestion` with a note that expert consensus was not reached (matching step 5f above).
 - `--workflow` is composable with `--consensus` and `--deliberate`; pass `--deliberate` signals through `INITIAL_PLAN_PROMPT`.
 - `direct:` / `--no-workflow` forces the default in-context loop even when thresholds are met. Default unchanged. Policy: `docs/shared/workflow-gating.md`.
 
@@ -176,8 +203,8 @@ Notes:
 ### Review Mode (`--review`)
 
 1. Read plan file from `.omc/plans/`
-2. Evaluate via Critic using `Task(subagent_type="oh-my-claudecode:critic", ...)`
-3. Return verdict: APPROVED, REVISE (with specific feedback), or REJECT (replanning required)
+2. Evaluate via Critic using `Task(subagent_type="oh-my-claudecode:critic", ...)`. Capture its verdict via the **Verdict Capture Protocol** above — parse the `OMC-VERDICT: critic | …` sentinel; a missing/empty return is UNKNOWN (recover from the output file or re-dispatch), never a pass.
+3. Return verdict, mapped from the critic sentinel: `ACCEPT`/`ACCEPT-WITH-RESERVATIONS` → APPROVED, `REVISE` → REVISE (with specific feedback), `REJECT` → REJECT (replanning required)
 
 ### Plan Output Format
 

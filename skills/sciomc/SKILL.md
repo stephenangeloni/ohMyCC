@@ -161,9 +161,11 @@ Check for:
 3. Gaps in coverage
 4. Evidence quality
 
-Output: [VERIFIED] or [CONFLICTS:<list>]
+End with your OMC-VERDICT sentinel: OMC-VERDICT: scientist | <VERIFIED|CONFLICTS|INCONCLUSIVE> | <summary>. If CONFLICTS, list them in the summary.
 ")
 ```
+
+Read the verdict from the scientist's `OMC-VERDICT: scientist | …` sentinel (per `docs/shared/agent-return-contract.md`): `VERIFIED` → findings are consistent, proceed to synthesis; `CONFLICTS` → resolve the listed conflicts (re-run affected stages) before synthesis; `INCONCLUSIVE` or a missing sentinel is UNKNOWN, not pass — recover from the task output file or re-run, never synthesize on an unread verdict. (The `--workflow` variant already enforces this via a `{ verified, conflicts[] }` schema — this makes the default path match.)
 
 ## AUTO Mode
 

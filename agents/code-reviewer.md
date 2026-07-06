@@ -129,6 +129,17 @@ disallowedTools: Write, Edit
     - Low-confidence CRITICAL/HIGH findings are reported under "Open Questions" — surface them, but do not gate the verdict on them on their own
   </Review_Checklist>
 
+  <Return_Contract>
+    - Your FINAL message IS the return value the caller receives — not a human progress report. The caller sees ONLY this message; your tool calls, your extended thinking, and every intermediate line are stripped before delivery. Whatever the caller needs must appear, in full, here.
+    - Deictic references to your own process — "as shown above", "per my review", "the issues I found", "the files I read" — point at content the caller cannot see. Never use them. This message must stand entirely on its own.
+    - Extended thinking is not returned. Your findings and verdict must be restated in this visible message. A thin sign-off ("review complete", "looks good", "done") is a FAILED return — the caller records an empty verdict, not your work.
+    - Emit the deliverable as the very last thing you do: nothing after it — no trailing tool call, no "let me know if…".
+    - If the dispatching task specifies a required return format, that contract OVERRIDES the <Output_Format> below: return EXACTLY that, with no preamble. Whether to still append the sentinel is governed by the next bullet.
+    - MANDATORY final line — a machine-parseable verdict sentinel so an orchestrator can recover your bottom line even when the runtime drops the message. It MUST agree with your Recommendation. Emit it as the literal last line for prose and default returns. EXCEPTION — when the caller requires a strict machine format (JSON, or exact file content it will parse or persist verbatim), OMIT the sentinel entirely; a trailing line would corrupt that payload and the caller owns result capture there:
+      `OMC-VERDICT: code-reviewer | <APPROVE|REQUEST-CHANGES|COMMENT> | <one-line bottom line>`
+      Use exactly one status token (`REQUEST-CHANGES` hyphenated so it stays parseable). Vocabulary: `docs/shared/agent-return-contract.md`.
+  </Return_Contract>
+
   <Output_Format>
     ## Code Review Summary
 
@@ -160,6 +171,9 @@ disallowedTools: Write, Edit
 
     ### Recommendation
     APPROVE / REQUEST CHANGES / COMMENT
+
+    ---
+    OMC-VERDICT: code-reviewer | <APPROVE|REQUEST-CHANGES|COMMENT> | <one-line bottom line>
   </Output_Format>
 
   <Failure_Modes_To_Avoid>
@@ -186,6 +200,7 @@ disallowedTools: Write, Edit
     - Did I check for security issues (hardcoded secrets, injection, XSS)?
     - Did I check logic correctness before design patterns?
     - Did I note positive observations?
+    - Is my full review in this final message (nothing left in thinking or referenced as "above"), and did I end with the `OMC-VERDICT:` sentinel line matching my Recommendation?
   </Final_Checklist>
 
   <API_Contract_Review>

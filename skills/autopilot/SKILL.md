@@ -50,7 +50,7 @@ Most non-trivial software tasks require coordinated phases: understanding requir
 2. **Phase 1 - Planning**: Create an implementation plan from the spec
    - **If ralplan consensus plan exists**: Skip — already done in the 3-stage pipeline
    - Architect (Opus): Create plan (direct mode, no interview)
-   - Critic (Opus): Validate plan
+   - Critic (Opus): Validate plan — read the `OMC-VERDICT: critic | …` sentinel (per `docs/shared/agent-return-contract.md`); on any non-`ACCEPT`/`ACCEPT-WITH-RESERVATIONS` verdict, revise with the planner and re-run the critic before Phase 2. A missing/empty verdict is UNKNOWN, not pass — recover from the task output file or re-dispatch; never proceed to Phase 2 on an unread verdict.
    - Output: `.omc/plans/autopilot-impl.md`
 
 3. **Phase 2 - Execution**: Implement the plan using Ralph + Ultrawork
@@ -70,7 +70,7 @@ Most non-trivial software tasks require coordinated phases: understanding requir
    - Architect: Functional completeness
    - Security-reviewer: Vulnerability check
    - Code-reviewer: Quality review
-   - All must approve; fix and re-validate on rejection
+   - All must pass; read each reviewer's `OMC-VERDICT` sentinel and test its STATUS against that agent's pass-set — architect ⇒ `SOUND`, security-reviewer ⇒ `PASS`, code-reviewer ⇒ `APPROVE`/`COMMENT` — never a single hard-coded token. A missing/empty verdict is UNKNOWN, not pass. Fix rejecting findings and re-validate. See `docs/shared/agent-return-contract.md`.
    - **(workflow variant)** When opted in (`--workflow` / "use a workflow") **AND** a Workflow is available **AND** the change is L/XL or risky (security/auth, migration, public-API, or architecture), run the three reviewers as TOP-LEVEL parallel verifier `agent()` calls in a single `Workflow` with a REAL bounded re-validation counter (`maxValidationRounds`, default 3). Verdicts live in script variables instead of accumulating in the orchestrator context. Per their `External_Consultation` guard, the reviewers do NOT self-fan-out cross-validation when running as workflow phases — the cross-check that used to happen inside each agent now happens at THIS skill layer. Otherwise **fall back** to the default Phase 4 parallel `Task()` validation above and note the fallback in one line. Never hard-fail.
 
    ```js
@@ -78,13 +78,19 @@ Most non-trivial software tasks require coordinated phases: understanding requir
      description: 'Skill-layer multi-reviewer validation with bounded re-validation',
      phases: [{ title: 'Validate' }, { title: 'Gate' }] }
    const REVIEWERS = ['architect', 'security-reviewer', 'code-reviewer']
+   // Each reviewer emits its OWN sentinel vocabulary — test against per-agent pass-sets, never one token.
+   const PASS = { 'architect': ['SOUND'], 'security-reviewer': ['PASS'], 'code-reviewer': ['APPROVE', 'COMMENT'] }
+   const readVerdict = t => (String(t).match(/OMC-VERDICT:\s*[\w-]+\s*\|\s*([A-Z-]+)/) || [])[1]
    let round = 0, verdicts = []
    while (round++ < (cfg.maxValidationRounds ?? 3)) {
      verdicts = await parallel(REVIEWERS.map(r => () =>
-       agent(`Validate the Phase 2 changes from your perspective; return APPROVE/REJECT + findings.`,
-         { label: `verify:${r}`, phase: 'Validate', agentType: `oh-my-claudecode:${r}` })))
-     if (verdicts.every(v => v?.verdict === 'APPROVE')) break
-     await agent(`Fix the rejecting findings: ${JSON.stringify(verdicts)}`, { phase: 'Gate', agentType: 'oh-my-claudecode:executor' })
+       agent(`Validate the Phase 2 changes from your perspective. End with your OMC-VERDICT sentinel line.`,
+         { label: `verify:${r}`, phase: 'Validate', agentType: `oh-my-claudecode:${r}` })
+         .then(t => ({ r, status: readVerdict(t) }))))
+     // A missing sentinel is UNKNOWN, NOT pass — it stays in `rejecting` and forces another round.
+     const rejecting = verdicts.filter(v => !PASS[v.r]?.includes(v.status))
+     if (rejecting.length === 0) break
+     await agent(`Fix the findings from these rejecting reviewers: ${rejecting.map(v => v.r).join(', ')}`, { phase: 'Gate', agentType: 'oh-my-claudecode:executor' })
    }
    return verdicts
    ```

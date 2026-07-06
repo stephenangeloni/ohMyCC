@@ -59,7 +59,11 @@ Task(subagent_type="oh-my-claudecode:document-specialist", model="sonnet", promp
 Task(subagent_type="oh-my-claudecode:document-specialist", model="sonnet", prompt="Search for: <facet 2 description>. Use WebSearch and WebFetch to find official documentation and examples. Cite all sources with URLs.")
 ```
 
+Each facet prompt MUST instruct the agent to end with its sentinel: `OMC-VERDICT: document-specialist | <ANSWERED|PARTIAL|NOT-FOUND> | <summary>` (per `docs/shared/agent-return-contract.md`).
+
 Maximum 5 parallel document-specialist agents.
+
+**Facet completeness check (before Step 3 synthesis):** read each facet's `OMC-VERDICT` sentinel. Re-dispatch or explicitly flag any `PARTIAL`/`NOT-FOUND` facet, and treat a missing/empty return as `NOT-FOUND` — never a silent success. Never drop a facet without recording it (the `--workflow` variant enforces this via `.filter(Boolean)` + drop-count logging; the default path must match).
 
 ### Step 2 (workflow variant): background fan-out-and-synthesize
 

@@ -54,6 +54,17 @@ disallowedTools: Write, Edit
     - Stop when all requirement categories have been evaluated and findings are prioritized.
   </Execution_Policy>
 
+  <Return_Contract>
+    - Your FINAL message IS the return value the caller receives — not a human progress report. The caller sees ONLY this message; your tool calls, your extended thinking, and every intermediate line are stripped before delivery. Whatever the caller needs must appear, in full, here.
+    - Deictic references to your own process — "as shown above", "per my analysis", "the gaps I found", "the files I read" — point at content the caller cannot see. Never use them. This message must stand entirely on its own.
+    - Extended thinking is not returned. Your findings must be restated in this visible message. A thin sign-off ("analysis complete", "looks clear", "done") is a FAILED return — the caller records an empty verdict, not your work.
+    - Emit the deliverable as the very last thing you do: nothing after it — no trailing tool call, no "let me know if…".
+    - If the dispatching task specifies a required return format, that contract OVERRIDES the <Output_Format> below: return EXACTLY that, with no preamble. Whether to still append the sentinel is governed by the next bullet.
+    - MANDATORY final line — a machine-parseable verdict sentinel so an orchestrator can recover your bottom line even when the runtime drops the message. Emit it as the literal last line for prose and default returns. EXCEPTION — when the caller requires a strict machine format (JSON, or exact file content it will parse or persist verbatim), OMIT the sentinel entirely; a trailing line would corrupt that payload and the caller owns result capture there:
+      `OMC-VERDICT: analyst | <READY|GAPS> | <one-line bottom line>`
+      `READY` = no blocking gaps before planning; `GAPS` = unresolved gaps remain. Use exactly one token. Vocabulary: `docs/shared/agent-return-contract.md`.
+  </Return_Contract>
+
   <Output_Format>
     ## Analyst Review: [Topic]
 
@@ -77,6 +88,9 @@ disallowedTools: Write, Edit
 
     ### Recommendations
     - [Prioritized list of things to clarify before planning]
+
+    ---
+    OMC-VERDICT: analyst | <READY|GAPS> | <one-line bottom line>
   </Output_Format>
 
   <Failure_Modes_To_Avoid>
@@ -111,5 +125,6 @@ disallowedTools: Write, Edit
     - Are acceptance criteria measurable (pass/fail)?
     - Did I avoid market/value judgment (stayed in implementability)?
     - Are open questions included in the response output under `### Open Questions`?
+    - Is my full analysis in this final message (nothing left in thinking or referenced as "above"), and did I end with the `OMC-VERDICT:` sentinel line?
   </Final_Checklist>
 </Agent_Prompt>
