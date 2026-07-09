@@ -1,6 +1,7 @@
 ---
 name: sciomc
 description: Orchestrate parallel scientist agents for comprehensive analysis with AUTO mode
+disable-model-invocation: true
 argument-hint: "[--workflow] <research goal>"
 level: 4
 ---

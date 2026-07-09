@@ -1,6 +1,7 @@
 ---
 name: external-context
 description: Invoke parallel document-specialist agents for external web searches and documentation lookup
+disable-model-invocation: true
 argument-hint: "[--workflow] <search query or topic>"
 level: 4
 ---

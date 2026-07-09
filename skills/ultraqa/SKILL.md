@@ -1,6 +1,7 @@
 ---
 name: ultraqa
 description: QA cycling workflow - test, verify, fix, repeat until goal met
+disable-model-invocation: true
 argument-hint: "[--workflow] [--tests|--build|--lint|--typecheck|--custom <pattern>] [--interactive]"
 level: 3
 ---

@@ -206,3 +206,53 @@ A workflow run counts toward the plan's usage and rate limits. When a skill does
 4. WF-REC cell → prompt via `AskUserQuestion`; WF-OPT → mention the option, default to Task/team.
 5. Before launching, confirm the loop-authority invariant (§6): no competing `/goal`/`ralph`.
 6. Apply token-cost mitigations (§7); on a first run, pilot a small slice.
+
+---
+
+## 9. User-invoked-only skills (`disable-model-invocation`)
+
+Complementary to §1–§8: those govern **whether a skill escalates to a Workflow**; this governs
+**whether the model may auto-launch the skill at all.** Heavyweight orchestrators should not fire
+on the model's own initiative from a bare prompt — only when the user explicitly types the command.
+
+**Mechanism.** `disable-model-invocation: true` in a skill's `SKILL.md` frontmatter. Per Claude Code
+docs (code.claude.com/docs/en/skills.md line 571 + table lines 349–354), it blocks **both** (a) the
+model's autonomous auto-selection **and** (b) programmatic `Skill("…")` invocation by another skill or
+hook. Only a literal human `/command` keypress invokes a flagged skill. (Distinct from `user-invocable`,
+which only controls menu visibility, **not** Skill-tool access — do not conflate the two.)
+
+**Hard constraint — never flag a `Skill()` target.** Because the flag also blocks programmatic `Skill()`
+calls, flagging a skill that another skill invokes via `Skill("oh-my-claudecode:<name>")` **severs that
+pipeline.** These are OMC's execution/planning targets and MUST stay model-invocable:
+
+| Must stay model-invocable | Invoked via `Skill()` by |
+|---|---|
+| `autopilot` | deep-dive, deep-interview |
+| `ralph` | deep-dive, deep-interview, ralplan, plan |
+| `team` | deep-dive, deep-interview, ralplan, plan |
+| `plan` (omc-plan) | deep-dive (`next-skill`), deep-interview |
+| `autoresearch` | deep-interview |
+
+`ralplan` is also excluded — it is the **gate** that auto-routes vague `ralph`/`autopilot`/`team`
+requests into consensus planning; disabling its model-invocation would defeat that routing.
+
+**Flagged (user-invoked only) — 12 leaf/entry orchestrators with no `Skill()` callers:**
+`ultrawork, ultraqa, sciomc, self-improve, ultragoal, fleet-audit, fleet-review, ccg, omc-teams,
+deepinit, deep-dive, external-context`.
+
+Unaffected by the flag: the user's `/command`; OMC's magic-keyword **prompt-enhancers**
+(`ulw`/`search`/`analyze`/`ultrathink` rewrite the prompt text, they do **not** invoke the same-named
+skill); and OMC's auto-slash-command **inline expansion**.
+
+**Checklist before flagging a new skill user-invoked-only:**
+1. Is it ever invoked via `Skill("…name")` in any `SKILL.md` body or `src/hooks`? → if yes, **do not
+   flag** (breaks the caller).
+2. Is it a `next-skill` / `pipeline` target, or injected via `[MAGIC KEYWORD: name]`? → if yes, **do not
+   flag**.
+3. Does it have a legitimate auto-invoke role (a gate/router like `ralplan`)? → if yes, **do not flag**.
+4. Otherwise, if it is a heavyweight fan-out/loop the model should not self-start → **flag it.**
+
+**⚠️ Verification status.** The Claude Code docs are **silent on whether `disable-model-invocation`
+applies to plugin-namespaced skills** (OMC ships as a plugin). It is a safe no-op if unsupported (no
+parse error). **Confirm empirically after a plugin reload + full restart:** each flagged skill's
+`/command` still runs when typed, and the model no longer auto-invokes it from a bare prompt.

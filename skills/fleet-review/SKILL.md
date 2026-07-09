@@ -1,6 +1,7 @@
 ---
 name: fleet-review
 description: Multi-agent code review pipeline with cross-model verification
+disable-model-invocation: true
 ---
 
 # /fleet-review — Multi-Agent Code Review Pipeline

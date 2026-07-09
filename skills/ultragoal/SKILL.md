@@ -1,6 +1,7 @@
 ---
 name: ultragoal
 description: Durable multi-goal workflow that persists plan/ledger artifacts under .omc/ultragoal and prints Claude /goal handoff text for the active session
+disable-model-invocation: true
 argument-hint: "<brief or subcommand>"
 level: 3
 ---

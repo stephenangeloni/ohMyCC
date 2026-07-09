@@ -1,6 +1,7 @@
 ---
 name: omc-teams
 description: CLI-team runtime for claude, codex, or gemini workers in tmux panes when you need process-based parallel execution
+disable-model-invocation: true
 aliases: []
 level: 4
 ---

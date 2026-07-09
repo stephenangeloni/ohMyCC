@@ -1,6 +1,7 @@
 ---
 name: fleet-audit
 description: Repo-wide audit or migration sweep across many files via a background Dynamic Workflow, with adversarial verification and a team/Task fallback
+disable-model-invocation: true
 argument-hint: "[--migrate] [--no-workflow] <audit goal or migration spec>"
 level: 4
 ---
