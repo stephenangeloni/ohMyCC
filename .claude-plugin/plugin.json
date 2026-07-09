@@ -62,7 +62,8 @@
     "./skills/verify/",
     "./skills/visual-verdict/",
     "./skills/wiki/",
-    "./skills/writer-memory/"
+    "./skills/writer-memory/",
+    "./skills/writing-great-skills/"
   ],
   "mcpServers": "./.mcp.json",
   "commands": "./commands/"
