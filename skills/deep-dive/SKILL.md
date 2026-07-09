@@ -3,11 +3,6 @@ name: deep-dive
 description: "2-stage pipeline: trace (causal investigation) -> deep-interview (requirements crystallization) with 3-point injection"
 disable-model-invocation: true
 argument-hint: "<problem or exploration target>"
-triggers:
-  - "deep dive"
-  - "deep-dive"
-  - "trace and interview"
-  - "investigate deeply"
 pipeline: [deep-dive, plan, autopilot]
 next-skill: plan
 next-skill-args: --consensus --direct

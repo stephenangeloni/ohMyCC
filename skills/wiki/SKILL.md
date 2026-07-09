@@ -1,7 +1,6 @@
 ---
 name: wiki
-description: LLM Wiki — persistent markdown knowledge base that compounds across sessions (Karpathy model)
-triggers: ["wiki", "wiki this", "wiki add", "wiki lint", "wiki query"]
+description: LLM Wiki — persistent markdown knowledge base that compounds across sessions (Karpathy model). Use when the user says "wiki", "wiki this", "wiki add/lint/query", or wants to build or query a durable project knowledge base.
 ---
 
 # Wiki

@@ -57,6 +57,11 @@ export interface BuiltinSkill {
   pipeline?: SkillPipelineMetadata;
   /** MCP server configuration (optional) */
   mcpConfig?: SkillMcpConfig;
+  // NOTE: there is intentionally no `triggers` field. A `triggers:` frontmatter key on a
+  // builtin skill (skills/*/SKILL.md) is NOT read here and is silently ignored — builtin
+  // skills are discovered by `description` (native Claude Code). Keyword-trigger
+  // auto-invocation applies ONLY to learner skills (.omc/skills/, see hooks/learner/).
+  // Fold trigger keywords into `description` ("Use when …") instead of adding `triggers:`.
 }
 
 /**

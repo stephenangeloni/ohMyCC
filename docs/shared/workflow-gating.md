@@ -244,6 +244,12 @@ Unaffected by the flag: the user's `/command`; OMC's magic-keyword **prompt-enha
 (`ulw`/`search`/`analyze`/`ultrathink` rewrite the prompt text, they do **not** invoke the same-named
 skill); and OMC's auto-slash-command **inline expansion**.
 
+**Discovery note — `triggers:` is not read for builtin skills.** The `triggers:` frontmatter field
+drives keyword auto-invocation **only** for learner skills (`.omc/skills/`, via `src/hooks/learner`).
+Builtin skills (`skills/*/SKILL.md`) are discovered purely by `description` (native Claude Code) — a
+`triggers:` field on a builtin skill is **silently ignored**. Fold trigger keywords into the
+`description` (`"Use when …"`); never add `triggers:` to a `skills/*/SKILL.md`.
+
 **Checklist before flagging a new skill user-invoked-only:**
 1. Is it ever invoked via `Skill("…name")` in any `SKILL.md` body or `src/hooks`? → if yes, **do not
    flag** (breaks the caller).
