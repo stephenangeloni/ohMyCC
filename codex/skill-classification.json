@@ -1,0 +1,242 @@
+[
+  {
+    "name": "ai-slop-cleaner",
+    "status": "adapted",
+    "reason": "Clean generated code with a regression-safe, deletion-first workflow."
+  },
+  {
+    "name": "ask",
+    "status": "adapted",
+    "reason": "Route a question to a local Claude, Codex, or Gemini advisor through the OMC CLI."
+  },
+  {
+    "name": "autopilot",
+    "status": "adapted",
+    "reason": "Run an autonomous Codex-native delivery pipeline from requirements through verification."
+  },
+  {
+    "name": "autoresearch",
+    "status": "adapted",
+    "reason": "Run a stateful experiment loop that keeps measured improvements and rejects regressions."
+  },
+  {
+    "name": "cancel",
+    "status": "adapted",
+    "reason": "Cancel active OMC or Codex orchestration without disturbing unrelated work."
+  },
+  {
+    "name": "ccg",
+    "status": "adapted",
+    "reason": "Collect independent Claude, Codex, and Gemini advice and synthesize it against evidence."
+  },
+  {
+    "name": "clip-it",
+    "status": "adapted",
+    "reason": "Copy supplied text or the current response to the macOS clipboard."
+  },
+  {
+    "name": "configure-notifications",
+    "status": "adapted",
+    "reason": "Configure OMC notification delivery through supported Codex hooks."
+  },
+  {
+    "name": "context-handoff",
+    "status": "adapted",
+    "reason": "Create a concise durable handoff for another Codex context."
+  },
+  {
+    "name": "cpr",
+    "status": "adapted",
+    "reason": "Commit, push, and open a pull request through a tightly scoped Git workflow."
+  },
+  {
+    "name": "debug",
+    "status": "adapted",
+    "reason": "Diagnose repository or orchestration failures with evidence-first reproduction."
+  },
+  {
+    "name": "deep-dive",
+    "status": "adapted",
+    "reason": "Trace a problem causally, then interview only the remaining ambiguity."
+  },
+  {
+    "name": "deep-interview",
+    "status": "adapted",
+    "reason": "Clarify ambiguous requirements one question at a time before execution."
+  },
+  {
+    "name": "deepinit",
+    "status": "adapted",
+    "reason": "Create or refine hierarchical AGENTS.md guidance for a repository."
+  },
+  {
+    "name": "external-context",
+    "status": "adapted",
+    "reason": "Gather external documentation and references with source-backed research."
+  },
+  {
+    "name": "fleet-audit",
+    "status": "adapted",
+    "reason": "Audit a large repository surface with parallel read-only native agents."
+  },
+  {
+    "name": "fleet-fix",
+    "status": "adapted",
+    "reason": "Apply a verified findings list in small sequential changes."
+  },
+  {
+    "name": "fleet-review",
+    "status": "adapted",
+    "reason": "Run a multi-perspective code review with independent verification."
+  },
+  {
+    "name": "hud",
+    "status": "adapted",
+    "reason": "Inspect or configure the available OMC or OMX status display for Codex."
+  },
+  {
+    "name": "learner",
+    "status": "adapted",
+    "reason": "Extract a reusable Codex skill from a successful workflow in the current session."
+  },
+  {
+    "name": "mcp-setup",
+    "status": "adapted",
+    "reason": "Configure MCP servers for Codex while preserving unrelated configuration."
+  },
+  {
+    "name": "mpc",
+    "status": "adapted",
+    "reason": "Merge a feature branch into the main branch with explicit destructive-action gates."
+  },
+  {
+    "name": "mpcw",
+    "status": "adapted",
+    "reason": "Merge a worktree branch and clean it up with explicit safety gates."
+  },
+  {
+    "name": "omc-doctor",
+    "status": "adapted",
+    "reason": "Diagnose the personal OMC and Codex integration."
+  },
+  {
+    "name": "omc-reference",
+    "status": "adapted",
+    "reason": "Explain the OMC workflow, agent, MCP, state, and host-boundary catalog."
+  },
+  {
+    "name": "omc-setup",
+    "status": "adapted",
+    "reason": "Install or refresh this repository's Codex integration."
+  },
+  {
+    "name": "omc-teams",
+    "status": "adapted",
+    "reason": "Run process-based OMC teams when the CLI runtime is available."
+  },
+  {
+    "name": "plan",
+    "status": "adapted",
+    "reason": "Create an executable implementation plan with Codex task tracking."
+  },
+  {
+    "name": "project-session-manager",
+    "status": "adapted",
+    "reason": "Manage worktree-first development sessions for issues, features, and reviews."
+  },
+  {
+    "name": "ralph",
+    "status": "adapted",
+    "reason": "Persist through a scoped task until independent verification passes."
+  },
+  {
+    "name": "ralplan",
+    "status": "adapted",
+    "reason": "Build a consensus plan with native planner, architect, and critic agents."
+  },
+  {
+    "name": "release",
+    "status": "adapted",
+    "reason": "Prepare and execute repository releases with explicit publication gates."
+  },
+  {
+    "name": "remember",
+    "status": "portable",
+    "reason": "Store durable project knowledge through OMC memory or repository documentation."
+  },
+  {
+    "name": "sciomc",
+    "status": "adapted",
+    "reason": "Coordinate independent scientific analyses and synthesize their evidence."
+  },
+  {
+    "name": "self-improve",
+    "status": "adapted",
+    "reason": "Run a bounded evolutionary improvement loop over code and measurable quality."
+  },
+  {
+    "name": "setup",
+    "status": "adapted",
+    "reason": "Route setup, repair, and MCP requests to the correct Codex or Claude host flow."
+  },
+  {
+    "name": "skill",
+    "status": "adapted",
+    "reason": "Manage Codex skills in global, project, and plugin scopes."
+  },
+  {
+    "name": "skillify",
+    "status": "adapted",
+    "reason": "Turn a repeatable session workflow into a reusable Codex skill draft."
+  },
+  {
+    "name": "team",
+    "status": "adapted",
+    "reason": "Coordinate multiple Codex native agents on a shared scoped task."
+  },
+  {
+    "name": "trace",
+    "status": "adapted",
+    "reason": "Inspect OMC execution traces and compare causal hypotheses."
+  },
+  {
+    "name": "ultragoal",
+    "status": "adapted",
+    "reason": "Execute durable multi-goal work with repository-native progress artifacts."
+  },
+  {
+    "name": "ultraqa",
+    "status": "adapted",
+    "reason": "Cycle through adversarial QA, fixes, and re-verification until the goal passes."
+  },
+  {
+    "name": "ultrawork",
+    "status": "adapted",
+    "reason": "Run high-throughput parallel execution with bounded Codex native agents."
+  },
+  {
+    "name": "verify",
+    "status": "portable",
+    "reason": "Require fresh command evidence before completion claims."
+  },
+  {
+    "name": "visual-verdict",
+    "status": "portable",
+    "reason": "Evaluate visual evidence against explicit acceptance criteria."
+  },
+  {
+    "name": "wiki",
+    "status": "portable",
+    "reason": "Maintain a persistent repository Markdown knowledge base through OMC MCP tools."
+  },
+  {
+    "name": "writer-memory",
+    "status": "adapted",
+    "reason": "Maintain durable story facts, characters, scenes, relationships, and themes."
+  },
+  {
+    "name": "writing-great-skills",
+    "status": "adapted",
+    "reason": "Author and review concise, effective Codex skills."
+  }
+]

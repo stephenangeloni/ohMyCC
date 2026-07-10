@@ -46,7 +46,32 @@ describe('worker-bootstrap', () => {
     }
   });
 
+  describe('generateMailboxTriggerMessage — empty-mailbox hardening', () => {
+    it('does not fabricate a phantom nudge when there are zero messages', () => {
+      // Regression: Math.max(1, count) silently promoted a real 0 into "1 new msg(s)",
+      // dispatching workers at an empty/nonexistent mailbox. Zero must produce no nudge.
+      const msg = generateMailboxTriggerMessage('dispatch-team', 'worker-1', 0);
+      expect(msg).toBe('');
+      expect(msg).not.toContain('new msg(s)');
+    });
+
+    it('does not fabricate a nudge for a negative count', () => {
+      expect(generateMailboxTriggerMessage('dispatch-team', 'worker-1', -5)).toBe('');
+    });
+
+    it('still emits a real nudge for a positive count', () => {
+      const msg = generateMailboxTriggerMessage('test-team', 'worker-1', 1);
+      expect(msg).toContain('1 new msg(s)');
+      expect(msg).toContain('act now');
+    });
+  });
+
   describe('generateWorkerOverlay', () => {
+    it('instructs the worker to no-op on an empty mailbox instead of fabricating work', () => {
+      const overlay = generateWorkerOverlay(baseParams);
+      expect(overlay).toContain('no pending messages');
+    });
+
     it('uses urgent trigger wording that requires immediate work and concrete progress', () => {
       expect(generateTriggerMessage('test-team', 'worker-1')).toContain('.omc/state/team/test-team/workers/worker-1/inbox.md');
       expect(generateTriggerMessage('test-team', 'worker-1')).toContain('execute now');

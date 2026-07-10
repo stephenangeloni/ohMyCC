@@ -68,7 +68,16 @@ export function generateMailboxTriggerMessage(
   count = 1,
   teamStateRoot = DEFAULT_INSTRUCTION_STATE_ROOT,
 ): string {
-  const normalizedCount = Number.isFinite(count) ? Math.max(1, Math.floor(count)) : 1;
+  // Empty-mailbox guard: a trigger must never announce messages that do not
+  // exist. The previous Math.max(1, count) silently promoted a real 0 into
+  // "1 new msg(s)", dispatching workers at an empty mailbox (phantom dispatch).
+  // Strict policy: a non-finite or non-positive count announces nothing.
+  // Both production callers pass a literal 1, so this branch is unreachable from
+  // production today — it guards future/erroneous/fixture callers. Any caller that
+  // can pass a computed count should skip sending when this returns ''.
+  if (!Number.isFinite(count) || count < 1) return '';
+
+  const normalizedCount = Math.max(1, Math.floor(count));
   const mailboxPath = buildTeamStateInstructionPath(teamName, teamStateRoot, 'mailbox', `${workerName}.json`);
   if (teamStateRoot !== DEFAULT_INSTRUCTION_STATE_ROOT) {
     return `${normalizedCount} new msg(s): check ${mailboxPath}, act and report progress.`;
@@ -219,6 +228,7 @@ Send messages via CLI API:
 - To leader: \`${formatOmcCliInvocation(`team api send-message --input "{\\"team_name\\":\\"${teamName}\\",\\"from_worker\\":\\"${workerName}\\",\\"to_worker\\":\\"leader-fixed\\",\\"body\\":\\"<message>\\"}" --json`)}\`
 - Check mailbox: \`${mailboxListCommand}\`
 - Mark delivered: \`${mailboxDeliveredCommand}\`
+- **Empty mailbox is a no-op**: if \`${mailboxListCommand}\` returns no messages, do NOT fabricate work or invent progress. Report "no pending messages" to leader-fixed and continue your assigned task (or stay idle). A trigger nudge is not itself a task.
 
 ## Startup Handshake (Required)
 Before doing any task work, send exactly one startup ACK to the leader:

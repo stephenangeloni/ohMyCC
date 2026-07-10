@@ -1,0 +1,144 @@
+const entries = [
+  ['agents-claude-align', 'Audit AGENTS.md against CLAUDE.md and safely synchronize shared guidance.', `# Align AGENTS.md with CLAUDE.md
+
+Run a read-only audit across the hierarchical instruction scopes, comparing meaning rather than Markdown layout. Classify guidance as aligned, missing, contradictory, Claude-only, Codex-specific, or unrelated content found only in \`AGENTS.md\`. Report exact files and headings.
+
+When synchronization is requested, treat \`CLAUDE.md\` as the source for shared behavioral rules, preserve Codex-specific guidance, and translate shared intent into Codex-native wording without copying Claude-only commands, tools, hooks, model aliases, plugin variables, or runtime APIs. If applicable shared guidance exists but the matching file is missing, preview and create \`AGENTS.md\`; do not create an empty or Claude-only file. If existing \`AGENTS.md\` content is unrelated, identify its sections and ask whether to keep or remove them before editing that file. Ask before resolving material contradictions, show the proposed and final diffs, then repeat the audit.`],
+  ['ai-slop-cleaner', 'Clean generated code with a regression-safe, deletion-first workflow.', `# AI Slop Cleaner\n\nWrite a cleanup plan before editing. Lock behavior with focused regression tests, then make small passes for dead code, duplication, needless abstraction, naming, and boundary repair. Prefer deletion and existing utilities. Use separate native executor and reviewer passes for high-impact cleanup, and finish with lint, typecheck, tests, and static analysis.`],
+  ['ask', 'Route a question to a local Claude, Codex, or Gemini advisor through the OMC CLI.', `# Ask an Advisor\n\nSelect the requested advisor and invoke the existing \`omc ask\` CLI with a bounded prompt. Capture the response as an artifact when requested, distinguish advisor output from your own conclusions, and synthesize only after checking it against repository evidence. Never assemble provider credentials or expose secrets.`],
+  ['autopilot', 'Run an autonomous Codex-native delivery pipeline from requirements through verification.', `# Autopilot\n\nClarify only material ambiguity, create a test-first plan, then execute through implementation, review, and adversarial QA. Use bounded native subagents for independent exploration, implementation, review, and verification. Keep one leader responsible for integration, continue while safe work remains, and stop only with fresh evidence or a genuine blocker.`],
+  ['autoresearch', 'Run a stateful experiment loop that keeps measured improvements and rejects regressions.', `# Autoresearch\n\nDefine one mission, an evaluator command, a baseline, a maximum runtime, and a decision log before changing code. Run one hypothesis at a time, measure it, keep only improvements, and revert only changes created by this workflow when a trial loses. Stop on the time limit, target metric, or repeated inability to produce a valid evaluation.`],
+  ['cancel', 'Cancel active OMC or Codex orchestration without disturbing unrelated work.', `# Cancel\n\nInspect active native subagents and OMC state first. Interrupt only work owned by the current requested workflow, clear only its managed state through the standard OMC MCP tools when appropriate, and report what stopped. Do not kill unrelated processes, sessions, or user work.`],
+  ['ccg', 'Collect independent Claude, Codex, and Gemini advice and synthesize it against evidence.', `# CCG\n\nUse the existing \`omc ask\` CLI to request bounded independent answers from the available Claude, Codex, and Gemini providers. Preserve each raw response, compare agreements and contradictions, verify important claims locally, and return one synthesis with evidence boundaries. Continue with the providers that are available and name any missing lane.`],
+  ['clip-it', 'Copy supplied text or the current response to the macOS clipboard.', `# Clip It\n\nChoose the exact text the user requested. If the current response text is unavailable, ask for or reconstruct only the smallest explicit payload. Pipe the final text to \`pbcopy\`, avoid adding commentary to the clipboard content, and report the byte or line count. On non-macOS systems, state that this adapter requires \`pbcopy\`.`],
+  ['configure-notifications', 'Configure OMC notification delivery through supported Codex hooks.', `# Configure Notifications\n\nInspect the existing notification configuration and supported Codex hook events. Add or update only the requested Telegram, Discord, or Slack destination through the repository's existing notification utilities, keep credentials out of output and version control, and preserve unrelated hooks. Test with a non-sensitive dry run when the integration supports it.`],
+  ['context-handoff', 'Create a concise durable handoff for another Codex context.', `# Context Handoff\n\nCapture the goal, constraints, completed work, changed files, verification evidence, unresolved risks, and exact next command. Keep facts separate from inference and omit secrets. Store the handoff only when requested; otherwise return it directly.`],
+  ['cpr', 'Commit, push, and open a pull request through a tightly scoped Git workflow.', `# Commit, Push, Request\n\nInspect status, diff, repository guidance, and target branch. Present the intended commit and remote effects before any push or pull-request creation, because those actions change external state. After authorization, use one bounded git specialist or execute directly, follow the repository commit protocol, verify the remote result, and never include unrelated changes.`],
+  ['debug', 'Diagnose repository or orchestration failures with evidence-first reproduction.', `# Debug\n\nReproduce the failure, inspect the smallest relevant logs, traces, state, and recent diff, then trace the bad value or transition to its source. Form one hypothesis at a time and test it minimally. Report the root cause with concrete file references; implement a fix only when the request includes fixing.`],
+  ['deep-dive', 'Trace a problem causally, then interview only the remaining ambiguity.', `# Deep Dive\n\nRun a read-only causal investigation first using repository evidence, traces, and competing hypotheses. Convert unresolved material uncertainty into a one-question-per-round interview using Codex structured input when available. Finish with a grounded problem statement, acceptance criteria, and execution handoff; do not implement unless explicitly requested.`],
+  ['deep-interview', 'Clarify ambiguous requirements one question at a time before execution.', `# Deep Interview\n\nInvestigate discoverable repository facts before asking the user. Ask exactly one concise question per round using Codex structured input when available. Stop when scope, constraints, acceptance criteria, and destructive boundaries are explicit, then return a requirements artifact and execution handoff.`],
+  ['deepinit', 'Create or refine hierarchical AGENTS.md guidance for a repository.', `# Deep Init\n\nMap repository boundaries, existing guidance, build systems, and nested ownership. Keep cross-cutting rules at the root and place directory-specific rules in nested \`AGENTS.md\` files. Preserve user guidance, remove duplicated or self-evident text, and validate that each file applies only to its subtree.`],
+  ['external-context', 'Gather external documentation and references with source-backed research.', `# External Context\n\nDelegate independent research questions to native research subagents or use approved web tools. Prefer official and primary sources, capture URLs and version dates, separate evidence from inference, and synthesize only information relevant to the requested implementation. Do not let external research silently expand scope.`],
+  ['fleet-audit', 'Audit a large repository surface with parallel read-only native agents.', `# Fleet Audit\n\nDefine the invariant, file population, exclusions, and severity rubric. Partition independent read-only slices across native subagents, normalize their findings, deduplicate by root cause, and run an adversarial verification pass. Return a ranked findings list with exact files; do not edit during the audit.`],
+  ['fleet-fix', 'Apply a verified findings list in small sequential changes.', `# Fleet Fix\n\nRequire a concrete verified findings list. Order fixes by dependency and risk, add regression tests first, and assign bounded native executors only to non-overlapping files. Integrate sequentially, verify after each batch, and stop rather than guessing when a finding lacks enough evidence.`],
+  ['fleet-review', 'Run a multi-perspective code review with independent verification.', `# Fleet Review\n\nSelect review lanes appropriate to the diff, such as logic, API, security, performance, tests, and style. Run independent read-only native reviewers, rank findings by impact, remove duplicates, and verify each blocking claim against the code. Return findings first with file references; do not modify files unless separately requested.`],
+  ['hud', 'Inspect or configure the available OMC or OMX status display for Codex.', `# HUD\n\nDetect whether the active Codex environment exposes an OMX HUD or compatible status display. Use its supported configuration command when present, preserve unrelated settings, and show the resulting configuration. If no native display surface exists, explain the exact capability gap instead of editing Claude status-line configuration.`],
+  ['learner', 'Extract a reusable Codex skill from a successful workflow in the current session.', `# Learner\n\nIdentify the repeatable procedure, triggers, inputs, failure modes, and verification evidence from the current session. Draft a concise Codex skill with native tools and no session-specific secrets or paths. Validate the draft with the installed skill validator and ask before overwriting an existing skill.`],
+  ['mcp-setup', 'Configure MCP servers for Codex while preserving unrelated configuration.', `# MCP Setup\n\nInspect current Codex MCP configuration and prefer the existing standard OMC server when it satisfies the request. Add or update only the named server using supported Codex configuration, preserve unrelated entries, validate command paths and timeouts, and perform a live list-tools smoke test. Never add an SDK dependency when stdio MCP is sufficient.`],
+  ['mpc', 'Merge a feature branch into the main branch with explicit destructive-action gates.', `# Merge Project Change\n\nInspect branch state, worktree cleanliness, upstreams, tests, and the repository's merge policy. Present the exact merge, push, and branch-deletion actions before executing them. After explicit authorization, perform the smallest non-interactive Git sequence, verify the remote state, and never discard uncommitted work.`],
+  ['mpcw', 'Merge a worktree branch and clean it up with explicit safety gates.', `# Merge Project Worktree\n\nInspect the source worktree, target branch, uncommitted changes, active processes, and upstream state. Present the merge, push, worktree removal, and branch-deletion actions before execution. After explicit authorization, merge and verify first, then remove only the identified clean worktree and branches.`],
+  ['omc-doctor', 'Diagnose the personal OMC and Codex integration.', `# OMC Doctor\n\nRun repository and installed-host diagnostics for the requested surface. Check CLI versions, marketplace/plugin state, generated drift, MCP startup, managed hooks, native agents, and configuration parsing while preserving user content. Apply only reversible local fixes within scope and report unrelated warnings separately.`],
+  ['omc-reference', 'Explain the OMC workflow, agent, MCP, state, and host-boundary catalog.', `# OMC Reference\n\nAnswer from the repository's current generated catalogs and host guidance. Distinguish Codex native agents and \`$omc-*\` skills from Claude-only surfaces, and distinguish standard MCP tools from in-process SDK tools. Prefer exact installed commands and file paths over recalled aliases.`],
+  ['omc-setup', "Install or refresh this repository's Codex integration.", `# OMC Setup\n\nFor Codex, use the repository's \`pnpm codex:build\`, \`pnpm codex:validate\`, \`pnpm codex:setup\`, and marketplace reinstall flow. Preserve unrelated \`$CODEX_HOME\` and all Claude files. If the user explicitly requests Claude setup, route to the existing Claude installer without translating it in place.`],
+  ['omc-teams', 'Run process-based OMC teams when the CLI runtime is available.', `# OMC Teams\n\nPrefer Codex native subagents for ordinary in-session parallel work. When the user explicitly requests the process-based OMC team runtime, verify the \`omc\` CLI and tmux environment, define bounded worker tasks, launch the supported Codex workers, monitor terminal states, and clean up only the created team resources.`],
+  ['plan', 'Create an executable implementation plan with Codex task tracking.', `# Plan\n\nInspect relevant repository context, state assumptions, and write ordered test-first tasks with exact files, verification commands, risks, and a stop condition. Use Codex plan tracking for multi-step work. Do not implement unless the request includes execution.`],
+  ['project-session-manager', 'Manage worktree-first development sessions for issues, features, and reviews.', `# Project Session Manager\n\nInspect existing branches, worktrees, session metadata, and repository naming rules. Create or resume the smallest isolated worktree and optional terminal session requested, preserve dirty worktrees, and record the issue or feature context. Ask before remote branch creation, deletion, or other destructive Git operations.`],
+  ['ralph', 'Persist through a scoped task until independent verification passes.', `# Ralph\n\nRequire an approved plan and test specification before implementation. Execute one bounded iteration at a time, use an independent native verifier after changes, and keep a concise progress artifact. Continue while recoverable work remains; stop on verified completion, user cancellation, or a genuine blocker.`],
+  ['ralplan', 'Build a consensus plan with native planner, architect, and critic agents.', `# Ralplan\n\nDelegate sequential read-only passes to native subagents \`omc-planner\`, \`omc-architect\`, and \`omc-critic\`, inheriting the active Codex model. Require explicit principles, decision drivers, alternatives, acceptance criteria, test shape, and risks. Revise until the critic approves or the bounded review limit is reached, then hand off without implementing.`],
+  ['release', 'Prepare and execute repository releases with explicit publication gates.', `# Release\n\nDiscover the repository's release rules, version source, changelog policy, test gates, signing, and publication targets. Cache only durable repository guidance. Prepare and verify release artifacts locally, then obtain explicit authorization before tags, pushes, package publication, or external release creation.`],
+  ['remember', 'Store durable project knowledge through OMC memory or repository documentation.', `# Remember\n\nRead existing project memory, notepad, and durable docs first. Store only reusable facts, decisions, or warnings in the narrowest appropriate location, avoid duplication and secrets, and report the key or file updated. Prefer repository documentation for facts future contributors need.`],
+  ['sciomc', 'Coordinate independent scientific analyses and synthesize their evidence.', `# SciOMC\n\nDefine the research question, data, assumptions, and evaluation criteria. Delegate independent analyses to native subagents, require reproducible calculations and uncertainty, compare contradictory results, and synthesize evidence without overstating confidence. Use external compute only when authorized.`],
+  ['self-improve', 'Run a bounded evolutionary improvement loop over code and measurable quality.', `# Self Improve\n\nDefine the mutable scope, objective metric, baseline, candidate budget, and rollback rule. Generate small competing candidates, evaluate them reproducibly, retain only measured winners, and keep a decision log. Never optimize against an untrusted or shifting evaluator, and stop at the budget or target.`],
+  ['setup', 'Route setup, repair, and MCP requests to the correct Codex or Claude host flow.', `# Setup Router\n\nIdentify the requested host and operation. For this Codex plugin, route builds, validation, personal setup, synchronization, removal, and MCP checks to the \`codex:*\` scripts. For Claude, leave the existing installer and plugin flow intact. Do not mix host configuration files.`],
+  ['skill', 'Manage Codex skills in global, project, and plugin scopes.', `# Skill Management\n\nList, search, create, edit, validate, install, or remove Codex skills in the requested scope. Use lowercase hyphenated names, valid two-field frontmatter, concise native instructions, and deterministic resources. Confirm before overwrite or destructive removal, and invoke skills with \`$name\`.`],
+  ['skillify', 'Turn a repeatable session workflow into a reusable Codex skill draft.', `# Skillify\n\nExtract the reusable trigger, procedure, resources, safety boundaries, and verification from the session. Remove project-specific accidents and all secrets, write concise Codex-native instructions, generate UI metadata when useful, and validate the skill. Do not install or overwrite it without the requested scope and authorization.`],
+  ['team', 'Coordinate multiple Codex native agents on a shared scoped task.', `# Team\n\nUse native subagents only when independent lanes materially improve throughput or safety. Give each agent bounded ownership and a verifiable deliverable, keep one leader responsible for integration, serialize dependent work, and independently verify all results. Use process-based OMC teams only when explicitly requested and available.`],
+  ['trace', 'Inspect OMC execution traces and compare causal hypotheses.', `# Trace\n\nUse the standard OMC MCP trace tools to retrieve the smallest relevant time window. Build competing hypotheses, correlate hooks, skills, agents, tools, and state transitions, and identify the earliest divergence. Return evidence, inference, and missing telemetry separately.`],
+  ['ultragoal', 'Execute durable multi-goal work with repository-native progress artifacts.', `# Ultragoal\n\nDecompose the objective into dependency-ordered goals with acceptance criteria and verification commands. Persist only managed progress and ledger artifacts under the repository's OMC state area, use Codex goal tracking when available, and hand off goals without relying on Claude-specific commands. Complete each goal only with fresh evidence.`],
+  ['ultraqa', 'Cycle through adversarial QA, fixes, and re-verification until the goal passes.', `# UltraQA\n\nDefine hostile scenarios from the acceptance criteria, run the smallest proving tests, classify failures, and fix one root cause at a time with regression coverage. Repeat with an independent native verifier until all required scenarios pass or the bounded attempt limit exposes a blocker. Remove temporary QA artifacts.`],
+  ['ultrawork', 'Run high-throughput parallel execution with bounded Codex native agents.', `# Ultrawork\n\nPartition only independent tasks, assign explicit file or subsystem ownership, and launch bounded native subagents. Keep dependent work sequential, avoid shared-file conflicts, integrate results centrally, and verify the combined result. Do not use parallelism when coordination overhead exceeds the work.`],
+  ['verify', 'Require fresh command evidence before completion claims.', `# Verify\n\nIdentify what proves each claim, run it fresh, read the exit status and failures, and report the evidence. Prefer targeted tests followed by broader build, lint, typecheck, and smoke checks proportional to risk. State exact gaps when a required check cannot run.`],
+  ['visual-verdict', 'Evaluate visual evidence against explicit acceptance criteria.', `# Visual Verdict\n\nCompare current screenshots or rendered artifacts with the supplied reference. Record objective differences, severity, a numeric score when useful, and the smallest next action. Require fresh visual evidence every iteration and never claim a match from code inspection alone.`],
+  ['wiki', 'Maintain a persistent repository Markdown knowledge base through OMC MCP tools.', `# Wiki\n\nSearch the repository wiki before writing. Add, update, lint, or query only durable project knowledge, keep entries concise, link evidence, and avoid duplicating source documentation. Report the affected wiki path or query result.`],
+  ['writer-memory', 'Maintain durable story facts, characters, scenes, relationships, and themes.', `# Writer Memory\n\nRead existing writer-memory records before adding facts. Store canonical characters, relationships, scenes, chronology, themes, and unresolved threads in the repository's established writer-memory format. Separate confirmed canon from ideas, detect contradictions, and never overwrite creative decisions silently.`],
+  ['writing-great-skills', 'Author and review concise, effective Codex skills.', `# Writing Great Skills\n\nDefine precise triggers in the description, keep the body procedural and concise, choose the right degree of freedom, and move optional detail into one-level references. Guard against premature completion, duplication, sediment, sprawl, no-op instructions, and negative-only rules. Validate frontmatter, names, resources, and a realistic forward test before shipping.`],
+];
+
+export const nativeSkills = new Map(entries.map(([name, description, body]) => [name, { description, body }]));
+
+export const codexOnlySkills = new Set(['agents-claude-align']);
+const portableNames = new Set(['remember', 'verify', 'visual-verdict', 'wiki']);
+export const portableSkills = new Map([...nativeSkills]
+  .filter(([name]) => !codexOnlySkills.has(name) && portableNames.has(name))
+  .map(([name, skill]) => [name, skill.description]));
+export const adaptedSkills = new Map([...nativeSkills]
+  .filter(([name]) => !codexOnlySkills.has(name) && !portableNames.has(name))
+  .map(([name, skill]) => [name, skill.description]));
+
+export const compatibilitySkills = new Set([
+  'context-handoff',
+  'deep-interview',
+  'plan',
+  'ralplan',
+  'remember',
+  'skill',
+  'trace',
+  'verify',
+  'visual-verdict',
+  'wiki',
+  'writing-great-skills',
+]);
+
+export const commandAliases = new Map([
+  ['ask', 'ask'],
+  ['autoresearch', 'autoresearch'],
+  ['ccg', 'ccg'],
+  ['clip-it', 'clip-it'],
+  ['configure-notifications', 'configure-notifications'],
+  ['context-handoff', 'context-handoff'],
+  ['cpr', 'cpr'],
+  ['debug', 'debug'],
+  ['deep-dive', 'deep-dive'],
+  ['deepinit', 'deepinit'],
+  ['external-context', 'external-context'],
+  ['fleet-fix', 'fleet-fix'],
+  ['fleet-review', 'fleet-review'],
+  ['hud', 'hud'],
+  ['learner', 'skillify'],
+  ['mcp-setup', 'mcp-setup'],
+  ['omc-doctor', 'omc-doctor'],
+  ['omc-setup', 'omc-setup'],
+  ['omc-teams', 'omc-teams'],
+  ['project-session-manager', 'project-session-manager'],
+  ['psm', 'project-session-manager'],
+  ['release', 'release'],
+  ['remember', 'remember'],
+  ['sciomc', 'sciomc'],
+  ['self-improve', 'self-improve'],
+  ['skill', 'skill'],
+  ['skillify', 'skillify'],
+  ['trace', 'trace'],
+  ['verify', 'verify'],
+  ['visual-verdict', 'visual-verdict'],
+  ['wiki', 'wiki'],
+  ['writer-memory', 'writer-memory'],
+  ['writing-great-skills', 'writing-great-skills'],
+]);
+
+export function publishedSkillName(sourceName) {
+  if (sourceName === 'setup') return 'omc-setup-router';
+  if (sourceName.startsWith('omc-')) return sourceName;
+  return `omc-${sourceName}`;
+}
+
+export const agentCatalog = [
+  ['analyst', 'Clarify requirements and acceptance criteria', 'Analyze the request, expose ambiguity and hidden constraints, and return explicit acceptance criteria. Do not implement.'],
+  ['architect', 'Review architecture and system boundaries', 'Evaluate interfaces, ownership boundaries, failure modes, and long-term tradeoffs. Stay read-only and return a concrete recommendation.'],
+  ['critic', 'Challenge plans and designs', 'Find missing requirements, weak assumptions, unsafe sequencing, and inadequate verification. Return blocking findings first.'],
+  ['debugger', 'Diagnose failures and root causes', 'Reproduce the failure, gather evidence, isolate the root cause, and recommend the smallest safe fix. Do not guess.'],
+  ['executor', 'Implement scoped changes and verify them', 'Implement the smallest correct change within the assigned scope. Preserve unrelated work and run fresh targeted verification before reporting.'],
+  ['explore', 'Map repository files, symbols, and relationships', 'Search the local repository read-only. Return absolute paths, relevant symbols, relationships, and evidence boundaries.'],
+  ['planner', 'Create executable implementation plans', 'Turn accepted requirements into ordered, test-first tasks with exact files, commands, risks, and stop conditions. Do not implement.'],
+  ['test-engineer', 'Design and implement focused tests', 'Own test strategy and test code. Follow red-green-refactor, keep each test focused, and report fresh test output.'],
+  ['verifier', 'Validate completion claims independently', 'Check the requested acceptance criteria against the diff and fresh commands. Report passed evidence, failures, and remaining gaps.'],
+];
+
+export function renderSkill(name, description, bodyName = name) {
+  const skill = nativeSkills.get(bodyName);
+  if (!skill) throw new Error(`Missing native Codex skill body: ${bodyName}`);
+  return `---\nname: ${name}\ndescription: "${description.replaceAll('"', '\\"')}"\n---\n\n${skill.body}\n`;
+}
+
+export function renderAgent([role, description, instructions]) {
+  return `# Generated by scripts/codex/build.mjs; do not edit.\nname = "omc-${role}"\ndescription = "${description}"\ndeveloper_instructions = """\nYou are the OMC ${role} specialist. ${instructions}\n\nFollow the repository AGENTS.md. Use Codex-native tools and native subagent delegation only. Inherit the active model configuration; do not select a model unless the caller explicitly supplies one.\n"""\n`;
+}

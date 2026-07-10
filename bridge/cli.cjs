@@ -3556,6 +3556,9 @@ function resolveInheritedModelFromEnv() {
   }
   return void 0;
 }
+function getDefaultModelMax() {
+  return resolveTierModelFromEnv("MAX") || BUILTIN_TIER_MODEL_DEFAULTS.MAX;
+}
 function getDefaultModelHigh() {
   return resolveTierModelFromEnv("HIGH") || BUILTIN_TIER_MODEL_DEFAULTS.HIGH;
 }
@@ -3569,7 +3572,8 @@ function getDefaultTierModels() {
   return {
     LOW: getDefaultModelLow(),
     MEDIUM: getDefaultModelMedium(),
-    HIGH: getDefaultModelHigh()
+    HIGH: getDefaultModelHigh(),
+    MAX: getDefaultModelMax()
   };
 }
 function resolveClaudeFamily(modelId) {
@@ -3578,6 +3582,7 @@ function resolveClaudeFamily(modelId) {
   if (lower.includes("sonnet")) return "SONNET";
   if (lower.includes("opus")) return "OPUS";
   if (lower.includes("haiku")) return "HAIKU";
+  if (lower.includes("fable")) return "FABLE";
   return null;
 }
 function hasBedrockModelId(modelIds) {
@@ -3660,8 +3665,8 @@ var init_models = __esm({
     "use strict";
     init_ssrf_guard();
     DIRECT_MODEL_ENV_KEYS = ["CLAUDE_MODEL", "ANTHROPIC_MODEL"];
-    INHERIT_TIER_PRIORITY = ["MEDIUM", "HIGH", "LOW"];
-    CLAUDE_TIER_ALIASES = /* @__PURE__ */ new Set(["sonnet", "opus", "haiku"]);
+    INHERIT_TIER_PRIORITY = ["MEDIUM", "HIGH", "LOW", "MAX"];
+    CLAUDE_TIER_ALIASES = /* @__PURE__ */ new Set(["sonnet", "opus", "haiku", "fable"]);
     TIER_ENV_KEYS = {
       LOW: [
         "OMC_MODEL_LOW",
@@ -3677,17 +3682,24 @@ var init_models = __esm({
         "OMC_MODEL_HIGH",
         "CLAUDE_CODE_BEDROCK_OPUS_MODEL",
         "ANTHROPIC_DEFAULT_OPUS_MODEL"
+      ],
+      MAX: [
+        "OMC_MODEL_MAX",
+        "CLAUDE_CODE_BEDROCK_FABLE_MODEL",
+        "ANTHROPIC_DEFAULT_FABLE_MODEL"
       ]
     };
     CLAUDE_FAMILY_DEFAULTS = {
       HAIKU: "claude-haiku-4-5",
       SONNET: "claude-sonnet-4-6",
-      OPUS: "claude-opus-4-8"
+      OPUS: "claude-opus-4-8",
+      FABLE: "claude-fable-5"
     };
     BUILTIN_TIER_MODEL_DEFAULTS = {
       LOW: CLAUDE_FAMILY_DEFAULTS.HAIKU,
       MEDIUM: CLAUDE_FAMILY_DEFAULTS.SONNET,
-      HIGH: CLAUDE_FAMILY_DEFAULTS.OPUS
+      HIGH: CLAUDE_FAMILY_DEFAULTS.OPUS,
+      MAX: CLAUDE_FAMILY_DEFAULTS.FABLE
     };
     BUILTIN_EXTERNAL_MODEL_DEFAULTS = {
       codexModel: "gpt-5.3-codex",
@@ -18324,7 +18336,7 @@ For each failure:
 1. **Diagnose** - Understand the error
 \`\`\`
 Task(
-  subagent_type="oh-my-claudecode:architect-low",
+  subagent_type="oh-my-claudecode:architect",
   model="haiku",
   prompt="Diagnose this error and suggest fix: [ERROR]"
 )
@@ -30530,7 +30542,8 @@ function generatePromptModeStartupPrompt(teamName, workerName2, teamStateRoot2 =
 ${cliOutputContract}` : base;
 }
 function generateMailboxTriggerMessage(teamName, workerName2, count = 1, teamStateRoot2 = DEFAULT_INSTRUCTION_STATE_ROOT) {
-  const normalizedCount = Number.isFinite(count) ? Math.max(1, Math.floor(count)) : 1;
+  if (!Number.isFinite(count) || count < 1) return "";
+  const normalizedCount = Math.max(1, Math.floor(count));
   const mailboxPath2 = buildTeamStateInstructionPath(teamName, teamStateRoot2, "mailbox", `${workerName2}.json`);
   if (teamStateRoot2 !== DEFAULT_INSTRUCTION_STATE_ROOT) {
     return `${normalizedCount} new msg(s): check ${mailboxPath2}, act and report progress.`;
@@ -30668,6 +30681,7 @@ Send messages via CLI API:
 - To leader: \`${formatOmcCliInvocation(`team api send-message --input "{\\"team_name\\":\\"${teamName}\\",\\"from_worker\\":\\"${workerName2}\\",\\"to_worker\\":\\"leader-fixed\\",\\"body\\":\\"<message>\\"}" --json`)}\`
 - Check mailbox: \`${mailboxListCommand}\`
 - Mark delivered: \`${mailboxDeliveredCommand}\`
+- **Empty mailbox is a no-op**: if \`${mailboxListCommand}\` returns no messages, do NOT fabricate work or invent progress. Report "no pending messages" to leader-fixed and continue your assigned task (or stay idle). A trigger nudge is not itself a task.
 
 ## Startup Handshake (Required)
 Before doing any task work, send exactly one startup ACK to the leader:
@@ -84681,7 +84695,7 @@ Please continue working on these tasks.
 This environment uses a non-standard model provider (AWS Bedrock, Google Vertex AI, or a proxy such as CC Switch / LiteLLM).
 
 How to pass \`model\` on Task/Agent calls:
-- Prefer a tier alias: \`model: "sonnet"\`, \`model: "opus"\`, or \`model: "haiku"\`. OMC's pre-tool enforcer resolves these to provider-safe IDs when one of these env vars is set: \`ANTHROPIC_DEFAULT_SONNET_MODEL\` (and sibling \`ANTHROPIC_DEFAULT_OPUS_MODEL\` / \`ANTHROPIC_DEFAULT_HAIKU_MODEL\`), \`CLAUDE_CODE_BEDROCK_SONNET_MODEL\` (and sibling \`CLAUDE_CODE_BEDROCK_OPUS_MODEL\` / \`CLAUDE_CODE_BEDROCK_HAIKU_MODEL\`), or \`OMC_SUBAGENT_MODEL\`.
+- Prefer a tier alias: \`model: "sonnet"\`, \`model: "opus"\`, \`model: "haiku"\`, or \`model: "fable"\`. OMC's pre-tool enforcer resolves these to provider-safe IDs when one of these env vars is set: \`ANTHROPIC_DEFAULT_SONNET_MODEL\` (and sibling \`ANTHROPIC_DEFAULT_OPUS_MODEL\` / \`ANTHROPIC_DEFAULT_HAIKU_MODEL\` / \`ANTHROPIC_DEFAULT_FABLE_MODEL\`), \`CLAUDE_CODE_BEDROCK_SONNET_MODEL\` (and sibling \`CLAUDE_CODE_BEDROCK_OPUS_MODEL\` / \`CLAUDE_CODE_BEDROCK_HAIKU_MODEL\` / \`CLAUDE_CODE_BEDROCK_FABLE_MODEL\`), or \`OMC_SUBAGENT_MODEL\`.
 - If none of those env vars are configured, the enforcer will deny the tier alias with an env-var configuration hint \u2014 set one of them in your \`settings.json\` env or shell profile.
 - The enforcer denies tier aliases it cannot resolve. It also denies provider-specific IDs that carry a \`[1m]\` context-window suffix or otherwise fail subagent-safe validation (sub-agents cannot inherit \`[1m]\`). Valid provider-specific IDs without extended-context suffixes are allowed.
 

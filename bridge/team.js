@@ -3188,6 +3188,9 @@ function getDirectProviderDetectionModelEnvValues() {
   const directModel = getDirectModelEnvValue();
   return directModel ? [directModel] : [];
 }
+function getDefaultModelMax() {
+  return resolveTierModelFromEnv("MAX") || BUILTIN_TIER_MODEL_DEFAULTS.MAX;
+}
 function getDefaultModelHigh() {
   return resolveTierModelFromEnv("HIGH") || BUILTIN_TIER_MODEL_DEFAULTS.HIGH;
 }
@@ -3201,7 +3204,8 @@ function getDefaultTierModels() {
   return {
     LOW: getDefaultModelLow(),
     MEDIUM: getDefaultModelMedium(),
-    HIGH: getDefaultModelHigh()
+    HIGH: getDefaultModelHigh(),
+    MAX: getDefaultModelMax()
   };
 }
 function resolveClaudeFamily(modelId) {
@@ -3210,6 +3214,7 @@ function resolveClaudeFamily(modelId) {
   if (lower.includes("sonnet")) return "SONNET";
   if (lower.includes("opus")) return "OPUS";
   if (lower.includes("haiku")) return "HAIKU";
+  if (lower.includes("fable")) return "FABLE";
   return null;
 }
 function hasBedrockModelId(modelIds) {
@@ -3292,8 +3297,8 @@ var init_models = __esm({
     "use strict";
     init_ssrf_guard();
     DIRECT_MODEL_ENV_KEYS = ["CLAUDE_MODEL", "ANTHROPIC_MODEL"];
-    INHERIT_TIER_PRIORITY = ["MEDIUM", "HIGH", "LOW"];
-    CLAUDE_TIER_ALIASES = /* @__PURE__ */ new Set(["sonnet", "opus", "haiku"]);
+    INHERIT_TIER_PRIORITY = ["MEDIUM", "HIGH", "LOW", "MAX"];
+    CLAUDE_TIER_ALIASES = /* @__PURE__ */ new Set(["sonnet", "opus", "haiku", "fable"]);
     TIER_ENV_KEYS = {
       LOW: [
         "OMC_MODEL_LOW",
@@ -3309,17 +3314,24 @@ var init_models = __esm({
         "OMC_MODEL_HIGH",
         "CLAUDE_CODE_BEDROCK_OPUS_MODEL",
         "ANTHROPIC_DEFAULT_OPUS_MODEL"
+      ],
+      MAX: [
+        "OMC_MODEL_MAX",
+        "CLAUDE_CODE_BEDROCK_FABLE_MODEL",
+        "ANTHROPIC_DEFAULT_FABLE_MODEL"
       ]
     };
     CLAUDE_FAMILY_DEFAULTS = {
       HAIKU: "claude-haiku-4-5",
       SONNET: "claude-sonnet-4-6",
-      OPUS: "claude-opus-4-8"
+      OPUS: "claude-opus-4-8",
+      FABLE: "claude-fable-5"
     };
     BUILTIN_TIER_MODEL_DEFAULTS = {
       LOW: CLAUDE_FAMILY_DEFAULTS.HAIKU,
       MEDIUM: CLAUDE_FAMILY_DEFAULTS.SONNET,
-      HIGH: CLAUDE_FAMILY_DEFAULTS.OPUS
+      HIGH: CLAUDE_FAMILY_DEFAULTS.OPUS,
+      MAX: CLAUDE_FAMILY_DEFAULTS.FABLE
     };
     BUILTIN_EXTERNAL_MODEL_DEFAULTS = {
       codexModel: "gpt-5.3-codex",
@@ -4874,7 +4886,8 @@ function generatePromptModeStartupPrompt(teamName, workerName, teamStateRoot3 = 
 ${cliOutputContract}` : base;
 }
 function generateMailboxTriggerMessage(teamName, workerName, count = 1, teamStateRoot3 = DEFAULT_INSTRUCTION_STATE_ROOT) {
-  const normalizedCount = Number.isFinite(count) ? Math.max(1, Math.floor(count)) : 1;
+  if (!Number.isFinite(count) || count < 1) return "";
+  const normalizedCount = Math.max(1, Math.floor(count));
   const mailboxPath = buildTeamStateInstructionPath(teamName, teamStateRoot3, "mailbox", `${workerName}.json`);
   if (teamStateRoot3 !== DEFAULT_INSTRUCTION_STATE_ROOT) {
     return `${normalizedCount} new msg(s): check ${mailboxPath}, act and report progress.`;
@@ -5012,6 +5025,7 @@ Send messages via CLI API:
 - To leader: \`${formatOmcCliInvocation(`team api send-message --input "{\\"team_name\\":\\"${teamName}\\",\\"from_worker\\":\\"${workerName}\\",\\"to_worker\\":\\"leader-fixed\\",\\"body\\":\\"<message>\\"}" --json`)}\`
 - Check mailbox: \`${mailboxListCommand}\`
 - Mark delivered: \`${mailboxDeliveredCommand}\`
+- **Empty mailbox is a no-op**: if \`${mailboxListCommand}\` returns no messages, do NOT fabricate work or invent progress. Report "no pending messages" to leader-fixed and continue your assigned task (or stay idle). A trigger nudge is not itself a task.
 
 ## Startup Handshake (Required)
 Before doing any task work, send exactly one startup ACK to the leader:

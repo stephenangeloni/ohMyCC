@@ -37,3 +37,5 @@ __pycache__/
 
 # Serena MCP cache
 .serena/
+# CocoIndex Code (ccc)
+/.cocoindex_code/

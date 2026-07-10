@@ -41,7 +41,7 @@ body=$(python3 "{skill_dir}/extract-body.py") && printf %s "$body" | pbcopy && e
 How it works:
 
 - `extract-body.py` finds the active Claude Code session transcript (most-recent
-  `*.jsonl` under `~/.claude/projects/<cwd-slug>/`), locates the most recent user
+`*.jsonl` under `[$CLAUDE_CONFIG_DIR|~/.claude]/projects/<cwd-slug>/`), locates the most recent user
   record containing the clip-it command marker — it matches both the bare
   `/clip-it` form and the plugin-namespaced `/oh-my-claudecode:clip-it` form — and
   walks backward through the `parentUuid` chain collecting assistant text blocks
@@ -59,7 +59,7 @@ clipboard.`).
 If `extract-body.py` exits non-zero, the bash command fails and stderr will show
 one of:
 
-- `no project dir at ~/.claude/projects/...` — running outside a Claude Code session (exit 2)
+- `no project dir at [$CLAUDE_CONFIG_DIR|~/.claude]/projects/...` — running outside a Claude Code session (exit 2)
 - `no *.jsonl in ...` — no session transcript yet (exit 3)
 - `no /clip-it user message found` — anchor missing; should not happen if you just ran the command (exit 4)
 - `no prior assistant text before anchor` — first response in conversation (exit 5)

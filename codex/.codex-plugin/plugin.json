@@ -1,0 +1,25 @@
+{
+  "name": "oh-my-claudecode",
+  "version": "1.0.0+codex.local-20260710-133003",
+  "description": "Personal OMC orchestration skills and standard MCP tools for Codex",
+  "author": {
+    "name": "Stephen Angeloni"
+  },
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "ohMyCC",
+    "shortDescription": "Personal OMC harness for Codex.",
+    "longDescription": "The complete namespaced OMC skill and command catalog plus the standard OMC MCP tool server. Native agents, guidance, and hooks are synchronized by pnpm codex:setup.",
+    "developerName": "Stephen Angeloni",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Tools",
+      "Workflows"
+    ],
+    "defaultPrompt": [
+      "Use $omc-verify to validate the current work.",
+      "Use $omc-ralplan to create a consensus implementation plan."
+    ]
+  }
+}

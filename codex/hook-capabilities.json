@@ -1,0 +1,18 @@
+{
+  "supported": [
+    "SessionStart",
+    "UserPromptSubmit",
+    "PreToolUse",
+    "PermissionRequest",
+    "PostToolUse",
+    "PreCompact",
+    "PostCompact",
+    "SubagentStart",
+    "SubagentStop",
+    "Stop"
+  ],
+  "unavailable": [
+    "PostToolUseFailure",
+    "SessionEnd"
+  ]
+}

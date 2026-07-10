@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "omc": {
+      "command": "node",
+      "args": [
+        "mcp-server.cjs"
+      ],
+      "cwd": "."
+    }
+  }
+}

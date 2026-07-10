@@ -1,0 +1,20 @@
+{
+  "name": "ohmycc-local",
+  "interface": {
+    "displayName": "ohMyCC Local"
+  },
+  "plugins": [
+    {
+      "name": "oh-my-claudecode",
+      "source": {
+        "source": "local",
+        "path": "./codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
