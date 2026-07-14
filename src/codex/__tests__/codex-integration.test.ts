@@ -114,6 +114,17 @@ describe('Codex plugin assets', () => {
       'omc-planner',
     );
 
+    for (const contextHandoffPath of [
+      'codex/skills/context-handoff/SKILL.md',
+      'codex/skills/omc-context-handoff/SKILL.md',
+    ]) {
+      const contextHandoff = readFileSync(join(repoRoot, contextHandoffPath), 'utf8');
+      expect(contextHandoff).toContain('git branch --show-current');
+      expect(contextHandoff).toContain('git switch -c');
+      expect(contextHandoff).toContain('context-matching branch');
+      expect(contextHandoff).toContain('must not continue development on `main`');
+    }
+
     const alignmentSkill = readFileSync(
       join(repoRoot, 'codex/skills/omc-agents-claude-align/SKILL.md'),
       'utf8',

@@ -1,20 +1,15 @@
 ---
 name: context-handoff
 description: >-
-  Generate a continuation prompt that captures the full resumable state of the current
-  work — goal and constraints, decisions and their rationale, dead ends to avoid, file
-  and commit pointers, artifacts, conventions, and the exact next action — so a fresh
-  session (or a teammate, or a future you) can pick the work back up with nothing lost.
-  Covers every active thread when a session holds more than one. The result is written to
-  HANDOFF.MD at the repository root, whose final lines are a ready-to-paste resume prompt
-  that is also copied to the clipboard (pbcopy) automatically. Use this whenever the user
-  wants to hand off, checkpoint, or preserve context: phrases like "create a handoff",
+  Generate a continuation prompt with the full resumable state: goals, constraints,
+  decisions and rationale, dead ends, file and commit pointers, artifacts, conventions,
+  every active thread, and the exact next action. Write it to HANDOFF.MD at the repository
+  root and copy its final ready-to-paste resume prompt to the clipboard with pbcopy. Use when
+  the user wants to hand off, checkpoint, or preserve context, including "create a handoff",
   "hand this off", "write a continuation/resume prompt", "checkpoint this", "save where we
-  are", "summarize the context for a fresh chat/session", "I'm running low on context",
-  "before we compact", "pass the baton", "bootstrap a new session", or "/handoff". Strongly
-  prefer this skill over a plain summary or /compact whenever the goal is to CONTINUE the
-  work elsewhere rather than just recap what happened — a summary explains the past, a
-  handoff enables the future.
+  are", "summarize the context for a fresh session", "I'm running low on context", "before
+  we compact", "pass the baton", "bootstrap a new session", or "/handoff". Prefer this over
+  a plain summary or /compact when the goal is to continue work elsewhere rather than recap.
 ---
 
 # Context Handoff
@@ -32,9 +27,34 @@ this conversation. A plain `/compact` or recap loses all of that.
 
 The deliverable is a file: **`HANDOFF.MD` at the repository root**. Its final lines are a
 fixed resume prompt, and that resume prompt is copied to the clipboard so the user can paste
-it straight into a new session. See *Write the handoff* below.
+it straight into a new session. The handoff also preserves a context-matching branch so the
+next session does not resume development on `main`. See *Write the handoff* below.
 
 ## How to build it
+
+**Branch preflight (before step 1; skip only outside a Git repository).** Resolve the
+repository root and inspect the current branch before assembling the handoff:
+
+```bash
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+BRANCH="$(git branch --show-current)"
+```
+
+- If `BRANCH` is not `main`, stay on that branch and record it as the continuation branch.
+- If `BRANCH` is `main`, derive a concise, context-matching branch name from the active goal.
+  Follow the repository's existing branch convention when one is evident; otherwise use a
+  conventional type such as `feat/`, `fix/`, `docs/`, or `chore/` plus a kebab-case context
+  slug. Create and switch to it immediately with `git switch -c <branch>`. A new local branch
+  is reversible, so do not pause for permission solely to create it.
+- Never reuse an unrelated existing branch just because its name collides. Choose another
+  descriptive name instead.
+- If branch creation or switching cannot be completed safely, record the exact requested
+  branch name and `git switch -c <branch>` command in `## Continuation branch`, mark it
+  pending, and make that command the blocking first action on resume. The fresh context
+  **must not continue development on `main`**.
+
+This preflight is part of starting the handoff, not part of the later development work. Do
+not move an existing non-`main` session to a different branch.
 
 **1. Check for supplied direction.** The dispatcher passes anything typed after the command
 through as `$ARGUMENTS`. If that's non-empty (or the user appended an instruction in the same
@@ -150,6 +170,13 @@ Pointers with one-line descriptions.>
 ### Shared sections (once, after all threads)
 
 ````
+## Continuation branch
+- Branch: `<context-matching branch>`
+- Status: `<active and created | already active | pending creation>`
+- Required command: `<none | git switch -c <branch>>`
+<This section is required in a Git repository. If creation is pending, state explicitly that
+the reader must run the command before any development and must not continue on `main`.>
+
 ## How the user works / conventions
 <Working agreements and environment muscle memory the fresh agent can't infer: tooling,
 naming, commit/deploy habits, gotchas, things the user has corrected before, how they like to
@@ -191,7 +218,7 @@ Before you write it, apply one test, **per thread**:
 
 > **Could a capable agent, given ONLY this prompt plus the files it points to, take that
 > thread's next action correctly — without asking what already happened, re-deciding something
-> already settled, or re-attempting something already ruled out?**
+> already settled, re-attempting something already ruled out, or developing on `main`?**
 
 If not, find the gap and fill it. Common misses: the *why* behind a decision, an unwritten
 agreement, a convention that's second nature here, or a next step too vague to start.
@@ -228,7 +255,7 @@ heading. Nothing comes after it — it must be the final content of the file:
 Copy the line below (already on your clipboard) and paste it as the first message of a
 brand-new session:
 
-Read HANDOFF.MD in the repository root and resume the work it describes. Start with the files under "Start by reading", honor every entry under "Decisions made (and why)", "Dead ends — do not re-explore", and "Out of bounds", then carry out the "Next action". If multiple threads are listed, resume all of them. Treat HANDOFF.MD as the source of truth — do not re-litigate settled decisions, re-walk the dead ends, or touch what's out of bounds.
+Read HANDOFF.MD in the repository root and resume the work it describes. Before making changes, switch to the branch under "Continuation branch"; if its status is pending creation, run its required command first and do not continue development on main. Start with the files under "Start by reading", honor every entry under "Decisions made (and why)", "Dead ends — do not re-explore", and "Out of bounds", then carry out the "Next action". If multiple threads are listed, resume all of them. Treat HANDOFF.MD as the source of truth — do not re-litigate settled decisions, re-walk the dead ends, or touch what's out of bounds.
 ````
 
 **3. Copy that same resume prompt to the clipboard** by reading it back from the file you
@@ -243,6 +270,7 @@ echo "Resume prompt copied to clipboard."
 **4. Confirm in chat — briefly.** The file is the source of truth, so do **not** re-dump the
 whole handoff into the conversation. Report only:
 - the path written (`<repo-root>/HANDOFF.MD`),
+- the continuation branch and whether it is active or pending creation,
 - a one-line-per-thread index of what it covers,
 - the resume prompt itself, and a note that it is already on the clipboard.
 

@@ -230,6 +230,15 @@ describe('Builtin Skills', () => {
       expect(skill?.name).toBe('ai-slop-cleaner');
     });
 
+    it('should move handoff work off main before the next context resumes development', () => {
+      const skill = getBuiltinSkill('context-handoff');
+      expect(skill).toBeDefined();
+      expect(skill?.template).toContain('git branch --show-current');
+      expect(skill?.template).toContain('git switch -c');
+      expect(skill?.template).toContain('context-matching branch');
+      expect(skill?.template).toContain('must not continue development on `main`');
+    });
+
     it('should surface bundled skill resources for skills with additional files', () => {
       const skill = getBuiltinSkill('project-session-manager');
       expect(skill).toBeDefined();
