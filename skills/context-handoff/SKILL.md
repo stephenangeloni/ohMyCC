@@ -87,12 +87,22 @@ fresh agent won't know to resume. A thread that's fully finished with no follow-
 one-line note rather than a full section.
 
 **4. Gather the concrete anchors.** Pull the real pointers a fresh agent needs:
-- Files created or changed, and the key files to *read first*. Use `git status` / `git log`
-  / `git diff --stat` and your own edit history to get this right rather than from memory.
+- Files created or changed. Use `git status` / `git log` / `git diff --stat` and your own edit
+  history to get this right rather than from memory.
+- **Sort every file pointer into one of two buckets** — this drives the two file sections in
+  the template:
+  - **Required for the next action**: the reader cannot take that step correctly without
+    having read it. Almost always very few files.
+  - **Contingent**: relevant only *if* the work goes a certain direction. Everything else
+    lands here, including files central to the work but not to the next step.
 - Commits, branches, PRs, deploys, built artifacts (tables, datasets, generated files),
   external state.
 - Existing project memory, handoff docs, or notes already on disk — point to them instead of
   re-explaining their contents.
+
+   **Anchor on names, not line numbers.** Point at a function, symbol, heading, or frontmatter
+   key — something greppable that survives the next edit. Line numbers go stale on the first
+   commit after the handoff and will send the reader to the wrong place.
 
 **5. Separate durable from ephemeral.** If something is already written down (a file, a
 commit, a doc, project memory), **point to it** — don't inline it. Spend the handoff's words
@@ -132,9 +142,22 @@ before they get detail.
 <What this thread is trying to achieve and why, in 1–3 sentences. Include hard constraints
 and the definition of done. This is the destination; everything else is navigation.>
 
-## Start by reading (in order)
-- `path/or/url` — <what it covers / why read it>
-<The minimal set of files/docs that orient the reader. Pointers, not contents.>
+## Read now (required for the next action)
+- `path/or/url` — <why the next action cannot be taken correctly without this>
+<Hard cap: at most three entries, and often zero or one. A file belongs here ONLY if the
+reader would have to open it anyway to take THE next action. Everything else — including
+files central to the thread but not to that step — goes in the file map below. Pointers,
+not contents.>
+
+## File map — read on demand
+| If you need to… | Go to | What you'll find |
+|---|---|---|
+| <the question or task that would send the reader here> | `path` → `<symbol / heading>` | <what's there, and the non-obvious part> |
+<An index, not a reading list. The reader consults a row when the work reaches it and
+otherwise never opens the file. Key the left column on the reader's *intent* — the question
+they'll have — not on a description of the file; a row keyed "hook dispatch logic" can't be
+triaged without opening the file, while "change when a hook fires" can. Include the gotcha in
+the third column: what surprised us in that file is the part worth writing down.>
 
 ## Where we are now
 <Current state in a few lines: what's done, what's in flight, the single most important fact
@@ -164,7 +187,9 @@ start immediately or wait.>
 
 ## Artifacts
 <Files created/changed, commits/branches/PRs, tables/datasets built, external state.
-Pointers with one-line descriptions.>
+Pointers with one-line descriptions. This is the ledger of what this session *changed*; the
+file map above is the index of where to *go*. A path can appear in both, but don't repeat the
+explanation — here say what changed about it, there say when to open it.>
 ````
 
 ### Shared sections (once, after all threads)
@@ -185,10 +210,12 @@ note any convention that applies to only one. Capture only what step 5's standin
 exclusion doesn't already cover.>
 
 ## Honesty note
-<Two things, both required: (1) what is unfinished, unverified, uncertain, or an open risk —
+<Three things, all required: (1) what is unfinished, unverified, uncertain, or an open risk —
 anything that might break or regress; (2) what the reader must NOT assume — the specific
-wrong inference they're likely to make if this isn't spelled out. A fresh agent will trust
-this prompt completely, so be explicit about both.>
+wrong inference they're likely to make if this isn't spelled out; (3) that the file map's
+descriptions are orientation, not a substitute for the file — before editing anything the map
+points at, open it. A fresh agent will trust this prompt completely, so be explicit about all
+three.>
 ````
 
 For the multi-thread shape, wrap the whole thing with a title and index:
@@ -228,6 +255,17 @@ nothing already captured in a linked file or auto-loaded `CLAUDE.md`/`AGENTS.md`
 agent knowledge, no narration of the journey that doesn't change the next action. Length is
 not the goal — resumability is.
 
+Finally, check the **reading budget** — the handoff spends the fresh session's context before
+it has done any work, so the split matters:
+- Is `## Read now` at or under three entries? If not, the overflow is contingent, not
+  required — move it to the file map.
+- Justify each remaining entry out loud: *"the next action is X, and X cannot be done
+  correctly without this file."* If that sentence doesn't hold, the file moves down.
+- Is `## Read now` empty while the next action edits code? Then it's under-specified, not
+  lean — name the file being edited.
+- Does every file-map row read as a *question the reader might have*, rather than a label for
+  the file? A row the reader can't triage without opening the file has failed its only job.
+
 ## Write the handoff
 
 The handoff is **always written to a file** — that file is the deliverable, not an optional
@@ -255,7 +293,7 @@ heading. Nothing comes after it — it must be the final content of the file:
 Copy the line below (already on your clipboard) and paste it as the first message of a
 brand-new session:
 
-Read HANDOFF.MD in the repository root and resume the work it describes. Before making changes, switch to the branch under "Continuation branch"; if its status is pending creation, run its required command first and do not continue development on main. Start with the files under "Start by reading", honor every entry under "Decisions made (and why)", "Dead ends — do not re-explore", and "Out of bounds", then carry out the "Next action". If multiple threads are listed, resume all of them. Treat HANDOFF.MD as the source of truth — do not re-litigate settled decisions, re-walk the dead ends, or touch what's out of bounds.
+Read HANDOFF.MD in the repository root and resume the work it describes. Before making changes, switch to the branch under "Continuation branch"; if its status is pending creation, run its required command first and do not continue development on main. Read the files under "Read now" and only those; treat "File map" as an index to consult when the work actually reaches a row, not as a reading list, and open a file before editing what a row describes. Honor every entry under "Decisions made (and why)", "Dead ends — do not re-explore", and "Out of bounds", then carry out the "Next action". If multiple threads are listed, resume all of them. Treat HANDOFF.MD as the source of truth — do not re-litigate settled decisions, re-walk the dead ends, or touch what's out of bounds.
 ````
 
 **3. Copy that same resume prompt to the clipboard** by reading it back from the file you
