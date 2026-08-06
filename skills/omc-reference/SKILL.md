@@ -91,7 +91,7 @@ Invoke built-in workflows via `/oh-my-claudecode:<name>`.
 - `ai-slop-cleaner` — regression-safe cleanup workflow
 
 ### Utility skills
-- `ask`, `cancel`, `note`, `skillify`, `learner` (deprecated alias), `omc-setup`, `mcp-setup`, `hud`, `omc-doctor`, `trace`, `release`, `project-session-manager`, `skill`, `writer-memory`, `configure-notifications`, `writing-great-skills` (skill-authoring quality rubric)
+- `ask`, `cancel`, `note`, `skillify`, `learner` (deprecated alias), `omc-setup`, `mcp-setup`, `hud`, `omc-doctor`, `diagnose` (tight-loop bug diagnosis for application code), `trace`, `release`, `project-session-manager`, `skill`, `writer-memory`, `configure-notifications`, `writing-great-skills` (skill-authoring quality rubric)
 
 ### Keyword triggers kept compact in CLAUDE.md
 - `"autopilot"→autopilot`

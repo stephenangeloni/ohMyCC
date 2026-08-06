@@ -70,6 +70,11 @@
     "reason": "Create or refine hierarchical AGENTS.md guidance for a repository."
   },
   {
+    "name": "diagnose",
+    "status": "adapted",
+    "reason": "Diagnose hard application bugs behind a tight, red-capable feedback loop."
+  },
+  {
     "name": "external-context",
     "status": "adapted",
     "reason": "Gather external documentation and references with source-backed research."

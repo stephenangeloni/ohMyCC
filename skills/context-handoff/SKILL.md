@@ -1,15 +1,11 @@
 ---
 name: context-handoff
 description: >-
-  Generate a continuation prompt with the full resumable state: goals, constraints,
-  decisions and rationale, dead ends, file and commit pointers, artifacts, conventions,
-  every active thread, and the exact next action. Write it to HANDOFF.MD at the repository
-  root and copy its final ready-to-paste resume prompt to the clipboard with pbcopy. Use when
-  the user wants to hand off, checkpoint, or preserve context, including "create a handoff",
-  "hand this off", "write a continuation/resume prompt", "checkpoint this", "save where we
-  are", "summarize the context for a fresh session", "I'm running low on context", "before
-  we compact", "pass the baton", "bootstrap a new session", or "/handoff". Prefer this over
-  a plain summary or /compact when the goal is to continue work elsewhere rather than recap.
+  Continuation prompt carrying the full resumable state — goals, constraints, decisions and
+  rationale, dead ends, file and commit pointers, every active thread, and the exact next
+  action — written to HANDOFF.MD and copied to the clipboard. Use when the work must travel:
+  to a new session, harness, directory, or person. Also use when the user is running low on
+  context and wants continuation rather than a recap.
 ---
 
 # Context Handoff
@@ -29,6 +25,41 @@ The deliverable is a file: **`HANDOFF.MD` at the repository root**. Its final li
 fixed resume prompt, and that resume prompt is copied to the clipboard so the user can paste
 it straight into a new session. The handoff also preserves a context-matching branch so the
 next session does not resume development on `main`. See *Write the handoff* below.
+
+## First: is a handoff the right move?
+
+A handoff is **narrow**. What it buys is **portability** — a file that travels. If nothing is
+travelling, something cheaper is correct. Make this call at a **phase boundary** (the gap
+between two chunks of work — the planning, the implementation, the QA), never mid-phase;
+mid-phase there is no decision to make except continue or split the remainder into subagents.
+
+Work the tree top to bottom. **The first yes wins.**
+
+1. **Can you continue in this session?** Yes if the next phase needs this one as a *primary
+   source* (planning → implementation wants the reasoning verbatim, not a summary of it), or
+   you simply have enough window left. **Continue costs nothing and loses nothing** — rule it
+   out before anything else.
+2. **Is this context irrelevant to what comes next?** If the exploration, the decisions, and
+   the dead ends are all disposable — **`/clear`**. Cheapest move available. But the cost of
+   getting it wrong is one-way: clear a *relevant* context and the **why** behind what you
+   built is gone, and no amount of reading the diff back returns it.
+3. **Does the work need to travel?** Only then is this skill correct — a new harness
+   (Claude → Codex), a new directory or repo, a colleague, or forking a side task you found
+   mid-phase without derailing the current one. That list is the whole clause.
+4. **Can the remaining task run AFK?** Scoped tightly enough to run unattended with no
+   steering — send it to a **subagent** and leave this session untouched.
+5. **Otherwise `/compact`,** with an instruction (`/compact we're about to QA the auth path`)
+   so the summary keeps what the next phase needs.
+
+`/compact` sits at the **bottom** deliberately: it is the default, not the first reach. Every
+move except *Continue* turns a **primary source** — the session as it happened — into a
+**secondary source**, a lossy summary of it. You gain room and lose fidelity; only pay that
+when staying costs more than it saves. The failure mode of reaching for `/compact` first is a
+fresh session that is confidently wrong about a decision the summary flattened.
+
+These are judgement calls, and the same boundary can go two ways on two days. The value is in
+asking the questions **in order**. If the answer lands on 1, 2, 4, or 5, say so in one line
+and stop — don't write a handoff nobody will read.
 
 ## How to build it
 

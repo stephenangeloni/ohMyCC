@@ -220,6 +220,43 @@ Every plan includes:
 - For deliberate consensus mode: **Pre-mortem (3 scenarios)** and **Expanded Test Plan** (unit/integration/e2e/observability)
 
 Plans are saved to `.omc/plans/`. Drafts go to `.omc/drafts/`.
+
+### Plan Durability
+
+A plan is a **contract an executing agent works from**, often in a fresh context and
+sometimes days later. Write it so it survives the codebase moving underneath it.
+
+- **Behavioral, not procedural.** State *what* the system should do — interfaces, types,
+  behavioral contracts, error modes. Leave *how* to the executor, which will explore the code
+  fresh and make better-informed local calls than the planner can.
+  - Good: "`SkillConfig` accepts an optional `schedule` field of type `CronExpression`;
+    absent means run-on-demand."
+  - Bad: "Open `src/types/skill.ts` and add a schedule field on line 42."
+- **File references are navigation, never the specification.** Naming the files a step will
+  touch is useful and stays in the plan. What must not live there is a step whose *meaning*
+  depends on a path or a line number — those go stale on the first commit and send the
+  executor to the wrong place. Anchor on greppable names: a symbol, a function, a heading, a
+  frontmatter key.
+- **Every acceptance criterion independently verifiable.** "Running `pnpm test -- auth`
+  passes with the new redirect case covered" is a criterion; "auth should work correctly" is
+  a wish. If the executor cannot tell done from not-done without asking, sharpen it.
+- **State what is out of scope.** An explicit exclusion list is what stops an executor
+  gold-plating into adjacent features it assumed were implied.
+
+**Wide refactors are the exception to vertical slicing.** A **wide refactor** is one
+mechanical change — rename a column, retype a shared symbol — whose **blast radius** fans
+across the codebase, so a single edit breaks thousands of call sites at once and no vertical
+slice can land green. Do not force it into one step. Sequence it as **expand–contract**:
+
+1. **Expand** — add the new form beside the old so nothing breaks.
+2. **Migrate** — move call sites over in batches sized by blast radius (per package, per
+   directory), each batch its own step, each keeping the checks green because the old form
+   still exists.
+3. **Contract** — delete the old form once no caller remains, blocked by every migrate batch.
+
+Where even the batches cannot stay green alone, keep the sequence but let them share an
+integration branch that all block a final integrate-and-verify step — green is promised only
+there, and the plan must say so.
 </Steps>
 
 <Tool_Usage>
