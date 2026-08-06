@@ -58,6 +58,25 @@ its own docstrings and comments promise.
 - Do not just catch typos in docs — catch cases where the code *lies* about what it does,
   because those are the bugs that ship
 
+### `standards` — Repo Standards & Code Smells
+**When relevant:** Any non-trivial code change. Picked on merit like the domain angles, and
+the natural pick when a diff is structurally awkward rather than logically wrong.
+**Prompt focus:**
+- First, find what this repo documents about how code should be written: `CODING_STANDARDS.md`,
+  `CONTRIBUTING.md`, `CLAUDE.md`, `AGENTS.md`, `docs/**` style guides, and any
+  `.editorconfig` / lint config that encodes a *convention* rather than a mechanical rule
+- Report every place the diff breaches a documented standard, citing the document and the
+  specific rule — these are the only findings this angle may call **hard violations**
+- On top of whatever the repo documents, always carry the **smell baseline**: twelve Fowler
+  code smells that apply even when a repo documents nothing. Read
+  [references/smell-baseline.md](references/smell-baseline.md) for the list, the fix for each,
+  and the reporting shape — the sub-agent has no other access to it, so paste it into the
+  angle's prompt in Step 3
+- A documented repo standard **overrides** the baseline: where the repo endorses something the
+  baseline would flag, suppress the smell and name the document that overrode it
+- Baseline smells are **always judgement calls**, never hard violations. Label them as such
+- Skip anything tooling already enforces — a linter finding is not a review finding
+
 ### `security` — Security & Input Validation
 **When relevant:** Changes that handle user input, authentication, authorization, API endpoints,
 database queries, file operations, or configuration. Changes touching routes, middleware, or
@@ -212,6 +231,7 @@ spawn. If an angle is not in this table, its catalog focus list is the full scop
 | Angle              | Default scope (no guidance)                                 | Broader scope (user must request)                                                                                       | Example broadening phrase                                                                                          |
 | ------------------ | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `spec-contract`    | Docstrings + load-bearing comments in the diff only         | Also audit implementation against external spec artifacts: `SPEC.md`, `docs/**`, ADRs, design notes, memory/notepad files, issue acceptance criteria | "Also check implementation against `docs/trade-protocol.md` and memory file `project_v7_live_deployment.md`"       |
+| `standards`        | Documented repo standards + the smell baseline, in-diff only | Also flag baseline smells in surrounding unchanged code the diff touches, or audit the whole module for consistency                                 | "Also check the rest of `src/features/pricing/` for the same smells, not just the changed hunks"                   |
 | `api-contract`     | In-code type signatures and response-shape literals         | Also verify against OpenAPI / Protobuf / GraphQL schema files and/or generated consumer SDKs                            | "Also verify responses against `openapi.yaml` and the client at `sdk/ts/src/generated/`"                           |
 | `test-coverage`    | New/changed code paths in the diff vs. tests in the diff    | Also check against overall project coverage targets or tests outside the diff that indirectly exercise the changed code | "Also check against coverage target in `pyproject.toml` and tests under `tests/integration/` that cover this API"  |
 | `data-integrity`   | Schema diff vs. application code in the diff                | Also verify against a production schema snapshot or known-bad row profiles                                              | "Assume prod table `orders` has 50M rows; check this migration under that profile"                                 |
@@ -297,6 +317,7 @@ $FILE_LIST
 REVIEW ANGLE CATALOG (pick from these IDs):
   logic          — Logic & Correctness (off-by-one, wrong comparisons, broken invariants)
   spec-contract  — Spec vs. Implementation Contract (docstrings/comments vs. actual code behavior)
+  standards      — Repo Standards & Code Smells (documented conventions + Fowler smell baseline)
   security       — Security & Input Validation (injection, auth bypass, data exposure)
   edge-cases     — Edge Cases & Error Handling (missing error handling, resource leaks, boundaries)
   perf           — Performance & Scalability (N+1 queries, unbounded loops, missing caching)
@@ -714,6 +735,22 @@ Match up the two verifiers' verdicts for each finding:
 - **Both REFUTED** -> Drop from final report (false positive)
 - **One LIKELY, one REFUTED** -> Drop (probably false positive)
 
+### Per-angle verdicts — one axis must never mask another
+
+Before the severity-ranked list, report **one verdict line per selected angle**. The angles
+are deliberately independent axes: a diff can be logically flawless and still implement the
+wrong contract, or match its spec exactly and breach every convention in the repo. A single
+severity-ranked list lets a loud axis bury a quiet one, and — worse — makes an angle that
+found nothing look identical to an angle that never ran.
+
+Two rules:
+
+- **Every selected angle gets a line, including the clean ones.** "`standards` — clean" is a
+  result. Silence is not.
+- **Do not re-rank findings across axes to produce a single worst-issue verdict.** Rank
+  within the severity list as normal, but the per-angle verdicts stay side by side. If the
+  user needs one headline, give them the worst issue *per axis*, not one winner across all.
+
 Present the final report:
 
 ```
@@ -721,6 +758,12 @@ FLEET REVIEW — FINAL REPORT
 ════════════════════════════════════════════════════════════
 Base branch: $BASE | Files changed: N | Duration: Xm Ys
 Review angles: [list selected angles with reasoning]
+
+PER-ANGLE VERDICT:
+  logic          — 2 findings (worst: P0)
+  spec-contract  — clean
+  standards      — 3 findings (worst: P2, all judgement calls)
+  security       — 1 finding (worst: P1)
 
 CONFIRMED FINDINGS (high confidence):
   [P0] Title — file:line

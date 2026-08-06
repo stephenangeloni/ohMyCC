@@ -9,6 +9,7 @@
   "debug": "omc-debug",
   "deep-dive": "omc-deep-dive",
   "deepinit": "omc-deepinit",
+  "diagnose": "omc-diagnose",
   "external-context": "omc-external-context",
   "fleet-fix": "omc-fleet-fix",
   "fleet-review": "omc-fleet-review",

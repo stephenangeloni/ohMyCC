@@ -114,7 +114,30 @@ commit didn't land).
 - If the working tree is dirty, run step 2 (Pending changes) before touching main
 - Never use `git add -A` / `git add .` — sweep risk for secrets and binaries
 - Never use `--no-verify` to bypass a failed pre-commit hook
-- If merge has conflicts, stop and report — do not force
+- If merge has conflicts, stop, report the conflicting files, and offer the resolution
+  procedure below — never force, and never `--abort` on the user's behalf
 - Run steps 5 and 6 (local + remote branch delete) in parallel
 - Report the final state concisely: pre-merge commit (if any), merged commit, branch cleaned
 - Worktree setup? If `git checkout main` fails with `'main' is already used by worktree at ...`, stop and use `/mpcw` instead.
+
+## Resolving merge conflicts
+
+When step 4 leaves conflicts, stop and show the user the conflicting files. Ask whether they
+want to resolve manually or have you work through it. **Resolve by intent, not by picking
+lines** — with their go-ahead:
+
+1. **See the current state.** `git status`, `git log --oneline` on both sides, and the
+   conflicting hunks.
+2. **Find the primary source for each side.** Understand *why* each change was made and what
+   it was for: commit messages, the PR, the originating issue. A conflict is two intents
+   colliding; you cannot resolve it by reading the diff alone.
+3. **Resolve each hunk.** Preserve both intents wherever they can coexist. Where they are
+   genuinely incompatible, take the one matching the merge's stated goal and state the
+   trade-off you made. Invent no new behavior — a conflict resolution is not the place for a
+   third design.
+4. **Run the project's checks** — typecheck, then tests, then format. Fix whatever the merge
+   broke; a green build is what proves the resolution, not the absence of conflict markers.
+5. **Finish the merge.** Stage everything and commit, then continue from step 5 (push main).
+
+Report which hunks you resolved, which intent won where they were incompatible, and the
+check output.

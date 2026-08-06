@@ -54,7 +54,11 @@ If there are more than 4 candidates, prefer the ones with commits ahead first; u
 ### 5. Merge the chosen branch
 
 - `git merge <branch>`
-- If merge fails due to conflicts, stop and report. Do not force. The user must resolve manually and rerun.
+- If merge fails due to conflicts, stop and report the conflicting files, then offer the user
+  a choice: resolve manually and rerun, or have you work through it using the resolution
+  procedure in `/mpc` ("Resolving merge conflicts") — resolve by intent traced to each side's
+  primary source, run the project's checks, then continue from step 6. Never force, and never
+  `--abort` on the user's behalf.
 - If the branch had 0 new commits, skip merge (nothing to do).
 
 ### 6. Push main
