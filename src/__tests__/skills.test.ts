@@ -274,6 +274,33 @@ describe('Builtin Skills', () => {
       expect(template).toContain('re-opening `HANDOFF.MD`, which will no longer exist');
     });
 
+    it('should keep durable facts out of HANDOFF.MD rather than stranding them there', () => {
+      const skill = getBuiltinSkill('context-handoff');
+      expect(skill).toBeDefined();
+      const template = skill!.template;
+
+      // A self-deleting file cannot be the last copy of anything, so a fact that outlives
+      // the next action is written to its own home BEFORE the handoff, then pointed at.
+      expect(template).toContain('Write it to its canonical home first');
+      expect(template).toContain('would this still matter after the next action is done?');
+      expect(template).toContain('A handoff is a courier, not a ledger.');
+
+      // An inlined task status is a second version of it, free to drift from the tracker.
+      expect(template).toContain('update the tracker');
+
+      // The survives-elsewhere check belongs to the author, not to whoever deletes the file:
+      // at delete time it is irreversible and the file is already the only copy.
+      expect(template).toContain(
+        'If this file were destroyed right now, unread, what would be permanently lost?',
+      );
+      expect(template).toContain('Run this test at **write** time, not at delete time.');
+
+      // The attestation makes a skipped write-out visible instead of silent.
+      expect(template).toContain('durability attestation');
+      expect(template).toContain('nothing here is the sole record of anything');
+      expect(template).toContain('An attestation you cannot back is');
+    });
+
     it('should surface bundled skill resources for skills with additional files', () => {
       const skill = getBuiltinSkill('project-session-manager');
       expect(skill).toBeDefined();
