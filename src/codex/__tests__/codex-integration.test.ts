@@ -123,6 +123,9 @@ describe('Codex plugin assets', () => {
       expect(contextHandoff).toContain('git switch -c');
       expect(contextHandoff).toContain('context-matching branch');
       expect(contextHandoff).toContain('must not continue development on `main`');
+      expect(contextHandoff).toContain('single-use');
+      expect(contextHandoff).toContain('delete it immediately');
+      expect(contextHandoff).toContain('reads the whole file up front');
     }
 
     const alignmentSkill = readFileSync(

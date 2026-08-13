@@ -240,6 +240,40 @@ describe('Builtin Skills', () => {
       expect(skill?.template).toContain('must not continue development on `main`');
     });
 
+    it('should make the consuming session delete HANDOFF.MD as its first action', () => {
+      const skill = getBuiltinSkill('context-handoff');
+      expect(skill).toBeDefined();
+      const template = skill!.template;
+
+      // The file carries its own self-destruct notice, so the handoff still disappears
+      // when the user opens it by hand or pastes a paraphrased resume prompt.
+      expect(template).toContain('always the first content in the file');
+      expect(template).toContain('On arrival — delete this file before doing anything else.');
+      expect(template).toContain(
+        'rm -f "$(git rev-parse --show-toplevel 2>/dev/null || pwd)/HANDOFF.MD"',
+      );
+
+      const resumePrompt = template
+        .split('\n')
+        .find((line) => line.startsWith('Read HANDOFF.MD in the repository root'));
+      expect(resumePrompt).toBeDefined();
+
+      // Deleting is only safe because the whole file is read up front — a partial read
+      // would drop the file map before the work ever reaches it.
+      expect(resumePrompt).toContain('in full');
+      expect(resumePrompt).toContain('rm -f HANDOFF.MD');
+      expect(resumePrompt).toContain('before any other action');
+      expect(resumePrompt).toContain('do not re-read it, recreate it');
+
+      // `tail -n 1` copies the resume prompt to the clipboard, so it has to stay a single
+      // unwrapped line that is the last content of the written file.
+      expect(resumePrompt!.trim().endsWith("touch what's out of bounds.")).toBe(true);
+      expect(template).toContain('must be the final content of the file');
+
+      // Nothing may plan to consult the deleted file later.
+      expect(template).toContain('re-opening `HANDOFF.MD`, which will no longer exist');
+    });
+
     it('should surface bundled skill resources for skills with additional files', () => {
       const skill = getBuiltinSkill('project-session-manager');
       expect(skill).toBeDefined();

@@ -3,9 +3,10 @@ name: context-handoff
 description: >-
   Continuation prompt carrying the full resumable state — goals, constraints, decisions and
   rationale, dead ends, file and commit pointers, every active thread, and the exact next
-  action — written to HANDOFF.MD and copied to the clipboard. Use when the work must travel:
-  to a new session, harness, directory, or person. Also use when the user is running low on
-  context and wants continuation rather than a recap.
+  action — written to HANDOFF.MD and copied to the clipboard. The fresh session reads the file
+  once and deletes it on arrival, so nothing lingers in the repo. Use when the work must
+  travel: to a new session, harness, directory, or person. Also use when the user is running
+  low on context and wants continuation rather than a recap.
 ---
 
 # Context Handoff
@@ -25,6 +26,16 @@ The deliverable is a file: **`HANDOFF.MD` at the repository root**. Its final li
 fixed resume prompt, and that resume prompt is copied to the clipboard so the user can paste
 it straight into a new session. The handoff also preserves a context-matching branch so the
 next session does not resume development on `main`. See *Write the handoff* below.
+
+**The file is single-use and self-deleting.** It is a courier, not a document: the fresh
+session reads it in full, **deletes it as its first action**, and works from context
+thereafter. Nothing downstream may cite it, index it, or treat it as durable documentation —
+if a fact deserves to outlive the handoff it belongs in a commit, a doc, or project memory,
+not here. This is what keeps `HANDOFF.MD` from silting up the repository as a stale
+second source of truth. Deletion is safe because the resume prompt reads the file **whole**,
+so the file map lands in context on message one; the lazy part of this design is the files
+the map *points at*, never the map itself. Any future change that makes the fresh context
+read `HANDOFF.MD` in pieces breaks that guarantee and must revisit the deletion step.
 
 ## First: is a handoff the right move?
 
@@ -166,6 +177,32 @@ Include the sections that carry weight; drop the empty ones (a quick fix may hav
 ends"; a research thread may have no "artifacts" yet). Order them so the reader is oriented
 before they get detail.
 
+Both shapes open with the arrival block below and close with the resume prompt.
+
+### Arrival block (always the first content in the file)
+
+Write this verbatim at the very top of `HANDOFF.MD`, above the title and everything else. It
+is the file's own copy of the self-destruct instruction, so the handoff still deletes itself
+when the user pastes a paraphrased resume prompt or opens the file by hand:
+
+````markdown
+> **On arrival — delete this file before doing anything else.**
+> You have just read this handoff in full, which is its entire purpose. Now run:
+>
+> ```bash
+> rm -f "$(git rev-parse --show-toplevel 2>/dev/null || pwd)/HANDOFF.MD"
+> ```
+>
+> Everything below is already in your context and stays there for the rest of the session —
+> including the file map, which you consult from memory, not from disk. Do not re-read this
+> file, do not copy it elsewhere, and do not recreate it when you finish. A new `HANDOFF.MD`
+> is written only when someone runs the handoff skill again.
+>
+> If the delete fails, say so in one line and carry on with the work anyway — you already hold
+> everything this file had, so removing it is hygiene, not a precondition. Do not stop to
+> troubleshoot it.
+````
+
 ### Per-thread sections (one set per thread)
 
 ````
@@ -249,9 +286,12 @@ points at, open it. A fresh agent will trust this prompt completely, so be expli
 three.>
 ````
 
-For the multi-thread shape, wrap the whole thing with a title and index:
+For the multi-thread shape, wrap the whole thing with a title and index, keeping the arrival
+block above the title:
 
 ````
+<arrival block>
+
 # Handoff — <session title spanning the threads>
 
 ## Threads
@@ -276,10 +316,16 @@ Before you write it, apply one test, **per thread**:
 
 > **Could a capable agent, given ONLY this prompt plus the files it points to, take that
 > thread's next action correctly — without asking what already happened, re-deciding something
-> already settled, re-attempting something already ruled out, or developing on `main`?**
+> already settled, re-attempting something already ruled out, developing on `main`, or
+> re-opening `HANDOFF.MD`, which will no longer exist?**
 
 If not, find the gap and fill it. Common misses: the *why* behind a decision, an unwritten
 agreement, a convention that's second nature here, or a next step too vague to start.
+
+The "no longer exists" clause has teeth: one read is the only read. Anything you leave
+implicit, expecting the reader to look it up in the handoff later, is simply lost. Write
+pointers that resolve against the **repository** — a path, a symbol, a commit — never against
+this file.
 
 Then check the opposite failure: is it **lean**? Reapply step 5's standing-rule exclusion —
 nothing already captured in a linked file or auto-loaded `CLAUDE.md`/`AGENTS.md`, no generic
@@ -312,9 +358,15 @@ The target path is `"$ROOT/HANDOFF.MD"`. Overwrite any existing `HANDOFF.MD` —
 single, always-current handoff, not an append log. (Note the literal filename `HANDOFF.MD`,
 uppercase extension, as the user specified.)
 
+A leftover `HANDOFF.MD` at this point means the previous handoff was never picked up, so
+overwrite it without ceremony. It does **not** mean the file is meant to accumulate: the
+consuming session deletes it, so between a pickup and the next handoff there is no
+`HANDOFF.MD` on disk at all.
+
 **2. Write the full handoff** (everything you assembled from the template above) to that
-path, and make the **last line of the file the resume prompt below**, verbatim, under a short
-heading. Nothing comes after it — it must be the final content of the file:
+path. The **arrival block is the first content in the file** and the **last line is the
+resume prompt below**, verbatim, under a short heading. Nothing comes after that line — it
+must be the final content of the file, because step 3 reads it back with `tail -n 1`:
 
 ````markdown
 ---
@@ -324,7 +376,7 @@ heading. Nothing comes after it — it must be the final content of the file:
 Copy the line below (already on your clipboard) and paste it as the first message of a
 brand-new session:
 
-Read HANDOFF.MD in the repository root and resume the work it describes. Before making changes, switch to the branch under "Continuation branch"; if its status is pending creation, run its required command first and do not continue development on main. Read the files under "Read now" and only those; treat "File map" as an index to consult when the work actually reaches a row, not as a reading list, and open a file before editing what a row describes. Honor every entry under "Decisions made (and why)", "Dead ends — do not re-explore", and "Out of bounds", then carry out the "Next action". If multiple threads are listed, resume all of them. Treat HANDOFF.MD as the source of truth — do not re-litigate settled decisions, re-walk the dead ends, or touch what's out of bounds.
+Read HANDOFF.MD in the repository root in full, then immediately delete it with `rm -f HANDOFF.MD` before any other action — it is a single-use context transfer, its contents now live in this conversation, and no copy should remain on disk; do not re-read it, recreate it, or write a new one when you finish. Resume the work it describes. Before making changes, switch to the branch under "Continuation branch"; if its status is pending creation, run its required command first and do not continue development on main. Read the files under "Read now" and only those; treat "File map" as an index you consult from context when the work actually reaches a row, not as a reading list, and open a file before editing what a row describes. Honor every entry under "Decisions made (and why)", "Dead ends — do not re-explore", and "Out of bounds", then carry out the "Next action". If multiple threads are listed, resume all of them. Treat what you read as the source of truth — do not re-litigate settled decisions, re-walk the dead ends, or touch what's out of bounds.
 ````
 
 **3. Copy that same resume prompt to the clipboard** by reading it back from the file you
@@ -341,10 +393,24 @@ whole handoff into the conversation. Report only:
 - the path written (`<repo-root>/HANDOFF.MD`),
 - the continuation branch and whether it is active or pending creation,
 - a one-line-per-thread index of what it covers,
-- the resume prompt itself, and a note that it is already on the clipboard.
+- the resume prompt itself, and a note that it is already on the clipboard,
+- one line that the fresh session will delete the file on arrival, so this copy is temporary.
 
-If `HANDOFF.MD` is tracked by git and the user does not want it committed, remind them to add
-it to `.gitignore` — but don't edit `.gitignore` unless asked.
+**Keep `HANDOFF.MD` untracked.** Because the file is created to be destroyed, committing it
+guarantees churn: an add commit from one session and a delete commit from the next, for
+content that was only ever a context transfer. Check both conditions separately, since they
+call for different advice:
+
+```bash
+git check-ignore -q HANDOFF.MD; echo "ignored=$?"                            # 0 = ignored
+git ls-files --error-unmatch HANDOFF.MD >/dev/null 2>&1; echo "tracked=$?"   # 0 = tracked
+```
+
+If it is neither ignored nor tracked, nothing is wrong — say nothing. If it is not ignored,
+mention that it belongs in `.gitignore` and why, but don't edit `.gitignore` unless asked. If
+it is already tracked, say so plainly: the arrival delete will surface as an unstaged deletion
+in the next session's `git status`, which is expected and should not be swept into an
+unrelated commit.
 
 **5. Stop — do not begin the next action.** The handoff's job ends when it's written and
 confirmed. Even if the documented next action is obvious and you could start on it immediately,
