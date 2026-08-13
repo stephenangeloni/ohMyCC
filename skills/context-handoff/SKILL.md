@@ -31,8 +31,9 @@ next session does not resume development on `main`. See *Write the handoff* belo
 session reads it in full, **deletes it as its first action**, and works from context
 thereafter. Nothing downstream may cite it, index it, or treat it as durable documentation —
 if a fact deserves to outlive the handoff it belongs in a commit, a doc, or project memory,
-not here. This is what keeps `HANDOFF.MD` from silting up the repository as a stale
-second source of truth. Deletion is safe because the resume prompt reads the file **whole**,
+not here. Putting it there is the **author's** job, done before the handoff is written (step
+5), never a hope pinned on the reader. This is what keeps `HANDOFF.MD` from silting up the
+repository as a stale second source of truth. Deletion is safe because the resume prompt reads the file **whole**,
 so the file map lands in context on message one; the lazy part of this design is the files
 the map *points at*, never the map itself. Any future change that makes the fresh context
 read `HANDOFF.MD` in pieces breaks that guarantee and must revisit the deletion step.
@@ -147,17 +148,41 @@ one-line note rather than a full section.
    commit after the handoff and will send the reader to the wrong place.
 
 **5. Separate durable from ephemeral.** If something is already written down (a file, a
-commit, a doc, project memory), **point to it** — don't inline it. Spend the handoff's words
-on what exists *only in this conversation*: the unrecorded decision, the half-finished
-reasoning, the "we agreed to do X next." This keeps the handoff lean and honest about where
-the source of truth lives.
+commit, a doc, project memory), **point to it** — don't inline it. This keeps the handoff lean
+and honest about where the source of truth lives.
 
-   **Never restate standing rules, constraints, or conventions that already live in an
-   auto-loaded instruction file** — `CLAUDE.md` or `AGENTS.md` at the user or repo level. A
-   fresh session loads those automatically, so the reader already has them; repeating them
-   burns words and buries the action at hand. Reference such a file by path only when a
-   *specific* rule is load-bearing for the next action and easy to miss; otherwise leave it
-   out entirely. (This is the standing rule applied by the self-check's leanness test below
+   What's left — the material that exists *only in this conversation* — splits in two, and
+   this split matters more than anything else in the step, because the handoff is deleted on
+   arrival and so cannot be the last copy of anything:
+   - **Transfer state** — the unrecorded decision, the half-finished reasoning, the dead end,
+     the gate the work is stopped at, the "we agreed to do X next." Its usefulness **ends when
+     the work resumes**. This is what a handoff is *for*; write it here.
+   - **Project state that simply hasn't been recorded yet** — a deadline, a commitment made to
+     someone, an external contact, a task's current status: anything whose usefulness
+     **outlives the next action**. **Write it to its canonical home first** — the task file,
+     the plan, the doc, the commit message, or project memory — **then point at it from the
+     handoff.** Keep the write-out minimal: record the fact where that kind of fact already
+     lives, and don't restructure the file around it.
+
+   The test is one question: *would this still matter after the next action is done?* If yes,
+   it does not belong in the handoff — it belongs where that kind of fact lives, and the
+   handoff points there. **A handoff is a courier, not a ledger.** Everything in it dies when
+   the fresh session deletes it, so a durable fact recorded only here is one `rm` from gone.
+
+   **Never restate what the reader will already have, or what has a home of its own.** Two
+   cases, with different reasons:
+   - **Standing rules, constraints, and conventions from an auto-loaded instruction file** —
+     `CLAUDE.md` or `AGENTS.md` at the user or repo level. A fresh session loads those
+     automatically, so the reader already has them; repeating them burns words and buries the
+     action at hand. Reference such a file by path only when a *specific* rule is load-bearing
+     for the next action and easy to miss; otherwise leave it out entirely.
+   - **The status of anything that has a tracker** — a task list, a plan, an issue, a board.
+     Point at the row; do not copy it. An inlined status is a second version, and it starts
+     drifting from the first the moment either changes. If what this conversation knows is
+     *fresher* than the tracker, that is a bug in the tracker: **update the tracker**, then
+     point at it. Never record the discrepancy in the handoff and leave it at that.
+
+   (This is the standing rule applied by the self-check's leanness and deletion tests below,
    and by the conventions section in the template.)
 
 **6. Assemble into the template below, run the self-check, then write it to `HANDOFF.MD`**
@@ -278,12 +303,18 @@ note any convention that applies to only one. Capture only what step 5's standin
 exclusion doesn't already cover.>
 
 ## Honesty note
-<Three things, all required: (1) what is unfinished, unverified, uncertain, or an open risk —
+<Four things, all required: (1) what is unfinished, unverified, uncertain, or an open risk —
 anything that might break or regress; (2) what the reader must NOT assume — the specific
 wrong inference they're likely to make if this isn't spelled out; (3) that the file map's
 descriptions are orientation, not a substitute for the file — before editing anything the map
-points at, open it. A fresh agent will trust this prompt completely, so be explicit about all
-three.>
+points at, open it; (4) the **durability attestation** — name the paths where this handoff's
+durable facts already live, then state it plainly:
+**nothing here is the sole record of anything**, so deleting this file on arrival costs only
+the convenience of the transfer. A fresh agent will trust this prompt completely, so be
+explicit about all four.
+
+Write (4) only once step 5's write-outs are actually done. An attestation you cannot back is
+worse than none at all, because the reader deletes the file believing it.>
 ````
 
 For the multi-thread shape, wrap the whole thing with a title and index, keeping the arrival
@@ -332,7 +363,7 @@ nothing already captured in a linked file or auto-loaded `CLAUDE.md`/`AGENTS.md`
 agent knowledge, no narration of the journey that doesn't change the next action. Length is
 not the goal — resumability is.
 
-Finally, check the **reading budget** — the handoff spends the fresh session's context before
+Next, weigh the **reading budget** — the handoff spends the fresh session's context before
 it has done any work, so the split matters:
 - Is `## Read now` at or under three entries? If not, the overflow is contingent, not
   required — move it to the file map.
@@ -342,6 +373,22 @@ it has done any work, so the split matters:
   lean — name the file being edited.
 - Does every file-map row read as a *question the reader might have*, rather than a label for
   the file? A row the reader can't triage without opening the file has failed its only job.
+
+Finally, apply the **deletion test** — the one that stops a handoff from quietly becoming a
+repository of tasks and their states:
+
+> **If this file were destroyed right now, unread, what would be permanently lost?**
+
+The only acceptable answer is *the convenience of the transfer*: the work would be harder to
+pick up, and nothing more. If the answer names a date, a commitment, an external contact, a
+task's status, or any other fact whose usefulness outlives the next action, that fact has no
+home yet. Give it one — per step 5 — **before** writing the handoff, then point at it from
+here. Only once that holds may you write the Honesty note's durability attestation.
+
+Run this test at **write** time, not at delete time. Checking it as someone is about to remove
+the file is far too late: the delete is irreversible, the fresh session was told to delete
+before it thinks about anything, and by then this file is the only copy. The author is the
+last party who can still fix it cheaply.
 
 ## Write the handoff
 
@@ -393,6 +440,9 @@ whole handoff into the conversation. Report only:
 - the path written (`<repo-root>/HANDOFF.MD`),
 - the continuation branch and whether it is active or pending creation,
 - a one-line-per-thread index of what it covers,
+- any durable facts you wrote out to their canonical homes in step 5, with the path each
+  landed in — those are the only edits this skill makes outside `HANDOFF.MD`, so the user
+  should hear about them here rather than find them later in `git status`,
 - the resume prompt itself, and a note that it is already on the clipboard,
 - one line that the fresh session will delete the file on arrival, so this copy is temporary.
 
