@@ -140,6 +140,11 @@
     "reason": "Run process-based OMC teams when the CLI runtime is available."
   },
   {
+    "name": "pickup-handoff",
+    "status": "adapted",
+    "reason": "Take delivery of a waiting handoff file and resume the work it describes."
+  },
+  {
     "name": "plan",
     "status": "adapted",
     "reason": "Create an executable implementation plan with Codex task tracking."

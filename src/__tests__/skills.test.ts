@@ -69,10 +69,10 @@ describe('Builtin Skills', () => {
   });
 
   describe('createBuiltinSkills()', () => {
-    it('should return correct number of skills (45 canonical + 3 aliases)', () => {
+    it('should return correct number of skills (46 canonical + 3 aliases)', () => {
       const skills = createBuiltinSkills();
-      // 48 entries: 45 canonical skills + 3 deprecated aliases (cancel-ralph, learner, psm)
-      expect(skills).toHaveLength(48);
+      // 49 entries: 46 canonical skills + 3 deprecated aliases (cancel-ralph, learner, psm)
+      expect(skills).toHaveLength(49);
     });
 
     it('should return an array of BuiltinSkill objects', () => {
@@ -152,6 +152,7 @@ describe('Builtin Skills', () => {
         'omc-teams',
         'omc-plan',
         'omc-reference',
+        'pickup-handoff',
         'project-session-manager',
         'psm',
         'ralph',
@@ -272,6 +273,57 @@ describe('Builtin Skills', () => {
 
       // Nothing may plan to consult the deleted file later.
       expect(template).toContain('re-opening `HANDOFF.MD`, which will no longer exist');
+    });
+
+    it('should read the waiting handoff whole and delete it before reporting', () => {
+      const skill = getBuiltinSkill('pickup-handoff');
+      expect(skill).toBeDefined();
+      const template = skill!.template;
+
+      // Deleting is only safe because the WHOLE file lands in context first; a ranged
+      // read would drop file-map rows the work never learns it is missing.
+      expect(template).toContain('Read the **entire file in one read**');
+      expect(template).toContain('Never `head`, `tail`, `grep`, or a ranged read.');
+      expect(template).toContain('read the remainder immediately');
+      expect(template).toContain('rm -f "$HANDOFF"');
+      expect(template).toContain('Do this **before** the receipt, not after.');
+    });
+
+    it('should stop for confirmation with a receipt rather than a re-summary', () => {
+      const skill = getBuiltinSkill('pickup-handoff');
+      expect(skill).toBeDefined();
+      const template = skill!.template;
+
+      expect(template).toContain('**The receipt is a receipt, not a summary.**');
+      expect(template).toContain('Proceed?');
+      // The fast path stays available for a user who already knows what is in there.
+      expect(template).toContain('`--now`');
+    });
+
+    it('should resume on the same contract the handoff resume prompt carries', () => {
+      const skill = getBuiltinSkill('pickup-handoff');
+      expect(skill).toBeDefined();
+      const template = skill!.template;
+
+      expect(template).toContain('**Branch first.**');
+      expect(template).toContain('Do not continue\n   development on `main`');
+      expect(template).toContain('**Read only `## Read now`.**');
+      expect(template).toContain('**Treat `## File map` as an index**');
+      expect(template).toContain('re-litigate a decision, re-walk a dead end');
+    });
+
+    it('should put a refused handoff back on disk and never author a new one', () => {
+      const skill = getBuiltinSkill('pickup-handoff');
+      expect(skill).toBeDefined();
+      const template = skill!.template;
+
+      // A refused delivery was never picked up, so it must still be waiting next time.
+      expect(template).toContain('Write the file back, verbatim, from context');
+      expect(template).toContain('not a reconstruction from memory');
+
+      // Finishing the resumed work is not a reason to write a handoff.
+      expect(template).toContain('**A new `HANDOFF.MD` when the work finishes.**');
+      expect(template).toContain('Do not hunt for');
     });
 
     it('should keep durable facts out of HANDOFF.MD rather than stranding them there', () => {
@@ -898,7 +950,7 @@ describe('Builtin Skills', () => {
     it('should return canonical skill names by default', () => {
       const names = listBuiltinSkillNames();
 
-      expect(names).toHaveLength(45);
+      expect(names).toHaveLength(46);
       expect(names).toContain('ai-slop-cleaner');
       expect(names).toContain('ask');
       expect(names).toContain('autopilot');
@@ -913,6 +965,7 @@ describe('Builtin Skills', () => {
       expect(names).toContain('ultragoal');
       expect(names).toContain('omc-plan');
       expect(names).toContain('omc-reference');
+      expect(names).toContain('pickup-handoff');
       expect(names).toContain('deepinit');
       expect(names).toContain('release');
       expect(names).toContain('omc-doctor');
@@ -937,7 +990,7 @@ describe('Builtin Skills', () => {
       const names = listBuiltinSkillNames({ includeAliases: true });
 
       // swarm alias removed in #1131; cancel-ralph, psm, and learner aliases still exist
-      expect(names).toHaveLength(48);
+      expect(names).toHaveLength(49);
       expect(names).toContain('ai-slop-cleaner');
       expect(names).toContain('autoresearch');
       expect(names).toContain('self-improve');

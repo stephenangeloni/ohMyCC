@@ -19,6 +19,7 @@
   "omc-doctor": "omc-doctor",
   "omc-setup": "omc-setup",
   "omc-teams": "omc-teams",
+  "pickup-handoff": "omc-pickup-handoff",
   "project-session-manager": "omc-project-session-manager",
   "psm": "omc-project-session-manager",
   "release": "omc-release",

@@ -52,7 +52,7 @@ describe('Codex plugin assets', () => {
       '950b7bb7fe86bdc67cc418a85b6b60145b8a50e3caf42b91561fe4b659e21400',
     );
     expect(sha256(join(repoRoot, '.claude-plugin/plugin.json'))).toBe(
-      '1ca8f00d3fe2489b2ce09a16bca7d42c60000b29f6c1665e2376409b59389123',
+      '5fa296f7a360d693b1cd8f049fbc7becf14edd4ec31b5921ae942215d0481fb9',
     );
     expect(sha256(join(repoRoot, 'hooks/hooks.json'))).toBe(
       '1fe65870803ef83b2b230f2f5b48532084d858b4f0653ab8144cc84ddeaac990',
@@ -61,7 +61,7 @@ describe('Codex plugin assets', () => {
       '745406d04ed491e14b56e8d150171adad72678f6bc60c3e5399edd1b07a9d9ad',
     );
     expect(treeHash(join(repoRoot, 'commands'))).toBe(
-      '7642a5128f33cd830fa01e78f21ea4b7593f6de279cb63b9b2935cc4f99fe857',
+      'b948e58686ff20b9cd7cb87dd2429f9f90bc1c485cb0046bcc98dc5d4f0f8726',
     );
   });
 
@@ -126,6 +126,25 @@ describe('Codex plugin assets', () => {
       expect(contextHandoff).toContain('single-use');
       expect(contextHandoff).toContain('delete it immediately');
       expect(contextHandoff).toContain('reads the whole file up front');
+    }
+
+    for (const pickupPath of [
+      'codex/skills/pickup-handoff/SKILL.md',
+      'codex/skills/omc-pickup-handoff/SKILL.md',
+    ]) {
+      const pickup = readFileSync(join(repoRoot, pickupPath), 'utf8');
+      // Whole-file read then delete: a ranged read would silently drop file-map rows.
+      expect(pickup).toContain('Read the entire file in one read');
+      expect(pickup).toContain('a partial read makes that deletion silently lossy');
+      expect(pickup).toContain('rm -f');
+      expect(pickup).toContain('immediately after reading and before reporting');
+      // Receipt, then stop.
+      expect(pickup).toContain('it is not a summary');
+      expect(pickup).toContain('stop and ask whether to proceed');
+      // Same resume contract the handoff's own prompt carries.
+      expect(pickup).toContain('never continue development on `main`');
+      expect(pickup).toContain('write the file back verbatim from context');
+      expect(pickup).toContain('Never write a new handoff when the resumed work finishes');
     }
 
     const alignmentSkill = readFileSync(

@@ -6,7 +6,7 @@
  * Cross-platform: Windows, macOS, Linux
  */
 
-import { existsSync, readFileSync, readdirSync, rmSync, mkdirSync, writeFileSync, symlinkSync, lstatSync, readlinkSync, unlinkSync, renameSync } from 'fs';
+import { existsSync, readFileSync, readdirSync, rmSync, mkdirSync, writeFileSync, symlinkSync, lstatSync, readlinkSync, statSync, unlinkSync, renameSync } from 'fs';
 import { spawn } from 'child_process';
 import { join, dirname, basename } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -44,6 +44,53 @@ function readJsonFile(path) {
   try {
     if (!existsSync(path)) return null;
     return JSON.parse(readFileSync(path, 'utf-8'));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Walk up from a directory to the enclosing worktree root.
+ *
+ * Deliberately does not shell out to `git rev-parse --show-toplevel`: SessionStart
+ * runs on every session with a 5s budget, and `.git` (a directory in a normal clone,
+ * a file in a linked worktree) answers the question without spawning a process.
+ */
+function findRepoRoot(startDir) {
+  let dir = startDir;
+  for (let depth = 0; depth < 40; depth += 1) {
+    if (existsSync(join(dir, '.git'))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
+  }
+  return null;
+}
+
+function formatAge(ms) {
+  if (!Number.isFinite(ms) || ms < 0) return 'unknown';
+  const minutes = Math.floor(ms / 60000);
+  if (minutes < 60) return `${Math.max(minutes, 1)}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 48) return `${hours}h`;
+  return `${Math.floor(hours / 24)}d`;
+}
+
+/**
+ * Detect a context handoff left by the context-handoff skill.
+ *
+ * Returns METADATA ONLY — path and age, never file contents. HANDOFF.MD is designed
+ * to be read exactly once, in full, and then deleted; the pickup-handoff skill owns
+ * that read. Injecting any part of the body here would leave the fresh session
+ * holding a lossy fragment of a file whose whole contract is whole-or-nothing.
+ */
+function detectPendingHandoff(directory) {
+  try {
+    const root = findRepoRoot(directory) || directory;
+    const path = join(root, 'HANDOFF.MD');
+    const stat = statSync(path, { throwIfNoEntry: false });
+    if (!stat?.isFile()) return null;
+    return { path, age: formatAge(Date.now() - stat.mtimeMs) };
   } catch {
     return null;
   }
@@ -449,6 +496,7 @@ function buildSessionStartAdditionalContext(messages) {
     /\[RALPH LOOP RESTORED\]/,
     /\[PROJECT MEMORY\]/,
     /\[NOTEPAD - Priority Context\]/,
+    /\[HANDOFF WAITING\]/,
     /\[PENDING TASKS DETECTED\]/,
   ];
   const prioritized = [];
@@ -779,6 +827,23 @@ Original task: ${ralphState.prompt || 'Task in progress'}
 Iteration: ${ralphState.iteration || 1}/${ralphState.max_iterations || 10}
 
 Treat this as prior-session context only. Prioritize the user's newest request, and resume the ralph loop only if the user explicitly asks to continue it.
+
+</session-restore>
+
+---
+`);
+    }
+
+    const pendingHandoff = detectPendingHandoff(directory);
+    if (pendingHandoff) {
+      messages.push(`<session-restore>
+
+[HANDOFF WAITING]
+
+A context handoff is waiting at ${pendingHandoff.path} (written ${pendingHandoff.age} ago).
+Do not read it or act on it now. If the user asks to pick up the handoff, follow the
+pickup-handoff skill, which reads the file in full and deletes it. Otherwise ignore it
+and serve the user's newest request.
 
 </session-restore>
 
