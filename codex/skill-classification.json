@@ -30,11 +30,6 @@
     "reason": "Collect independent Claude, Codex, and Gemini advice and synthesize it against evidence."
   },
   {
-    "name": "clip-it",
-    "status": "adapted",
-    "reason": "Copy supplied text or the current response to the macOS clipboard."
-  },
-  {
     "name": "configure-notifications",
     "status": "adapted",
     "reason": "Configure OMC notification delivery through supported Codex hooks."

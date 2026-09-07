@@ -276,7 +276,7 @@ the default fate of any document without a pruning discipline, because adding fe
 removing feels risky.
 
 - **Before:** a skill still routing through `swarm` (removed in #1131), or a hand-maintained
-  skill list that forgot `clip-it` after the migration added it.
+  skill list still advertising `clip-it` after Claude Code's native copy command replaced it.
 - **After:** delete the dead reference; where a fact is derivable, **point to the live
   source** instead of copying it (a copied number is future sediment).
 

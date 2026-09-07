@@ -69,10 +69,10 @@ describe('Builtin Skills', () => {
   });
 
   describe('createBuiltinSkills()', () => {
-    it('should return correct number of skills (46 canonical + 3 aliases)', () => {
+    it('should return correct number of skills (45 canonical + 3 aliases)', () => {
       const skills = createBuiltinSkills();
-      // 49 entries: 46 canonical skills + 3 deprecated aliases (cancel-ralph, learner, psm)
-      expect(skills).toHaveLength(49);
+      // 48 entries: 45 canonical skills + 3 deprecated aliases (cancel-ralph, learner, psm)
+      expect(skills).toHaveLength(48);
     });
 
     it('should return an array of BuiltinSkill objects', () => {
@@ -129,7 +129,6 @@ describe('Builtin Skills', () => {
         'cancel',
         'cancel-ralph',
         'ccg',
-        'clip-it',
         'configure-notifications',
         'context-handoff',
         'cpr',
@@ -950,7 +949,7 @@ describe('Builtin Skills', () => {
     it('should return canonical skill names by default', () => {
       const names = listBuiltinSkillNames();
 
-      expect(names).toHaveLength(46);
+      expect(names).toHaveLength(45);
       expect(names).toContain('ai-slop-cleaner');
       expect(names).toContain('ask');
       expect(names).toContain('autopilot');
@@ -976,6 +975,7 @@ describe('Builtin Skills', () => {
       expect(names).toContain('visual-verdict');
       expect(names).toContain('wiki');
       expect(names).not.toContain('swarm'); // removed in #1131
+      expect(names).not.toContain('clip-it'); // superseded by Claude Code's native copy command
       expect(names).not.toContain('psm');
     });
 
@@ -990,7 +990,7 @@ describe('Builtin Skills', () => {
       const names = listBuiltinSkillNames({ includeAliases: true });
 
       // swarm alias removed in #1131; cancel-ralph, psm, and learner aliases still exist
-      expect(names).toHaveLength(49);
+      expect(names).toHaveLength(48);
       expect(names).toContain('ai-slop-cleaner');
       expect(names).toContain('autoresearch');
       expect(names).toContain('self-improve');

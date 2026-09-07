@@ -52,7 +52,7 @@ describe('Codex plugin assets', () => {
       '950b7bb7fe86bdc67cc418a85b6b60145b8a50e3caf42b91561fe4b659e21400',
     );
     expect(sha256(join(repoRoot, '.claude-plugin/plugin.json'))).toBe(
-      '5fa296f7a360d693b1cd8f049fbc7becf14edd4ec31b5921ae942215d0481fb9',
+      'd80e90aaa935e072b3992ba48020dc9c81cbff8266b171bfc644a3d6b9634fa7',
     );
     expect(sha256(join(repoRoot, 'hooks/hooks.json'))).toBe(
       '1fe65870803ef83b2b230f2f5b48532084d858b4f0653ab8144cc84ddeaac990',
@@ -61,7 +61,7 @@ describe('Codex plugin assets', () => {
       '745406d04ed491e14b56e8d150171adad72678f6bc60c3e5399edd1b07a9d9ad',
     );
     expect(treeHash(join(repoRoot, 'commands'))).toBe(
-      'b948e58686ff20b9cd7cb87dd2429f9f90bc1c485cb0046bcc98dc5d4f0f8726',
+      '56aade6f0d50679883f095a999964e20399aacb1ba8bcee18b12205c303d20fa',
     );
   });
 
