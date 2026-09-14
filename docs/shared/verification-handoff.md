@@ -37,7 +37,7 @@ the verification goes.
    where `<start>` is the commit the task started from, and add untracked files
    from `git status --porcelain`. Note high-risk paths: security or auth, data
    loss or a destructive operation, a migration, a release.
-2. **Recommend.** Use the size thresholds of `docs/shared/verification-tiers.md`:
+2. **Recommend** from the size and risk of the change:
 
    | Recommend | When |
    |-----------|------|

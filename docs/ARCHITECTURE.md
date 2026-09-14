@@ -234,7 +234,7 @@ autopilot build me a REST API with authentication
 ```
 
 #### ralph
-Repeating loop that does not stop until work is verified complete. The `verifier` agent confirms completion before the loop exits.
+Repeating loop that does not stop until work is verified complete. Before the loop exits, a separate reviewer (`architect` by default, or `critic` or Codex via `--critic`) approves the work against each story's acceptance criteria, and a green receipt from `scripts/verify-gate.mjs` confirms the repo's verify command passes.
 - Trigger: `ralph`, `don't stop`, `must complete`
 ```bash
 ralph: refactor the authentication module
