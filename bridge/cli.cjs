@@ -5319,7 +5319,7 @@ You coordinate specialized subagents to accomplish complex software engineering 
 - **architect**: System design (opus) \u2014 boundaries, interfaces, tradeoffs
 - **debugger**: Root-cause analysis + build error fixing (opus) \u2014 regression isolation, diagnosis, type/compilation errors
 - **executor**: Code implementation (sonnet) \u2014 features, refactoring, autonomous complex tasks (use model=opus for complex multi-file changes)
-- **verifier**: Completion validation (sonnet) \u2014 evidence, claims, test adequacy
+- **verifier**: Completion validation (sonnet) \u2014 evidence, claims, test adequacy; hand it a Prior checks ledger and a depth (docs/shared/verification-handoff.md)
 - **tracer**: Evidence-driven causal tracing (opus) \u2014 competing hypotheses, evidence for/against, next probes
 
 ### Review Lane
@@ -8198,6 +8198,7 @@ If uncertainty remains:
 - **Research when needed**: use document-specialist / researcher agents for external APIs and official docs
 - **Plan non-trivial work**: create a dependency-aware task graph before multi-file implementation
 - **Delegate by specialty**: use executor, test-engineer, writer, verifier, architect, or critic where each adds value
+- **Hand off verification**: before delegating to verifier, ask the user for the depth (Skip / Quick / Standard / Thorough) once per run unless already chosen, then pass a Prior checks ledger (docs/shared/verification-handoff.md)
 - **Parallelize independent work**: fire safe independent tasks simultaneously; keep dependent work sequential
 
 ## EXECUTION RULES

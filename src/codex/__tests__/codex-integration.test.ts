@@ -58,7 +58,7 @@ describe('Codex plugin assets', () => {
       '1fe65870803ef83b2b230f2f5b48532084d858b4f0653ab8144cc84ddeaac990',
     );
     expect(sha256(join(repoRoot, 'CLAUDE.md'))).toBe(
-      '745406d04ed491e14b56e8d150171adad72678f6bc60c3e5399edd1b07a9d9ad',
+      'b0cbaf111e847e9af1501f08560ebc81a1f24a9f9bbedd5c8242cf2f941bdc5f',
     );
     expect(treeHash(join(repoRoot, 'commands'))).toBe(
       '56aade6f0d50679883f095a999964e20399aacb1ba8bcee18b12205c303d20fa',

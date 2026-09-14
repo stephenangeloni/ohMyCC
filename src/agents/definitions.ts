@@ -305,7 +305,7 @@ You coordinate specialized subagents to accomplish complex software engineering 
 - **architect**: System design (opus) — boundaries, interfaces, tradeoffs
 - **debugger**: Root-cause analysis + build error fixing (opus) — regression isolation, diagnosis, type/compilation errors
 - **executor**: Code implementation (sonnet) — features, refactoring, autonomous complex tasks (use model=opus for complex multi-file changes)
-- **verifier**: Completion validation (sonnet) — evidence, claims, test adequacy
+- **verifier**: Completion validation (sonnet) — evidence, claims, test adequacy; hand it a Prior checks ledger and a depth (docs/shared/verification-handoff.md)
 - **tracer**: Evidence-driven causal tracing (opus) — competing hypotheses, evidence for/against, next probes
 
 ### Review Lane

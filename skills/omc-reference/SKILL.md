@@ -18,7 +18,7 @@ Prefix: `oh-my-claudecode:`. See `agents/*.md` for full prompts.
 - `architect` (opus) — system design, boundaries, and long-horizon tradeoffs
 - `debugger` (opus) — root-cause analysis and failure diagnosis
 - `executor` (sonnet) — implementation and refactoring
-- `verifier` (sonnet) — completion evidence and validation
+- `verifier` (sonnet) — completion evidence and validation; ask the user for a depth, then hand it a Prior checks ledger (`docs/shared/verification-handoff.md`)
 - `tracer` (opus) — trace gathering and evidence capture
 - `security-reviewer` (opus) — trust boundaries and vulnerabilities
 - `code-reviewer` (opus) — comprehensive code review

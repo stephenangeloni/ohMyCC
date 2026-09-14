@@ -5,6 +5,9 @@ orchestrators must consume it. This is the single source of truth for the
 `OMC-VERDICT:` sentinel vocabulary — the per-agent `<Return_Contract>` blocks
 reference this file so the vocabulary cannot drift across agent definitions.
 
+The inbound half, what a caller hands `verifier` before it runs (a Prior checks
+ledger and a depth), is `docs/shared/verification-handoff.md`.
+
 ## The problem this prevents
 
 A subagent's caller receives **only the agent's final message**. Tool-call

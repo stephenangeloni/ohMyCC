@@ -24,6 +24,7 @@ If uncertainty remains:
 - **Research when needed**: use document-specialist / researcher agents for external APIs and official docs
 - **Plan non-trivial work**: create a dependency-aware task graph before multi-file implementation
 - **Delegate by specialty**: use executor, test-engineer, writer, verifier, architect, or critic where each adds value
+- **Hand off verification**: before delegating to verifier, ask the user for the depth (Skip / Quick / Standard / Thorough) once per run unless already chosen, then pass a Prior checks ledger (docs/shared/verification-handoff.md)
 - **Parallelize independent work**: fire safe independent tasks simultaneously; keep dependent work sequential
 
 ## EXECUTION RULES

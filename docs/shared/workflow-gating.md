@@ -93,6 +93,8 @@ team mode · `WF-OPT` = Workflow offered as opt-in, Task/team remains the defaul
 | **L** (10–30 files) | TASK | TASK/TEAM · **WF-OPT** | **WF-REC** |
 | **XL** (>30 / repo-wide) | TASK/TEAM · **WF-OPT** | **WF-REC** | **WF-REC** |
 
+A separate verifier lane takes a user-chosen depth and a Prior checks ledger: `docs/shared/verification-handoff.md`.
+
 ### Hard floor — DO NOT ESCALATE (no workflow, ever auto)
 
 - The entire **XS** row and the **S/Trivial** + **S/Standard** cells — most routine single-file

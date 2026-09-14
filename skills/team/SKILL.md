@@ -110,7 +110,7 @@ Each pipeline stage uses **specialized agents** -- not just executors. The lead 
 | **team-plan**   | `explore` (haiku), `planner` (opus) | `analyst` (opus), `architect` (opus)                                                                    | Use `analyst` for unclear requirements. Use `architect` for systems with complex boundaries.                                                                                                      |
 | **team-prd**    | `analyst` (opus)                    | `critic` (opus)                                                                                         | Use `critic` to challenge scope.                                                                                                                                                                  |
 | **team-exec**   | `executor` (sonnet)                 | `executor` (opus), `debugger` (opus), `designer` (sonnet), `writer` (haiku), `test-engineer` (sonnet) | Match agent to subtask type. Use `executor` (model=opus) for complex autonomous work, `designer` for UI, `debugger` for compilation issues, `writer` for docs, `test-engineer` for test creation. |
-| **team-verify** | `verifier` (sonnet)                 | `test-engineer` (sonnet), `security-reviewer` (opus), `code-reviewer` (opus)                          | Always run `verifier`. Add `security-reviewer` for auth/crypto changes. Add `code-reviewer` for >20 files or architectural changes. `code-reviewer` also covers style/formatting checks.          |
+| **team-verify** | `verifier` (sonnet)                 | `test-engineer` (sonnet), `security-reviewer` (opus), `code-reviewer` (opus)                          | Run `verifier` unless the user chose Skip. Add `security-reviewer` for auth/crypto changes. Add `code-reviewer` for >20 files or architectural changes. `code-reviewer` also covers style/formatting checks.          |
 | **team-fix**    | `executor` (sonnet)                 | `debugger` (opus), `executor` (opus)                                                                  | Use `debugger` for type/build errors and regression isolation. Use `executor` (model=opus) for complex multi-file fixes.                                                                          |
 
 **Routing rules:**
@@ -134,9 +134,11 @@ Each pipeline stage uses **specialized agents** -- not just executors. The lead 
   - Entry: `TeamCreate`, `TaskCreate`, assignment, and worker spawn are complete.
   - Agents: workers spawned as the appropriate specialist type per subtask (see routing table).
   - Exit: execution tasks reach terminal state for the current pass.
+  - Evidence: each worker's completion report quotes every check it ran (exact command + result line), so the lead can build the `team-verify` ledger.
 - **team-verify**
   - Entry: execution pass finishes.
-  - Agents: `verifier` + task-appropriate reviewers (see routing table).
+  - Depth: before the first `team-verify`, the lead asks the user for the verification depth (Skip / Quick / Standard / Thorough) unless the invocation named one, and reuses the answer for later rounds. Skip drops only `verifier`: the routing-rule-4 reviewers still run, and the run is reported as not independently verified.
+  - Agents: `verifier` + task-appropriate reviewers (see routing table). Hand `verifier` a Prior checks ledger (`docs/shared/verification-handoff.md`) built from the checks the workers reported: artifact hashes, exact commands, quoted results.
   - Exit (pass): verification gates pass with no required follow-up.
   - Exit (fail): fix tasks are generated and control moves to `team-fix`.
 - **team-fix**
