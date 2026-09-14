@@ -145,7 +145,10 @@ caller asked for.
 |--------|------|------------------------|
 | ACCEPTED | all four conditions hold | Uses the quoted result (Source LEDGER). The `standard` spot check runs one again (Source RE-RUN); a different result is a failed spot check. |
 | RE-RUN | the check proves its claim, but the identity changed, the check is not deterministic, or the depth is `thorough` | Runs it again (Source RE-RUN). |
-| REJECTED | the exact command or quoted result is missing, or the check does not prove its claim | Writes and runs a check that does (Source NEW), or reports the gap. |
+| REJECTED | the exact command or quoted result is missing, the check does not prove its claim, or it is not deterministic and the verifier does not run it | Writes and runs a check that does, for example a narrower deterministic one (Source NEW), or reports the gap. |
+
+The verifier prompt states the rule for a check it does not run:
+"RE-RUN means you ran it. A non-deterministic item you do not run is REJECTED; cover its claim with a narrower deterministic check, or list it as a gap."
 
 ## 5. Report
 

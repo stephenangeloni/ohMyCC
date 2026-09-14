@@ -174,3 +174,17 @@ describe('verifier callers', () => {
     expect(team).toContain('reuses the answer');
   });
 });
+
+describe('triage vocabulary stays strict', () => {
+  // A verifier once labelled an item it never ran "RE-RUN (not re-executed)".
+  const RERUN_RULE =
+    'RE-RUN means you ran it. A non-deterministic item you do not run is REJECTED; cover its claim with a narrower deterministic check, or list it as a gap.';
+
+  it('the verifier prompt reserves RE-RUN for items it ran', () => {
+    expect(read('agents/verifier.md')).toContain(RERUN_RULE);
+  });
+
+  it('the shared doc states the same rule', () => {
+    expect(read(HANDOFF_DOC)).toContain(RERUN_RULE);
+  });
+});
