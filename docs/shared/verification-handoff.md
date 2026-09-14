@@ -184,6 +184,7 @@ Illustrative triage of the example ledger above, at `standard`:
 - [ ] Every check row has the exact command and the verbatim result line.
 - [ ] Checks that use the network, the clock or random input are marked `no`.
 - [ ] "Not yet checked" lists what you did not check.
+- [ ] The verifier runs on sonnet or a stronger model; never pass `model: "haiku"` for it, because accepting a check without re-running it takes judgment.
 
 ## Consumers
 

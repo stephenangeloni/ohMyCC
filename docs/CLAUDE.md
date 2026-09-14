@@ -33,7 +33,7 @@ Detailed agent catalog, tools, team pipeline, commit protocol, and full skills r
 </skills>
 
 <verification>
-Verify before claiming completion. Size appropriately: small→haiku, standard→sonnet, large/security→opus.
+Verify before claiming completion. Size appropriately: standard→sonnet, large/security→opus. Never run `verifier` below sonnet: accepting a ledger check without re-running it takes judgment.
 When you delegate to `verifier`, pass a Prior checks ledger (`docs/shared/verification-handoff.md`) with a depth.
 Ask the user for that depth first (Skip / Quick / Standard / Thorough, recommended from the change size) unless they already chose one; only the user can choose Skip, and skipped work is reported as not independently verified.
 If verification fails, keep iterating.

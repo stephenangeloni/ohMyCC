@@ -188,3 +188,17 @@ describe('triage vocabulary stays strict', () => {
     expect(read(HANDOFF_DOC)).toContain(RERUN_RULE);
   });
 });
+
+describe('verifier model floor', () => {
+  // A caller once read "small→haiku" as the verifier's model; Haiku then accepted
+  // checks it never opened. Ledger triage is judgment work.
+  it('the CLAUDE.md template never sizes the verifier below sonnet', () => {
+    const block = verificationBlock(read('docs/CLAUDE.md'));
+    expect(block).toContain('Never run `verifier` below sonnet');
+    expect(block).not.toContain('small→haiku');
+  });
+
+  it('the shared doc caller checklist states the floor', () => {
+    expect(read(HANDOFF_DOC)).toContain('The verifier runs on sonnet or a stronger model');
+  });
+});
