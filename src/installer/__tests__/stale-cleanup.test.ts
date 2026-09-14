@@ -14,7 +14,7 @@ import { join } from 'path';
 import { tmpdir } from 'os';
 
 // We test the exported cleanup functions directly
-import { cleanupStaleAgents, cleanupStaleSkills, prunePluginDuplicateSkills, prunePluginDuplicateAgents } from '../index.js';
+import { cleanupStaleAgents, cleanupStaleSkills } from '../index.js';
 
 // ── Test helpers ─────────────────────────────────────────────────────────────
 
@@ -413,8 +413,12 @@ describe('prunePluginDuplicateSkills', () => {
     expect(existsSync(join(skillsDir, 'my-private-skill'))).toBe(true);
   });
 
-  it('returns empty when skills directory does not exist', () => {
-    const removed = prunePluginDuplicateSkills(log);
+  it('returns empty when skills directory does not exist', async () => {
+    // Re-import so SKILLS_DIR resolves under the temp CLAUDE_CONFIG_DIR; the top-level
+    // import resolves to the real ~/.claude/skills and would prune the user's skills.
+    vi.resetModules();
+    const { prunePluginDuplicateSkills: prune } = await import('../index.js');
+    const removed = prune(log);
     expect(removed).toEqual([]);
   });
 
@@ -509,8 +513,12 @@ describe('prunePluginDuplicateAgents', () => {
     expect(existsSync(join(agentsDir, 'AGENTS.md'))).toBe(true);
   });
 
-  it('returns empty when agents directory does not exist', () => {
-    const removed = prunePluginDuplicateAgents(log);
+  it('returns empty when agents directory does not exist', async () => {
+    // Re-import so AGENTS_DIR resolves under the temp CLAUDE_CONFIG_DIR; the top-level
+    // import resolves to the real ~/.claude/agents and would prune the user's agents.
+    vi.resetModules();
+    const { prunePluginDuplicateAgents: prune } = await import('../index.js');
+    const removed = prune(log);
     expect(removed).toEqual([]);
   });
 });
