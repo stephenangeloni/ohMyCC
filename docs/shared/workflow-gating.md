@@ -87,13 +87,13 @@ team mode · `WF-OPT` = Workflow offered as opt-in, Task/team remains the defaul
 
 | Size ↓ \ Complexity → | **Trivial** | **Standard** | **High** |
 |---|---|---|---|
-| **XS** (1 file) | DIRECT | DIRECT | DIRECT + separate verifier lane |
+| **XS** (1 file) | DIRECT | DIRECT | DIRECT (+ verifier lane if the user asks for review) |
 | **S** (2–3 files) | DIRECT | DIRECT (executor) | TASK (consensus plan / verify) |
 | **M** (4–9 files) | DIRECT | TASK/TEAM | TASK/TEAM · **WF-OPT** |
 | **L** (10–30 files) | TASK | TASK/TEAM · **WF-OPT** | **WF-REC** |
 | **XL** (>30 / repo-wide) | TASK/TEAM · **WF-OPT** | **WF-REC** | **WF-REC** |
 
-A separate verifier lane takes a user-chosen depth and a Prior checks ledger: `docs/shared/verification-handoff.md`.
+A separate verifier lane runs only when the user asks for review or inside a workflow they started; it takes a user-chosen depth and a Prior checks ledger: `docs/shared/verification-handoff.md`.
 
 ### Hard floor — DO NOT ESCALATE (no workflow, ever auto)
 

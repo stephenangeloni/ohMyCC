@@ -22,8 +22,11 @@ With a ledger, the verifier confirms that the bytes are the same, reads every
 check to decide whether it proves its claim, and spends its runs on what nobody
 has checked yet.
 
-The separate-pass rule does not change. The verifier is still a separate pass,
-and a claim without a command and a quoted result is still rejected.
+Independent review is opt-in: a caller hands work to `verifier` only when the user
+asks for review, or inside a workflow the user started that has a review stage
+(`team`, `ralph`, `autopilot`). When a review runs, it is still a separate pass,
+and a claim without a command and a quoted result is still rejected. Everything
+below applies once a review is going to run.
 
 ## 1. Ask the user for the depth
 

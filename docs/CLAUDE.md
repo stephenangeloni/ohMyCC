@@ -33,17 +33,18 @@ Detailed agent catalog, tools, team pipeline, commit protocol, and full skills r
 </skills>
 
 <verification>
-Verify before claiming completion. Size appropriately: standard→sonnet, large/security→opus. Never run `verifier` below sonnet: accepting a ledger check without re-running it takes judgment.
-When you delegate to `verifier`, pass a Prior checks ledger (`docs/shared/verification-handoff.md`) with a depth.
-Ask the user for that depth first (Skip / Quick / Standard / Thorough, recommended from the change size) unless they already chose one; only the user can choose Skip, and skipped work is reported as not independently verified.
+Verify before claiming completion: run the relevant tests, lint and build yourself.
+Independent review is opt-in: delegate to `verifier` or `code-reviewer` only when the user asks for review, or inside a workflow the user started that has a review stage (`team`, `ralph`, `autopilot`). Otherwise report the work as not independently verified.
+When you delegate to `verifier`, pass a Prior checks ledger (`docs/shared/verification-handoff.md`) with a depth. Size it sonnet by default, opus for large or security changes. Never run `verifier` below sonnet: accepting a ledger check without re-running it takes judgment.
+Ask the user for that depth first (Skip / Quick / Standard / Thorough, recommended from the change size) unless they already chose one; if no one can answer (a background or non-interactive session), use the recommended depth and say so. Only the user can choose Skip, and skipped work is reported as not independently verified.
 If verification fails, keep iterating.
 </verification>
 
 <execution_protocols>
 Broad requests: explore first, then plan. 2+ independent tasks in parallel. `run_in_background` for builds/tests.
 Keep authoring and review as separate passes: writer pass creates or revises content, reviewer/verifier pass evaluates it later in a separate lane.
-Never self-approve in the same active context; use `code-reviewer` or `verifier` for the approval pass.
-Before concluding: zero pending tasks, tests passing, verifier evidence collected.
+Never self-approve in the same active context: never call your own work reviewed or verified.
+Before concluding: zero pending tasks, tests passing, and the review verdict when a review ran.
 </execution_protocols>
 
 <workflow_gating>

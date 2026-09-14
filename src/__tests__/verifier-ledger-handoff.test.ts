@@ -202,3 +202,41 @@ describe('verifier model floor', () => {
     expect(read(HANDOFF_DOC)).toContain('The verifier runs on sonnet or a stronger model');
   });
 });
+
+describe('independent review is opt-in', () => {
+  // The upstream rule "use `code-reviewer` or `verifier` for the approval pass" made
+  // every session start a review nobody asked for. Workflows the user starts keep theirs.
+  const executionProtocols = (content: string): string =>
+    content.match(/<execution_protocols>([\s\S]*?)<\/execution_protocols>/)?.[1]?.trim() ?? '';
+
+  it('the CLAUDE.md template reviews only on request or inside a workflow the user started', () => {
+    const verification = verificationBlock(read('docs/CLAUDE.md'));
+    expect(verification).toContain('Independent review is opt-in');
+    expect(verification).toContain('only when the user asks for review, or inside a workflow the user started');
+    expect(verification).toContain('report the work as not independently verified');
+  });
+
+  it('no always-loaded line demands an approval pass on every change', () => {
+    const protocols = executionProtocols(read('docs/CLAUDE.md'));
+    expect(protocols).toContain('Never self-approve in the same active context');
+    expect(protocols).not.toContain('for the approval pass');
+    expect(protocols).not.toContain('verifier evidence collected');
+  });
+
+  it('a session no one can answer uses the recommended depth', () => {
+    expect(verificationBlock(read('docs/CLAUDE.md'))).toContain(
+      'if no one can answer (a background or non-interactive session), use the recommended depth and say so',
+    );
+  });
+
+  it('keeps <execution_protocols> identical in all three CLAUDE.md copies', () => {
+    const template = executionProtocols(read('docs/CLAUDE.md'));
+    expect(executionProtocols(read('CLAUDE.md'))).toBe(template);
+    expect(executionProtocols(read('.github/CLAUDE.md'))).toBe(template);
+  });
+
+  it('the shared doc and the gating matrix agree that review is opt-in', () => {
+    expect(read(HANDOFF_DOC)).toContain('Independent review is opt-in');
+    expect(read('docs/shared/workflow-gating.md')).not.toContain('DIRECT + separate verifier lane');
+  });
+});
